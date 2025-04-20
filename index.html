@@ -70,23 +70,24 @@
         .grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 0;
+            gap: 10px;
             margin: 0;
             padding: 0;
         }
 
         .card {
-            width: calc(100% / 6); /* 6 capas por linha */
+            flex: 1 1 calc(16.66% - 10px); /* 6 por linha com gap compensado */
             background-color: #222;
-            border-radius: 0;
             overflow: hidden;
             text-align: center;
+            border-radius: 10px;
         }
 
         .card img {
             width: 100%;
             height: auto;
             display: block;
+            border-radius: 10px;
         }
 
         .label {
@@ -106,13 +107,13 @@
 
         @media screen and (max-width: 768px) {
             .card {
-                width: calc(100% / 3);
+                flex: 1 1 calc(33.33% - 10px); /* 3 por linha */
             }
         }
 
         @media screen and (max-width: 480px) {
             .card {
-                width: 50%;
+                flex: 1 1 calc(50% - 10px); /* 2 por linha */
             }
         }
     </style>
