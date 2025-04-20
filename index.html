@@ -92,7 +92,7 @@
             text-decoration: none;
             color: inherit;
             transition: opacity 0.3s ease, visibility 0.3s ease;
-            cursor: pointer;
+            cursor: default;
         }
 
         .grid a.hidden {
@@ -155,7 +155,7 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
     <header>
         <div class="logo">CIROS<span>BLACK</span></div>
         <input type="text" placeholder="Pesquisar...">
@@ -224,7 +224,10 @@
         const grid = document.getElementById('grid-container');
         const originalOrder = Array.from(grid.children);
 
-        // Clique nas capas para navegar manualmente usando data-link
+        // Desabilita botão direito (caso oncontextmenu seja removido)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // (Opcional) Navegar ao clicar em capa
         grid.addEventListener('click', function (e) {
             const target = e.target.closest('a[data-link]');
             if (target) {
