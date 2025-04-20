@@ -94,7 +94,7 @@
         .card:hover {
             transform: scale(1.05);
             z-index: 1;
-            box-shadow: 0 0 20px rgba(0, 191, 255, 0.5); /* Neon azul com 50% opacidade */
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
         }
 
         .card img {
@@ -188,5 +188,23 @@
             </div>
         </section>
     </main>
+
+    <script>
+        document.querySelector('header input').addEventListener('input', function () {
+            const search = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.grid a');
+
+            cards.forEach(card => {
+                const title = card.querySelector('.label').textContent.toLowerCase();
+                const category = card.querySelector('.label span').textContent.toLowerCase();
+
+                if (title.includes(search) || category.includes(search)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
