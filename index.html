@@ -68,18 +68,15 @@
         }
 
         .grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
             gap: 20px;
-            margin: 0;
-            padding: 0;
         }
 
         .grid a {
             display: block;
             text-decoration: none;
             color: inherit;
-            flex: 1 1 calc(16.66% - 20px);
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
@@ -124,15 +121,21 @@
             color: gray;
         }
 
+        @media screen and (max-width: 1200px) {
+            .grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
         @media screen and (max-width: 768px) {
-            .grid a {
-                flex: 1 1 calc(33.33% - 20px);
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
         @media screen and (max-width: 480px) {
-            .grid a {
-                flex: 1 1 calc(50% - 20px);
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -195,6 +198,13 @@
                         <div class="label">Exemplo <span>Categoria</span></div>
                     </div>
                 </a>
+                <!-- Nova capa adicionada -->
+                <a href="#">
+                    <div class="card">
+                        <img src="capas/yu-yu-hakusho.png" alt="Nova Capa">
+                        <div class="label">Nova Capa <span>Nova Categoria</span></div>
+                    </div>
+                </a>
             </div>
         </section>
     </main>
@@ -208,7 +218,6 @@
             const search = this.value.toLowerCase();
 
             if (search.trim() === '') {
-                // Restaura ordem original
                 grid.innerHTML = '';
                 originalOrder.forEach(card => {
                     card.classList.remove('hidden');
