@@ -80,6 +80,16 @@
             text-decoration: none;
             color: inherit;
             flex: 1 1 calc(16.66% - 20px);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .grid a.hidden {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
         }
 
         .card {
@@ -199,9 +209,9 @@
                 const category = card.querySelector('.label span').textContent.toLowerCase();
 
                 if (title.includes(search) || category.includes(search)) {
-                    card.style.display = '';
+                    card.classList.remove('hidden');
                 } else {
-                    card.style.display = 'none';
+                    card.classList.add('hidden');
                 }
             });
         });
