@@ -158,7 +158,7 @@
 
         <section class="destaques">
             <h2>Destaques</h2>
-            <div class="grid">
+            <div class="grid" id="grid-container">
                 <a href="https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho">
                     <div class="card">
                         <img src="capas/yu-yu-hakusho.png" alt="Yu Yu Hakusho">
@@ -202,7 +202,11 @@
     <script>
         document.querySelector('header input').addEventListener('input', function () {
             const search = this.value.toLowerCase();
-            const cards = document.querySelectorAll('.grid a');
+            const grid = document.getElementById('grid-container');
+            const cards = Array.from(grid.children);
+
+            const matching = [];
+            const notMatching = [];
 
             cards.forEach(card => {
                 const title = card.querySelector('.label').textContent.toLowerCase();
@@ -210,10 +214,17 @@
 
                 if (title.includes(search) || category.includes(search)) {
                     card.classList.remove('hidden');
+                    matching.push(card);
                 } else {
                     card.classList.add('hidden');
+                    notMatching.push(card);
                 }
             });
+
+            // Reordenar: primeiro os que correspondem à pesquisa
+            grid.innerHTML = '';
+            matching.forEach(card => grid.appendChild(card));
+            notMatching.forEach(card => grid.appendChild(card));
         });
     </script>
 </body>
