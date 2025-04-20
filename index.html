@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CirosBlack</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: white;
+        }
+
+        header {
+            background-color: black;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-weight: bold;
+            color: white;
+            font-size: 24px;
+        }
+
+        .logo span {
+            color: red;
+        }
+
+        header input {
+            padding: 6px;
+            border-radius: 5px;
+            border: none;
+            margin: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        nav a.active {
+            color: red;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .welcome h1 {
+            font-size: 36px;
+        }
+
+        .welcome p {
+            font-size: 18px;
+            margin-top: 5px;
+        }
+
+        .destaques h2 {
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .label {
+            padding: 10px;
+        }
+
+        .label span {
+            display: block;
+            font-size: 12px;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">CIROS<span>BLACK</span></div>
+        <input type="text" placeholder="Pesquisar...">
+        <nav>
+            <a href="#">Início</a>
+            <a href="#">Animes</a>
+            <a href="#">Filmes</a>
+            <a href="#" class="active">Séries</a>
+            <a href="#">Cursos</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <h1>Bem-vindo CirosBlack</h1>
+            <p>Todos os seus conteúdos em um só lugar!</p>
+        </section>
+
+        <section class="destaques">
+            <h2>Destaques</h2>
+            <div class="grid">
+                <div class="card">
+                    <img src="capas/yu-yu-hakusho.jpg" alt="Yu Yu Hakusho">
+                    <div class="label">Yu Yu Hakusho <span>Animes</span></div>
+                </div>
+                <div class="card">
+                    <img src="capas/jaspion.jpg" alt="Jaspion">
+                    <div class="label">Jaspion <span>Séries - Tokusatsu</span></div>
+                </div>
+                <div class="card">
+                    <img src="capas/changeman.jpg" alt="Changeman">
+                    <div class="label">Changeman <span>Séries - Tokusatsu</span></div>
+                </div>
+                <div class="card">
+                    <img src="capas/yu-yu-hakusho.jpg" alt="Doctor Strange">
+                    <div class="label">Doctor Strange <span>Marvel</span></div>
+                </div>
+                <div class="card">
+                    <img src="capas/yu-yu-hakusho.jpg" alt="Wonka">
+                    <div class="label">Wonka <span>Fantasia</span></div>
+                </div>
+                <div class="card">
+                    <img src="capas/yu-yu-hakusho.jpg" alt="Exemplo">
+                    <div class="label">Exemplo <span>Categoria</span></div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
