@@ -200,15 +200,27 @@
     </main>
 
     <script>
-        document.querySelector('header input').addEventListener('input', function () {
+        const searchInput = document.querySelector('header input');
+        const grid = document.getElementById('grid-container');
+        const originalOrder = Array.from(grid.children);
+
+        searchInput.addEventListener('input', function () {
             const search = this.value.toLowerCase();
-            const grid = document.getElementById('grid-container');
-            const cards = Array.from(grid.children);
+
+            if (search.trim() === '') {
+                // Restaura ordem original
+                grid.innerHTML = '';
+                originalOrder.forEach(card => {
+                    card.classList.remove('hidden');
+                    grid.appendChild(card);
+                });
+                return;
+            }
 
             const matching = [];
             const notMatching = [];
 
-            cards.forEach(card => {
+            originalOrder.forEach(card => {
                 const title = card.querySelector('.label').textContent.toLowerCase();
                 const category = card.querySelector('.label span').textContent.toLowerCase();
 
@@ -221,7 +233,6 @@
                 }
             });
 
-            // Reordenar: primeiro os que correspondem à pesquisa
             grid.innerHTML = '';
             matching.forEach(card => grid.appendChild(card));
             notMatching.forEach(card => grid.appendChild(card));
