@@ -75,12 +75,19 @@
             padding: 0;
         }
 
-        .card {
+        .grid a {
+            display: block;
+            text-decoration: none;
+            color: inherit;
             flex: 1 1 calc(16.66% - 10px); /* 6 por linha com gap compensado */
+        }
+
+        .card {
             background-color: #222;
             overflow: hidden;
             text-align: center;
             border-radius: 10px;
+            height: 100%;
         }
 
         .card img {
@@ -100,19 +107,14 @@
             color: gray;
         }
 
-        .grid a {
-            text-decoration: none;
-            color: inherit;
-        }
-
         @media screen and (max-width: 768px) {
-            .card {
+            .grid a {
                 flex: 1 1 calc(33.33% - 10px); /* 3 por linha */
             }
         }
 
         @media screen and (max-width: 480px) {
-            .card {
+            .grid a {
                 flex: 1 1 calc(50% - 10px); /* 2 por linha */
             }
         }
@@ -158,18 +160,24 @@
                         <div class="label">Changeman <span>Séries - Tokusatsu</span></div>
                     </div>
                 </a>
-                <div class="card">
-                    <img src="capas/yu-yu-hakusho.png" alt="Doctor Strange">
-                    <div class="label">Doctor Strange <span>Marvel</span></div>
-                </div>
-                <div class="card">
-                    <img src="capas/yu-yu-hakusho.png" alt="Wonka">
-                    <div class="label">Wonka <span>Fantasia</span></div>
-                </div>
-                <div class="card">
-                    <img src="capas/yu-yu-hakusho.png" alt="Exemplo">
-                    <div class="label">Exemplo <span>Categoria</span></div>
-                </div>
+                <a href="#">
+                    <div class="card">
+                        <img src="capas/yu-yu-hakusho.png" alt="Doctor Strange">
+                        <div class="label">Doctor Strange <span>Marvel</span></div>
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="card">
+                        <img src="capas/yu-yu-hakusho.png" alt="Wonka">
+                        <div class="label">Wonka <span>Fantasia</span></div>
+                    </div>
+                </a>
+                <a href="#">
+                    <div class="card">
+                        <img src="capas/yu-yu-hakusho.png" alt="Exemplo">
+                        <div class="label">Exemplo <span>Categoria</span></div>
+                    </div>
+                </a>
             </div>
         </section>
     </main>
