@@ -99,15 +99,20 @@
             color: gray;
         }
 
+        .grid a {
+            text-decoration: none;
+            color: inherit;
+        }
+
         @media screen and (max-width: 768px) {
             .card {
-                width: calc(100% / 3); /* 3 por linha em telas menores */
+                width: calc(100% / 3);
             }
         }
 
         @media screen and (max-width: 480px) {
             .card {
-                width: 50%; /* 2 por linha em telas muito pequenas */
+                width: 50%;
             }
         }
     </style>
@@ -134,18 +139,24 @@
         <section class="destaques">
             <h2>Destaques</h2>
             <div class="grid">
-                <div class="card">
-                    <img src="capas/yu-yu-hakusho.png" alt="Yu Yu Hakusho">
-                    <div class="label">Yu Yu Hakusho <span>Animes</span></div>
-                </div>
-                <div class="card">
-                    <img src="capas/jaspion.png" alt="Jaspion">
-                    <div class="label">Jaspion <span>Séries - Tokusatsu</span></div>
-                </div>
-                <div class="card">
-                    <img src="capas/changeman.png" alt="Changeman">
-                    <div class="label">Changeman <span>Séries - Tokusatsu</span></div>
-                </div>
+                <a href="https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho">
+                    <div class="card">
+                        <img src="capas/yu-yu-hakusho.png" alt="Yu Yu Hakusho">
+                        <div class="label">Yu Yu Hakusho <span>Animes</span></div>
+                    </div>
+                </a>
+                <a href="https://cirosblack.github.io/CirosBlack/Series/Jaspion/">
+                    <div class="card">
+                        <img src="capas/jaspion.png" alt="Jaspion">
+                        <div class="label">Jaspion <span>Séries - Tokusatsu</span></div>
+                    </div>
+                </a>
+                <a href="https://cirosblack.github.io/CirosBlack/Series/Changeman">
+                    <div class="card">
+                        <img src="capas/changeman.png" alt="Changeman">
+                        <div class="label">Changeman <span>Séries - Tokusatsu</span></div>
+                    </div>
+                </a>
                 <div class="card">
                     <img src="capas/yu-yu-hakusho.png" alt="Doctor Strange">
                     <div class="label">Doctor Strange <span>Marvel</span></div>
