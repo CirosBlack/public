@@ -1,275 +1,280 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CirosBlack</title>
-    <style>
-        * {
-            scrollbar-width: none;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CirosBlack</title>
+  <style>
+    * {
+      scrollbar-width: none;
+    }
 
-        *::-webkit-scrollbar {
-            display: none;
-        }
+    *::-webkit-scrollbar {
+      display: none;
+    }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #111;
-            color: white;
-            overflow-y: scroll;
-        }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      overflow-y: scroll;
+    }
 
-        header {
-            background-color: black;
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
+    header {
+      background-color: black;
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
 
-        .logo {
-            font-weight: bold;
-            color: white;
-            font-size: 24px;
-        }
+    .logo {
+      font-weight: bold;
+      color: white;
+      font-size: 24px;
+    }
 
-        .logo span {
-            color: red;
-        }
+    .logo span {
+      color: red;
+    }
 
-        header input {
-            padding: 6px;
-            border-radius: 5px;
-            border: none;
-            margin: 10px;
-        }
+    nav {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-        }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
 
-        nav a.active {
-            color: red;
-            font-weight: bold;
-        }
+    nav a.active {
+      color: red;
+      font-weight: bold;
+    }
 
-        main {
-            padding: 120px 20px 20px;
-        }
+    nav input {
+      padding: 6px;
+      border-radius: 5px;
+      border: none;
+      margin-left: 20px;
+    }
 
-        .welcome h1 {
-            font-size: 36px;
-        }
+    main {
+      padding: 120px 20px 20px;
+    }
 
-        .welcome p {
-            font-size: 18px;
-            margin-top: 5px;
-        }
+    .welcome h1 {
+      font-size: 36px;
+    }
 
-        .destaques h2 {
-            margin-top: 40px;
-            margin-bottom: 20px;
-        }
+    .welcome p {
+      font-size: 18px;
+      margin-top: 5px;
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 20px;
-        }
+    .destaques h2 {
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
 
-        .grid a {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            cursor: default;
-        }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 20px;
+    }
 
-        .grid a.hidden {
-            opacity: 0;
-            visibility: hidden;
-            height: 0;
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-        }
+    .grid a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      cursor: default;
+    }
 
-        .card {
-            background-color: #222;
-            overflow: hidden;
-            text-align: center;
-            border-radius: 10px;
-            height: 100%;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+    .grid a.hidden {
+      opacity: 0;
+      visibility: hidden;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
 
-        .card:hover {
-            transform: scale(1.05);
-            z-index: 1;
-            box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
-        }
+    .card {
+      background-color: #222;
+      overflow: hidden;
+      text-align: center;
+      border-radius: 10px;
+      height: 100%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-        .card img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 10px;
-        }
+    .card:hover {
+      transform: scale(1.05);
+      z-index: 1;
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+    }
 
-        .label {
-            padding: 10px;
-        }
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+    }
 
-        .label span {
-            display: block;
-            font-size: 12px;
-            color: gray;
-        }
+    .label {
+      padding: 10px;
+    }
 
-        @media screen and (max-width: 1200px) {
-            .grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
+    .label span {
+      display: block;
+      font-size: 12px;
+      color: gray;
+    }
 
-        @media screen and (max-width: 768px) {
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+    @media screen and (max-width: 1200px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
 
-        @media screen and (max-width: 480px) {
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+    @media screen and (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
 </head>
 <body oncontextmenu="return false">
-    <header>
-        <div class="logo">CIROS<span>BLACK</span></div>
-        <input type="text" placeholder="Pesquisar...">
-        <nav>
-            <a href="#">Início</a>
-            <a href="#">Animes</a>
-            <a href="#">Filmes</a>
-            <a href="#" class="active">Séries</a>
-            <a href="#">Cursos</a>
-        </nav>
-    </header>
+  <header>
+    <div class="logo">CIROS<span>BLACK</span></div>
+    <nav>
+      <a href="#">Início</a>
+      <a href="#">Animes</a>
+      <a href="#">Filmes</a>
+      <a href="#" class="active">Séries</a>
+      <a href="#">Cursos</a>
+      <input type="text" placeholder="Pesquisar..." />
+    </nav>
+  </header>
 
-    <main>
-        <section class="welcome">
-            <h1>Bem-vindo CirosBlack</h1>
-            <p>Todos os seus conteúdos em um só lugar!</p>
-        </section>
+  <main>
+    <section class="welcome">
+      <h1>Bem-vindo CirosBlack</h1>
+      <p>Todos os seus conteúdos em um só lugar!</p>
+    </section>
 
-        <section class="destaques">
-            <h2>Destaques</h2>
-            <div class="grid" id="grid-container">
-                <a data-link="https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho">
-                    <div class="card">
-                        <img src="capas/yu-yu-hakusho.png" alt="Yu Yu Hakusho">
-                        <div class="label">Yu Yu Hakusho <span>Animes</span></div>
-                    </div>
-                </a>
-                <a data-link="https://cirosblack.github.io/CirosBlack/Series/Jaspion/">
-                    <div class="card">
-                        <img src="capas/jaspion.png" alt="Jaspion">
-                        <div class="label">Jaspion <span>Séries - Tokusatsu</span></div>
-                    </div>
-                </a>
-                <a data-link="https://cirosblack.github.io/CirosBlack/Series/Changeman">
-                    <div class="card">
-                        <img src="capas/changeman.png" alt="Changeman">
-                        <div class="label">Changeman <span>Séries - Tokusatsu</span></div>
-                    </div>
-                </a>
-                <a data-link="#">
-                    <div class="card">
-                        <img src="capas/yu-yu-hakusho.png" alt="Doctor Strange">
-                        <div class="label">Doctor Strange <span>Marvel</span></div>
-                    </div>
-                </a>
-                <a data-link="#">
-                    <div class="card">
-                        <img src="capas/yu-yu-hakusho.png" alt="Wonka">
-                        <div class="label">Wonka <span>Fantasia</span></div>
-                    </div>
-                </a>
-                <a data-link="#">
-                    <div class="card">
-                        <img src="capas/yu-yu-hakusho.png" alt="Exemplo">
-                        <div class="label">Exemplo <span>Categoria</span></div>
-                    </div>
-                </a>
+    <section class="destaques">
+      <h2>Destaques</h2>
+      <div class="grid" id="grid-container">
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho">
+          <div class="card">
+            <img src="capas/yu-yu-hakusho.png" alt="Yu Yu Hakusho" />
+            <div class="label">Yu Yu Hakusho <span>Animes</span></div>
+          </div>
+        </a>
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/Jaspion/">
+          <div class="card">
+            <img src="capas/jaspion.png" alt="Jaspion" />
+            <div class="label">Jaspion <span>Séries - Tokusatsu</span></div>
+          </div>
+        </a>
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/Changeman">
+          <div class="card">
+            <img src="capas/changeman.png" alt="Changeman" />
+            <div class="label">Changeman <span>Séries - Tokusatsu</span></div>
+          </div>
+        </a>
+        <a data-link="#">
+          <div class="card">
+            <img src="capas/yu-yu-hakusho.png" alt="Doctor Strange" />
+            <div class="label">Doctor Strange <span>Marvel</span></div>
+          </div>
+        </a>
+        <a data-link="#">
+          <div class="card">
+            <img src="capas/yu-yu-hakusho.png" alt="Wonka" />
+            <div class="label">Wonka <span>Fantasia</span></div>
+          </div>
+        </a>
+        <a data-link="#">
+          <div class="card">
+            <img src="capas/yu-yu-hakusho.png" alt="Exemplo" />
+            <div class="label">Exemplo <span>Categoria</span></div>
+          </div>
+        </a>
 
-                <!-- Adicione novas capas abaixo -->
-            </div>
-        </section>
-    </main>
+        <!-- Adicione novas capas abaixo -->
+      </div>
+    </section>
+  </main>
 
-    <script>
-        const searchInput = document.querySelector('header input');
-        const grid = document.getElementById('grid-container');
-        const originalOrder = Array.from(grid.children);
+  <script>
+    const searchInput = document.querySelector('nav input');
+    const grid = document.getElementById('grid-container');
+    const originalOrder = Array.from(grid.children);
 
-        // Desabilita botão direito (caso oncontextmenu seja removido)
-        document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => e.preventDefault());
 
-        // (Opcional) Navegar ao clicar em capa
-        grid.addEventListener('click', function (e) {
-            const target = e.target.closest('a[data-link]');
-            if (target) {
-                const link = target.getAttribute('data-link');
-                if (link && link !== '#') {
-                    window.location.href = link;
-                }
-            }
+    grid.addEventListener('click', function (e) {
+      const target = e.target.closest('a[data-link]');
+      if (target) {
+        const link = target.getAttribute('data-link');
+        if (link && link !== '#') {
+          window.location.href = link;
+        }
+      }
+    });
+
+    searchInput.addEventListener('input', function () {
+      const search = this.value.toLowerCase();
+
+      if (search.trim() === '') {
+        grid.innerHTML = '';
+        originalOrder.forEach(card => {
+          card.classList.remove('hidden');
+          grid.appendChild(card);
         });
+        return;
+      }
 
-        searchInput.addEventListener('input', function () {
-            const search = this.value.toLowerCase();
+      const matching = [];
+      const notMatching = [];
 
-            if (search.trim() === '') {
-                grid.innerHTML = '';
-                originalOrder.forEach(card => {
-                    card.classList.remove('hidden');
-                    grid.appendChild(card);
-                });
-                return;
-            }
+      originalOrder.forEach(card => {
+        const title = card.querySelector('.label').textContent.toLowerCase();
+        const category = card.querySelector('.label span').textContent.toLowerCase();
 
-            const matching = [];
-            const notMatching = [];
+        if (title.includes(search) || category.includes(search)) {
+          card.classList.remove('hidden');
+          matching.push(card);
+        } else {
+          card.classList.add('hidden');
+          notMatching.push(card);
+        }
+      });
 
-            originalOrder.forEach(card => {
-                const title = card.querySelector('.label').textContent.toLowerCase();
-                const category = card.querySelector('.label span').textContent.toLowerCase();
-
-                if (title.includes(search) || category.includes(search)) {
-                    card.classList.remove('hidden');
-                    matching.push(card);
-                } else {
-                    card.classList.add('hidden');
-                    notMatching.push(card);
-                }
-            });
-
-            grid.innerHTML = '';
-            matching.forEach(card => grid.appendChild(card));
-            notMatching.forEach(card => grid.appendChild(card));
-        });
-    </script>
+      grid.innerHTML = '';
+      matching.forEach(card => grid.appendChild(card));
+      notMatching.forEach(card => grid.appendChild(card));
+    });
+  </script>
 </body>
 </html>
