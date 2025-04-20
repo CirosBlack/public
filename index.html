@@ -6,11 +6,11 @@
     <title>CirosBlack</title>
     <style>
         * {
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
 
         *::-webkit-scrollbar {
-            display: none; /* Chrome, Safari e Edge */
+            display: none;
         }
 
         body {
@@ -64,7 +64,7 @@
         }
 
         main {
-            padding: 120px 20px 20px; /* espaço para o header fixo */
+            padding: 120px 20px 20px;
         }
 
         .welcome h1 {
@@ -92,6 +92,7 @@
             text-decoration: none;
             color: inherit;
             transition: opacity 0.3s ease, visibility 0.3s ease;
+            cursor: pointer;
         }
 
         .grid a.hidden {
@@ -176,48 +177,44 @@
         <section class="destaques">
             <h2>Destaques</h2>
             <div class="grid" id="grid-container">
-                <a href="https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho">
+                <a data-link="https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho">
                     <div class="card">
                         <img src="capas/yu-yu-hakusho.png" alt="Yu Yu Hakusho">
                         <div class="label">Yu Yu Hakusho <span>Animes</span></div>
                     </div>
                 </a>
-                <a href="https://cirosblack.github.io/CirosBlack/Series/Jaspion/">
+                <a data-link="https://cirosblack.github.io/CirosBlack/Series/Jaspion/">
                     <div class="card">
                         <img src="capas/jaspion.png" alt="Jaspion">
                         <div class="label">Jaspion <span>Séries - Tokusatsu</span></div>
                     </div>
                 </a>
-                <a href="https://cirosblack.github.io/CirosBlack/Series/Changeman">
+                <a data-link="https://cirosblack.github.io/CirosBlack/Series/Changeman">
                     <div class="card">
                         <img src="capas/changeman.png" alt="Changeman">
                         <div class="label">Changeman <span>Séries - Tokusatsu</span></div>
                     </div>
                 </a>
-                <a href="#">
+                <a data-link="#">
                     <div class="card">
                         <img src="capas/yu-yu-hakusho.png" alt="Doctor Strange">
                         <div class="label">Doctor Strange <span>Marvel</span></div>
                     </div>
                 </a>
-                <a href="#">
+                <a data-link="#">
                     <div class="card">
                         <img src="capas/yu-yu-hakusho.png" alt="Wonka">
                         <div class="label">Wonka <span>Fantasia</span></div>
                     </div>
                 </a>
-                <a href="#">
+                <a data-link="#">
                     <div class="card">
                         <img src="capas/yu-yu-hakusho.png" alt="Exemplo">
                         <div class="label">Exemplo <span>Categoria</span></div>
                     </div>
                 </a>
-                <a href="#">
-                    <div class="card">
-                        <img src="capas/yu-yu-hakusho.png" alt="Nova Capa">
-                        <div class="label">Nova Capa <span>Nova Categoria</span></div>
-                    </div>
-                </a>
+
+                <!-- Adicione novas capas abaixo -->
             </div>
         </section>
     </main>
@@ -226,6 +223,17 @@
         const searchInput = document.querySelector('header input');
         const grid = document.getElementById('grid-container');
         const originalOrder = Array.from(grid.children);
+
+        // Clique nas capas para navegar manualmente usando data-link
+        grid.addEventListener('click', function (e) {
+            const target = e.target.closest('a[data-link]');
+            if (target) {
+                const link = target.getAttribute('data-link');
+                if (link && link !== '#') {
+                    window.location.href = link;
+                }
+            }
+        });
 
         searchInput.addEventListener('input', function () {
             const search = this.value.toLowerCase();
