@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CirosBlack</title>
+  <style>
+    * {
+      scrollbar-width: none;
+    }
+
+    *::-webkit-scrollbar {
+      display: none;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: white;
+      overflow-y: scroll;
+    }
+
+    header {
+      background-color: black;
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-weight: bold;
+      color: white;
+      font-size: 24px;
+    }
+
+    .logo span {
+      color: red;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+
+    nav a.active {
+      color: red;
+      font-weight: bold;
+    }
+
+    nav input {
+      padding: 6px;
+      border-radius: 5px;
+      border: none;
+      margin-left: 20px;
+    }
+
+    main {
+      padding: 120px 20px 20px;
+    }
+
+    .welcome h1 {
+      font-size: 36px;
+    }
+
+    .welcome p {
+      font-size: 18px;
+      margin-top: 5px;
+    }
+
+    .destaques h2 {
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 20px;
+    }
+
+    .grid a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      cursor: default;
+    }
+
+    .grid a.hidden {
+      opacity: 0;
+      visibility: hidden;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .card {
+      background-color: #222;
+      overflow: hidden;
+      text-align: center;
+      border-radius: 10px;
+      height: 100%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      z-index: 1;
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .label {
+      padding: 10px;
+    }
+
+    .label span {
+      display: block;
+      font-size: 12px;
+      color: gray;
+    }
+
+    @media screen and (max-width: 1200px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+  <header>
+    <div class="logo">CIROS<span>BLACK</span></div>
+    <nav>
+      <a href="#">Início</a>
+      <a href="#">Animes</a>
+      <a href="#">Filmes</a>
+      <a href="#" class="active">Séries</a>
+      <a href="#">Cursos</a>
+      <input type="text" placeholder="Pesquisar..." />
+    </nav>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h1>Bem-vindo CirosBlack</h1>
+      <p>Todos os seus conteúdos em um só lugar!</p>
+    </section>
+
+    <section class="destaques">
+      <h2>Destaques</h2>
+      <div class="grid" id="grid-container">
+        <a data-link="https://cirosblack.github.io/public/Cursos">
+          <div class="card">
+            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Cinema%204D%20A%20Jornada%20do%20Iniciante%20ao%20Expert/capa/c4.png" alt="Cinema 4D" />
+            <div class="label">Cinema 4D<span>3D</span></div>
+          </div>
+      
+
+        <!-- Adicione novas capas abaixo -->
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const searchInput = document.querySelector('nav input');
+    const grid = document.getElementById('grid-container');
+    const originalOrder = Array.from(grid.children);
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    grid.addEventListener('click', function (e) {
+      const target = e.target.closest('a[data-link]');
+      if (target) {
+        const link = target.getAttribute('data-link');
+        if (link && link !== '#') {
+          window.location.href = link;
+        }
+      }
+    });
+
+    searchInput.addEventListener('input', function () {
+      const search = this.value.toLowerCase();
+
+      if (search.trim() === '') {
+        grid.innerHTML = '';
+        originalOrder.forEach(card => {
+          card.classList.remove('hidden');
+          grid.appendChild(card);
+        });
+        return;
+      }
+
+      const matching = [];
+      const notMatching = [];
+
+      originalOrder.forEach(card => {
+        const title = card.querySelector('.label').textContent.toLowerCase();
+        const category = card.querySelector('.label span').textContent.toLowerCase();
+
+        if (title.includes(search) || category.includes(search)) {
+          card.classList.remove('hidden');
+          matching.push(card);
+        } else {
+          card.classList.add('hidden');
+          notMatching.push(card);
+        }
+      });
+
+      grid.innerHTML = '';
+      matching.forEach(card => grid.appendChild(card));
+      notMatching.forEach(card => grid.appendChild(card));
+    });
+  </script>
+</body>
+</html>
