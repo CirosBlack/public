@@ -172,6 +172,53 @@
         #aiAnalysisBtn:hover, #aiSuggestBtn:hover, #aiSuggestFixedIncomeBtn:hover, #aiSuggestOthersBtn:hover {
             background-color: #9b59b6;
         }
+        
+        /* NOVO PAINEL DE COMPRA RÁPIDA */
+        .quick-add-panel {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 25px;
+            border-left: 5px solid #2980b9;
+        }
+        .quick-add-panel h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .quick-add-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .quick-add-form .form-group {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .quick-add-form label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .quick-add-form input {
+            min-width: 150px;
+        }
+        .quick-add-form button {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .quick-add-form button:hover {
+            background-color: #3498db;
+        }
+
 
         /* Gráficos */
         .charts-header {
@@ -328,6 +375,23 @@
                 <tbody id="portfolio-body"></tbody>
             </table>
         </div>
+        
+        <!-- NOVO PAINEL DE COMPRA RÁPIDA -->
+        <div class="quick-add-panel">
+            <h3>Registrar Compra Rápida</h3>
+            <form id="quickAddForm" class="quick-add-form">
+                <div class="form-group">
+                    <label for="quickAddAssetName">Ativo</label>
+                    <input type="text" id="quickAddAssetName" list="asset-list" required>
+                    <datalist id="asset-list"></datalist>
+                </div>
+                <div class="form-group">
+                    <label for="quickAddAssetQty">Quantidade de Cotas</label>
+                    <input type="number" id="quickAddAssetQty" min="1" required>
+                </div>
+                <button type="submit">Adicionar Cotas</button>
+            </form>
+        </div>
 
         <div class="asset-management">
             <button id="addAssetBtn">Adicionar Novo Ativo</button>
@@ -461,6 +525,7 @@
                 `;
                 tbody.appendChild(row);
             });
+            updateAssetDatalist();
         }
         
         function formatCurrency(value) {
@@ -799,7 +864,7 @@
             });
 
             const prompt = `
-                Por favor, atue como um analista de investimentos certificado (CFA) especializado em estratégias de renda passiva para investidores brasileiros. Considere o cenário macroeconômico atual do Brasil (taxa Selic, inflação, etc.).
+                Por favor, atue como um analista de investimentos certificado (CFA) especializado em estratégias de renda passiva para investidores brasileiros. Considere o cenário macroeconômico atual do Brasil (taxa Selic, inflação, etc.) e que todos os investimentos são feitos através da plataforma do Nubank.
 
                 Analise a seguinte carteira de investimentos, cujo objetivo principal é maximizar a geração de dividendos mensais de forma sustentável e segura.
 
@@ -820,7 +885,7 @@
 
                 **3. Plano de Ação e Sugestões:**
                    - **Rebalanceamento:** [Dê uma sugestão clara sobre quais posições devem ser aumentadas ou diminuídas para mitigar os riscos e otimizar os dividendos].
-                   - **Sugestão de Ativo:** [Se aplicável, sugira UM tipo de ativo/setor que está em falta e que fortaleceria a carteira].
+                   - **Sugestão de Ativo:** [Se aplicável, sugira UM tipo de ativo/setor que está em falta e que fortaleceria a carteira, garantindo que seja negociável no Nubank].
 
                 **4. Conclusão:**
                    - [Uma frase final de encorajamento e um resumo da principal ação a ser tomada].
@@ -841,12 +906,12 @@
             }));
 
             const prompt = `
-                Atue como um analista de investimentos (CFA) focado no mercado brasileiro de FIIs e Fiagros. A carteira de um investidor, que busca altos dividendos mensais, é a seguinte:
+                Atue como um analista de investimentos (CFA) focado no mercado brasileiro de FIIs e Fiagros. A carteira de um investidor, que busca altos dividendos mensais e investe pelo Nubank, é a seguinte:
                 ${JSON.stringify(portfolioData, null, 2)}
 
                 **Sua Tarefa:**
                 1.  Identifique o setor (Tijolo, Papel ou Fiagro) que está mais sub-alocado ou que oferece a melhor oportunidade de diversificação para esta carteira.
-                2.  Sugira UM ÚNICO ativo (FII ou Fiagro) dentro desse setor que seja uma excelente adição. Não sugira nenhum dos seguintes ativos que já estão na carteira: ${existingAssets}.
+                2.  Sugira UM ÚNICO ativo (FII ou Fiagro) negociado no Nubank dentro desse setor que seja uma excelente adição. Não sugira nenhum dos seguintes ativos que já estão na carteira: ${existingAssets}.
                 3.  Compare o ativo sugerido com um outro ativo popular do mesmo setor, explicando por que a sua sugestão é mais adequada para este investidor.
 
                 **Forneça sua resposta estritamente no seguinte formato:**
@@ -875,19 +940,19 @@
             }));
 
             const prompt = `
-                Atue como um consultor financeiro para um investidor brasileiro com a seguinte carteira de renda variável focada em dividendos:
+                Atue como um consultor financeiro. Um investidor possui a seguinte carteira de renda variável focada em dividendos e investe através do Nubank:
                 ${JSON.stringify(portfolioData, null, 2)}
 
-                O investidor precisa de sugestões de Renda Fixa para complementar sua estratégia. Forneça DUAS sugestões, cada uma com um objetivo diferente, e explique de forma clara e direta.
+                Sugira DUAS opções de investimentos em RENDA FIXA que sejam adequadas para este investidor, focando em produtos que são comumente encontrados na plataforma do Nubank (como CDBs, LCIs/LCAs, e Tesouro Direto).
 
                 **Sua resposta deve seguir estritamente o seguinte formato:**
 
                 **Opção 1: Reserva de Oportunidade (Alta Liquidez)**
-                - **Produto Sugerido:** [Ex: Tesouro Selic, CDB 110% CDI com liquidez diária]
+                - **Produto Sugerido:** [Ex: Tesouro Selic, CDB de liquidez diária do Nubank, Nu Reserva Imediata]
                 - **Justificativa:** [Explique em 1-2 frases por que este produto é ideal para ter dinheiro disponível para aproveitar quedas no mercado de renda variável].
 
                 **Opção 2: Estabilidade e Proteção (Longo Prazo)**
-                - **Produto Sugerido:** [Ex: Tesouro IPCA+ com juros semestrais, LCI/LCA de longo prazo]
+                - **Produto Sugerido:** [Ex: Tesouro IPCA+ com juros semestrais, CDB/LCI/LCA prefixado ou atrelado ao IPCA disponível no Nubank]
                 - **Justificativa:** [Explique em 1-2 frases como este produto protege o poder de compra contra a inflação e pode gerar uma renda complementar estável].
             `;
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
@@ -902,19 +967,19 @@
             }));
 
             const prompt = `
-                Atue como um consultor financeiro para um investidor brasileiro com a seguinte carteira de renda variável focada em dividendos:
+                Atue como um consultor financeiro. Um investidor possui a seguinte carteira de renda variável focada em dividendos e investe através do Nubank:
                 ${JSON.stringify(portfolioData, null, 2)}
 
-                O investidor deseja diversificar para além de FIIs/Fiagros. Forneça DUAS sugestões de OUTRAS CLASSES DE ATIVOS, cada uma com um objetivo estratégico diferente.
+                Sugira DUAS opções de investimentos em OUTRAS CLASSES DE ATIVOS (como Ações de crescimento, ETFs, BDRs ou Criptomoedas) que sejam negociáveis no Nubank para diversificar e complementar esta carteira.
 
                 **Sua resposta deve seguir estritamente o seguinte formato:**
 
-                **Opção 1: Potencial de Crescimento do Capital**
-                - **Classe/Ativo Sugerido:** [Ex: Ações de uma empresa específica, ETF BOVA11]
+                **Opção 1: Potencial de Crescimento do Capital (Brasil)**
+                - **Classe/Ativo Sugerido:** [Ex: Ações de uma empresa específica (ex: NU), ETF BOVA11]
                 - **Papel na Carteira:** [Explique em 1-2 frases como este ativo pode adicionar um componente de valorização de capital para equilibrar a estratégia de renda].
 
                 **Opção 2: Dolarização e Diversificação Global**
-                - **Classe/Ativo Sugerido:** [Ex: BDR de uma empresa estrangeira, ETF IVVB11]
+                - **Classe/Ativo Sugerido:** [Ex: BDR de uma empresa estrangeira (ex: AAPL34), ETF IVVB11, Nu Renda Ibov Smart Dividendos]
                 - **Papel na Carteira:** [Explique em 1-2 frases como este ativo pode proteger parte do patrimônio contra a desvalorização do Real e dar exposição a mercados internacionais].
             `;
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
