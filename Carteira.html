@@ -58,7 +58,7 @@
         tr:nth-child(even) {
             background-color: #f8f9fa;
         }
-        input[type="number"], input[type="text"] {
+        input[type="number"], input[type="text"], select {
             width: 90%;
             padding: 8px;
             border: 1px solid #b2bec3;
@@ -68,7 +68,7 @@
             min-width: 70px;
             box-sizing: border-box;
         }
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #c0392b;
         }
@@ -160,10 +160,20 @@
         }
 
         /* Gráficos */
+        .charts-header {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .charts-header select {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #dfe6e9;
+        }
         .charts-container {
             display: flex;
             justify-content: space-around;
-            margin-top: 30px;
+            margin-top: 20px;
             flex-wrap: wrap;
             gap: 20px;
         }
@@ -312,6 +322,17 @@
             <button id="aiSuggestBtn">✨ Sugerir Novo Ativo com IA</button>
         </div>
 
+        <div class="charts-header">
+            <h3>Visualização da Carteira</h3>
+            <select id="chartTypeSelector" onchange="changeChartType()">
+                <option value="doughnut">Rosca</option>
+                <option value="pie">Pizza</option>
+                <option value="barVertical">Barras (Vertical)</option>
+                <option value="bar">Barras (Horizontal)</option>
+                <option value="polarArea">Área Polar</option>
+            </select>
+        </div>
+
         <div class="charts-container">
             <div class="chart-wrapper">
                 <canvas id="targetAllocationChart"></canvas>
@@ -387,6 +408,7 @@
         ];
 
         let targetChart, currentChart;
+        let currentChartType = 'doughnut';
         Chart.register(ChartDataLabels);
 
         function renderTable() {
@@ -635,6 +657,11 @@
             e.target.reset();
         });
         
+        function changeChartType() {
+            currentChartType = document.getElementById('chartTypeSelector').value;
+            calculatePortfolio(); // Força o redesenho dos gráficos
+        }
+
         function updateCharts(data, totalPatrimonio) {
             const labels = data.map(a => a.name);
             const targetData = data.map(a => a.targetPct * 100);
@@ -643,8 +670,11 @@
             const targetDividends = data.map(a => (totalPatrimonio * a.targetPct * (a.dy / 100)) / 12);
             const currentDividends = data.map(a => a.monthlyDividend);
             
+            const chartTypeForJs = currentChartType === 'barVertical' ? 'bar' : currentChartType;
+            const indexAxis = currentChartType === 'bar' ? 'y' : 'x';
+
             const chartConfig = (title, chartData, dividendData) => ({
-                type: 'doughnut',
+                type: chartTypeForJs,
                 data: {
                     labels: labels,
                     datasets: [{
@@ -656,20 +686,23 @@
                             '#1abc9c', '#9b59b6', '#34495e', '#e67e22', '#95a5a6'
                         ],
                         borderColor: '#fff',
-                        borderWidth: 2
+                        borderWidth: (currentChartType === 'bar' || currentChartType === 'barVertical') ? 0 : 2
                     }]
                 },
                 options: {
+                    indexAxis: indexAxis,
                     responsive: true,
                     plugins: {
                         legend: { display: false },
                         title: { display: true, text: title, font: { size: 16 } },
                         datalabels: {
-                            color: '#fff',
+                            color: (currentChartType === 'bar' || currentChartType === 'barVertical') ? '#333' : '#fff',
+                            anchor: (currentChartType === 'bar' || currentChartType === 'barVertical') ? 'end' : 'center',
+                            align: (currentChartType === 'bar' || currentChartType === 'barVertical') ? 'start' : 'center',
                             textAlign: 'center',
                             font: { weight: 'bold', size: 11 },
                             formatter: (value, context) => {
-                                if (value < 4) return '';
+                                if (value < 4 && (currentChartType !== 'bar' && currentChartType !== 'barVertical')) return '';
                                 const label = context.chart.data.labels[context.dataIndex];
                                 const dividend = context.chart.data.datasets[0].dividends[context.dataIndex];
                                 const dividendString = dividend > 0 ? `\n${formatCurrency(dividend)}` : '';
@@ -698,46 +731,13 @@
             }
         }
         
-        // --- Lógica da API do Gemini ---
-        async function callGeminiAPI(prompt) {
-            const apiKey = ""; // Deixado em branco para ser preenchido pelo ambiente
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{
-                    role: "user",
-                    parts: [{ text: prompt }]
-                }]
-            };
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Erro na API do Gemini: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-
-            if (result.candidates && result.candidates.length > 0 &&
-                result.candidates[0].content && result.candidates[0].content.parts &&
-                result.candidates[0].content.parts.length > 0) {
-                return result.candidates[0].content.parts[0].text;
-            } else {
-                throw new Error("A resposta da API do Gemini não contém o texto esperado.");
-            }
-        }
-
         async function analyzeWithAI() {
             syncStateWithDOM();
             const aiModalTitle = document.getElementById('aiModalTitle');
             const aiResultDiv = document.getElementById('aiResult');
             aiModalTitle.textContent = 'Análise da Carteira com IA (Gemini)';
             aiModal.style.display = 'block';
-            aiResultDiv.textContent = 'Analisando sua carteira... Por favor, aguarde.';
+            aiResultDiv.textContent = 'O prompt para a análise foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua análise.';
 
             const portfolioData = assetsState.map(asset => {
                 const totalPatrimonio = assetsState.reduce((sum, a) => sum + (a.myQty * a.currentPrice), 0) || 1;
@@ -765,11 +765,11 @@
             `;
             
             try {
-                const analysisText = await callGeminiAPI(prompt);
-                aiResultDiv.textContent = analysisText;
-            } catch (error) {
-                console.error("Erro ao chamar a API do Gemini:", error);
-                aiResultDiv.textContent = "Ocorreu um erro ao tentar analisar a carteira. Por favor, tente novamente mais tarde.";
+                await navigator.clipboard.writeText(prompt);
+                window.open('https://gemini.google.com/', '_blank');
+            } catch (err) {
+                console.error('Falha ao copiar o prompt: ', err);
+                aiResultDiv.textContent = 'Não foi possível copiar o prompt. Por favor, tente novamente.';
             }
         }
 
@@ -779,7 +779,7 @@
             const aiResultDiv = document.getElementById('aiResult');
             aiModalTitle.textContent = 'Sugestão de Novo Ativo com IA (Gemini)';
             aiModal.style.display = 'block';
-            aiResultDiv.textContent = 'Buscando uma boa oportunidade para sua carteira...';
+            aiResultDiv.textContent = 'O prompt para a sugestão foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua sugestão.';
 
             const existingAssets = assetsState.map(a => a.name).join(', ');
             const portfolioData = assetsState.map(asset => ({
@@ -801,11 +801,11 @@
             `;
 
             try {
-                const suggestionText = await callGeminiAPI(prompt);
-                aiResultDiv.textContent = suggestionText;
-            } catch (error) {
-                console.error("Erro ao chamar a API do Gemini para sugestão:", error);
-                aiResultDiv.textContent = "Ocorreu um erro ao buscar a sugestão. Por favor, tente novamente mais tarde.";
+                await navigator.clipboard.writeText(prompt);
+                window.open('https://gemini.google.com/', '_blank');
+            } catch (err) {
+                console.error('Falha ao copiar o prompt para sugestão:', err);
+                aiResultDiv.textContent = 'Não foi possível copiar o prompt. Por favor, tente novamente.';
             }
         }
 
