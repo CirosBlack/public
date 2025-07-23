@@ -15,14 +15,15 @@
             color: #333;
             display: flex;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
             margin: 0;
+            box-sizing: border-box;
         }
         .container {
             width: 100%;
             max-width: 1500px;
             background-color: #fff;
-            padding: 25px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
@@ -33,7 +34,7 @@
         /* Tabela Responsiva */
         .table-container {
             width: 100%;
-            overflow-x: auto; /* Adiciona scroll horizontal apenas na tabela */
+            overflow-x: auto; /* Adiciona scroll horizontal APENAS na tabela se necessário */
         }
         table {
             width: 100%;
@@ -42,10 +43,10 @@
         }
         th, td {
             border: 1px solid #dfe6e9;
-            padding: 12px 15px;
+            padding: 12px 8px; /* Padding reduzido para ajudar no encaixe */
             text-align: center;
             font-size: 14px;
-            white-space: nowrap;
+            /* white-space: nowrap; Removido para permitir quebra de linha */
         }
         th {
             background-color: #34495e;
@@ -65,6 +66,7 @@
             text-align: center;
             font-size: 14px;
             min-width: 70px;
+            box-sizing: border-box;
         }
         input:focus {
             outline: none;
@@ -126,6 +128,7 @@
             justify-content: center;
             gap: 15px;
             margin: 20px 0;
+            flex-wrap: wrap;
         }
         .asset-management button, .modal-button, .action-btn {
             background-color: #34495e;
@@ -228,21 +231,6 @@
         .modal-button.confirm:hover { background-color: #2ecc71; }
         .modal-button.cancel { background-color: #7f8c8d; }
         .modal-button.cancel:hover { background-color: #95a5a6; }
-
-        /* Media Queries para Responsividade */
-        @media (max-width: 992px) {
-            .dashboard {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 576px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            .chart-wrapper {
-                max-width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
@@ -635,7 +623,6 @@
             const targetData = data.map(a => a.targetPct * 100);
             const currentData = data.map(a => a.currentPct * 100);
 
-            // Calcula os dividendos para cada slice do gráfico
             const targetDividends = data.map(a => (totalPatrimonio * a.targetPct * (a.dy / 100)) / 12);
             const currentDividends = data.map(a => a.monthlyDividend);
             
@@ -646,7 +633,7 @@
                     datasets: [{
                         label: '% da Carteira',
                         data: chartData,
-                        dividends: dividendData, // Passa os dividendos para o plugin
+                        dividends: dividendData,
                         backgroundColor: [
                             '#2c3e50', '#e74c3c', '#3498db', '#f1c40f',
                             '#1abc9c', '#9b59b6', '#34495e', '#e67e22', '#95a5a6'
@@ -665,7 +652,7 @@
                             textAlign: 'center',
                             font: { weight: 'bold', size: 11 },
                             formatter: (value, context) => {
-                                if (value < 4) return ''; // Oculta labels de fatias muito pequenas
+                                if (value < 4) return '';
                                 const label = context.chart.data.labels[context.dataIndex];
                                 const dividend = context.chart.data.datasets[0].dividends[context.dataIndex];
                                 const dividendString = dividend > 0 ? `\n${formatCurrency(dividend)}` : '';
