@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira (com IA)</title>
+    <title>Calculadora de Balanceamento de Carteira v15 (Final)</title>
+    <!-- Chart.js para os gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Estilos Gerais */
         body {
@@ -136,6 +138,19 @@
             background-color: #9b59b6;
         }
 
+        /* Gráficos */
+        .charts-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .chart-wrapper {
+            width: 100%;
+            max-width: 45%;
+            min-width: 300px;
+        }
+
         /* Resumo Inferior */
         .summary {
             margin-top: 25px;
@@ -235,6 +250,7 @@
                     <th>% Alvo</th>
                     <th>Minha Qtd.</th>
                     <th>Preço Atual (R$)</th>
+                    <th>DY (12M) %</th>
                     <th>Ações</th>
                     <th>Meu Valor (R$)</th>
                     <th>% Atual</th>
@@ -254,10 +270,20 @@
             <button id="aiAnalysisBtn">Analisar Carteira com IA</button>
         </div>
 
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <canvas id="targetAllocationChart"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="currentAllocationChart"></canvas>
+            </div>
+        </div>
+
          <div class="summary">
-            <h2>Resumo do Aporte Mensal</h2>
+            <h2>Resumo do Aporte e Projeções</h2>
             <p>Total a Investir este Mês: <span id="totalAporteReal">R$ 0,00</span></p>
             <p>Total de Cotas a Comprar: <span id="totalCotasComprar">0</span></p>
+            <p>Renda Mensal Estimada (Dividendos): <span id="monthlyDividends">R$ 0,00</span></p>
          </div>
     </div>
 
@@ -314,16 +340,18 @@
 
     <script>
         let assetsState = [
-            { id: 'cacr11', name: 'CACR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 10, currentPrice: 0 },
-            { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', type: 'fiis', targetPct: 0.15, myQty: 22, currentPrice: 0 },
-            { id: 'vgir11', name: 'VGIR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 17, currentPrice: 0 },
-            { id: 'habt11', name: 'HABT11', segment: 'Papel', type: 'fiis', targetPct: 0.05, myQty: 1, currentPrice: 0 },
-            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.10, myQty: 23, currentPrice: 0 },
-            { id: 'ggrc11', name: 'GGRC11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0 },
-            { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0 },
-            { id: 'snag11', name: 'SNAG11', segment: 'Fiagro', type: 'fiagros', targetPct: 0.20, myQty: 0, currentPrice: 0 },
-            { id: 'mana11', name: 'MANA11', segment: 'Outro', type: 'fiis', targetPct: 0.00, myQty: 1, currentPrice: 0 }
+            { id: 'cacr11', name: 'CACR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 10, currentPrice: 0, dy: 0 },
+            { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', type: 'fiis', targetPct: 0.15, myQty: 22, currentPrice: 0, dy: 0 },
+            { id: 'vgir11', name: 'VGIR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 17, currentPrice: 0, dy: 0 },
+            { id: 'habt11', name: 'HABT11', segment: 'Papel', type: 'fiis', targetPct: 0.05, myQty: 1, currentPrice: 0, dy: 0 },
+            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.10, myQty: 23, currentPrice: 0, dy: 0 },
+            { id: 'ggrc11', name: 'GGRC11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0, dy: 0 },
+            { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0, dy: 0 },
+            { id: 'snag11', name: 'SNAG11', segment: 'Fiagro', type: 'fiagros', targetPct: 0.20, myQty: 0, currentPrice: 0, dy: 0 },
+            { id: 'mana11', name: 'MANA11', segment: 'Outro', type: 'fiis', targetPct: 0.00, myQty: 1, currentPrice: 0, dy: 0 }
         ];
+
+        let targetChart, currentChart;
 
         function renderTable() {
             const tbody = document.getElementById('portfolio-body');
@@ -333,6 +361,7 @@
                 const row = document.createElement('tr');
                 row.id = `row_${asset.id}`;
                 const priceValue = asset.currentPrice > 0 ? asset.currentPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+                const dyValue = asset.dy > 0 ? asset.dy.toFixed(2) : '';
                 
                 const assetTypePath = asset.type || 'fiis';
                 const investidor10Url = `https://investidor10.com.br/${assetTypePath}/${asset.name.toLowerCase()}/`;
@@ -343,6 +372,7 @@
                     <td><input type="number" id="target_pct_${asset.id}" value="${(asset.targetPct * 100).toFixed(2)}" step="0.1" oninput="calculatePortfolio()"></td>
                     <td><input type="number" id="qty_${asset.id}" value="${asset.myQty}" step="1" oninput="calculatePortfolio()"></td>
                     <td><input type="text" class="price-input" id="price_${asset.id}" value="${priceValue}" placeholder="0,00" onblur="formatAndRecalculate(this)" onfocus="this.select()"></td>
+                    <td><input type="number" id="dy_${asset.id}" value="${dyValue}" step="0.1" placeholder="0.00" oninput="calculatePortfolio()"></td>
                     <td><a href="${investidor10Url}" target="_blank" class="action-btn search-btn" title="Ver no Investidor10">🔍</a></td>
                     <td class="output" id="value_${asset.id}">-</td>
                     <td class="output" id="pct_${asset.id}">-</td>
@@ -381,6 +411,7 @@
                 const targetPctInput = document.getElementById(`target_pct_${asset.id}`);
                 const qtyInput = document.getElementById(`qty_${asset.id}`);
                 const priceInput = document.getElementById(`price_${asset.id}`);
+                const dyInput = document.getElementById(`dy_${asset.id}`);
 
                 if (targetPctInput) asset.targetPct = parseFloat(targetPctInput.value) / 100 || 0;
                 if (qtyInput) asset.myQty = parseInt(qtyInput.value) || 0;
@@ -388,19 +419,25 @@
                     const priceStr = priceInput.value || '0';
                     asset.currentPrice = parseFloat(priceStr.replace(/\./g, '').replace(',', '.')) || 0;
                 }
+                if (dyInput) asset.dy = parseFloat(dyInput.value) || 0;
             });
         }
 
         function calculatePortfolio() {
             syncStateWithDOM();
+            saveStateToLocalStorage();
             const aporteMensal = parseFloat(document.getElementById('aporteMensal').value) || 0;
             let totalPatrimonio = 0;
             let totalTargetPct = 0;
+            let totalAnnualDividends = 0;
             
             let currentAssets = assetsState.map(asset => {
                 const myValue = asset.myQty * asset.currentPrice;
                 totalPatrimonio += myValue;
                 totalTargetPct += asset.targetPct;
+                if (asset.dy > 0) {
+                    totalAnnualDividends += myValue * (asset.dy / 100);
+                }
                 return { ...asset, myValue };
             });
 
@@ -462,6 +499,9 @@
             targetPctTotalEl.classList.toggle('invalid', Math.abs(totalTargetPct - 1.0) > 0.001);
             document.getElementById('totalAporteReal').textContent = formatCurrency(totalAporteReal);
             document.getElementById('totalCotasComprar').textContent = totalCotasComprar;
+            document.getElementById('monthlyDividends').textContent = formatCurrency(totalAnnualDividends / 12);
+
+            updateCharts(currentAssets);
         }
 
         const addModal = document.getElementById('addAssetModal');
@@ -513,7 +553,8 @@
                 type: type,
                 targetPct: targetPct,
                 myQty: 0,
-                currentPrice: 0
+                currentPrice: 0,
+                dy: 0
             };
             assetsState.push(newAsset);
             
@@ -554,12 +595,58 @@
             e.target.reset();
         });
         
-        // --- Lógica da API do Gemini ---
+        function updateCharts(data) {
+            const labels = data.map(a => a.name);
+            const targetData = data.map(a => a.targetPct * 100);
+            const currentData = data.map(a => a.currentPct * 100);
+
+            const chartConfig = (title, chartData) => ({
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '% da Carteira',
+                        data: chartData,
+                        backgroundColor: [
+                            '#2c3e50', '#e74c3c', '#ecf0f1', '#3498db', '#f1c40f',
+                            '#1abc9c', '#9b59b6', '#34495e', '#e67e22', '#95a5a6'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: title, font: { size: 16 } }
+                    }
+                }
+            });
+
+            if (targetChart) targetChart.destroy();
+            targetChart = new Chart(document.getElementById('targetAllocationChart'), chartConfig('Alocação Ideal (% Alvo)', targetData));
+
+            if (currentChart) currentChart.destroy();
+            currentChart = new Chart(document.getElementById('currentAllocationChart'), chartConfig('Alocação Atual (%)', currentData));
+        }
+
+        function saveStateToLocalStorage() {
+            localStorage.setItem('portfolioManagerData', JSON.stringify(assetsState));
+        }
+
+        function loadStateFromLocalStorage() {
+            const savedData = localStorage.getItem('portfolioManagerData');
+            if (savedData) {
+                assetsState = JSON.parse(savedData);
+            }
+        }
+        
         async function analyzeWithAI() {
             syncStateWithDOM();
             const aiResultDiv = document.getElementById('aiResult');
             aiModal.style.display = 'block';
-            aiResultDiv.textContent = 'Analisando sua carteira... Por favor, aguarde.';
+            aiResultDiv.textContent = 'O prompt para a análise foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua análise.';
 
             const portfolioData = assetsState.map(asset => {
                 const totalPatrimonio = assetsState.reduce((sum, a) => sum + (a.myQty * a.currentPrice), 0) || 1;
@@ -586,41 +673,17 @@
                 Seja direto e use uma linguagem fácil de entender.
             `;
             
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiKey = ""; // Deixado em branco para ser preenchido pelo ambiente
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro na API do Gemini: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const analysisText = result.candidates[0].content.parts[0].text;
-                    aiResultDiv.textContent = analysisText;
-                } else {
-                    throw new Error("A resposta da API do Gemini não contém o texto esperado.");
-                }
-
-            } catch (error) {
-                console.error("Erro ao chamar a API do Gemini:", error);
-                aiResultDiv.textContent = "Ocorreu um erro ao tentar analisar a carteira. Por favor, tente novamente mais tarde.";
+                await navigator.clipboard.writeText(prompt);
+                window.open('https://gemini.google.com/', '_blank');
+            } catch (err) {
+                console.error('Falha ao copiar o prompt: ', err);
+                aiResultDiv.textContent = 'Não foi possível copiar o prompt. Por favor, tente novamente.';
             }
         }
 
         window.onload = () => {
+            loadStateFromLocalStorage();
             renderTable();
             calculatePortfolio();
         };
