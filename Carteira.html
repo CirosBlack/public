@@ -166,59 +166,12 @@
         .search-btn:hover {
             background-color: #3498db;
         }
-        #aiAnalysisBtn, #aiSuggestBtn, #aiSuggestFixedIncomeBtn, #aiSuggestOthersBtn {
+        #aiAnalysisBtn, #aiSuggestBtn, #aiSuggestFixedIncomeBtn, #aiSuggestOthersBtn, #aiOptimizeBtn {
             background-color: #8e44ad;
         }
-        #aiAnalysisBtn:hover, #aiSuggestBtn:hover, #aiSuggestFixedIncomeBtn:hover, #aiSuggestOthersBtn:hover {
+        #aiAnalysisBtn:hover, #aiSuggestBtn:hover, #aiSuggestFixedIncomeBtn:hover, #aiSuggestOthersBtn:hover, #aiOptimizeBtn:hover {
             background-color: #9b59b6;
         }
-        
-        /* NOVO PAINEL DE COMPRA RÁPIDA */
-        .quick-add-panel {
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            margin-top: 25px;
-            border-left: 5px solid #2980b9;
-        }
-        .quick-add-panel h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        .quick-add-form {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-        .quick-add-form .form-group {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        .quick-add-form label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .quick-add-form input {
-            min-width: 150px;
-        }
-        .quick-add-form button {
-            background-color: #2980b9;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .quick-add-form button:hover {
-            background-color: #3498db;
-        }
-
 
         /* Gráficos */
         .charts-header {
@@ -400,6 +353,7 @@
             <button id="aiSuggestBtn">✨ Sugerir FII/Fiagro</button>
             <button id="aiSuggestFixedIncomeBtn">✨ Sugerir Renda Fixa</button>
             <button id="aiSuggestOthersBtn">✨ Sugerir Outros Ativos</button>
+            <button id="aiOptimizeBtn">✨ Otimizar % Alvo</button>
         </div>
 
         <div class="charts-header">
@@ -658,6 +612,7 @@
         document.getElementById('aiSuggestBtn').onclick = () => { suggestAssetWithAI(); };
         document.getElementById('aiSuggestFixedIncomeBtn').onclick = () => { suggestFixedIncomeWithAI(); };
         document.getElementById('aiSuggestOthersBtn').onclick = () => { suggestOtherAssetsWithAI(); };
+        document.getElementById('aiOptimizeBtn').onclick = () => { optimizeTargetWithAI(); };
 
         document.getElementById('cancelAdd').onclick = () => { addModal.style.display = 'none'; };
         document.getElementById('cancelRemove').onclick = () => { removeModal.style.display = 'none'; };
@@ -984,6 +939,42 @@
             `;
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
         }
+
+        async function optimizeTargetWithAI() {
+            syncStateWithDOM();
+            const portfolioData = assetsState.map(asset => ({
+                ativo: asset.name,
+                segmento: asset.segment,
+                percentual_alvo_atual: (asset.targetPct * 100).toFixed(2) + '%'
+            }));
+
+            const prompt = `
+                Atue como um gestor de portfólio (CFA) especializado em estratégias de renda para investidores brasileiros, considerando que os investimentos são feitos pela plataforma Nubank.
+
+                A seguir está a alocação alvo ATUAL de uma carteira focada em dividendos mensais. O investidor deseja uma sugestão de rebalanceamento ESTRATÉGICO, ou seja, uma nova distribuição de porcentagens alvo para otimizar a diversificação e o potencial de renda, mantendo os mesmos ativos.
+
+                **Alocação Alvo Atual:**
+                ${JSON.stringify(portfolioData, null, 2)}
+
+                **Sua Tarefa:**
+                Proponha uma NOVA alocação de '% Alvo' para estes mesmos ativos. A soma das novas porcentagens deve ser exatamente 100%. Apresente a sua sugestão em formato de tabela e, em seguida, escreva uma breve justificativa (2-3 frases) para as principais mudanças que você propôs, focando em reduzir a concentração e melhorar a relação risco/retorno para dividendos.
+
+                **Forneça sua resposta estritamente no seguinte formato:**
+
+                **Nova Sugestão de Alocação Alvo:**
+                | Ativo | % Alvo Sugerido |
+                |---|---|
+                | NOME_ATIVO_1 | XX.XX% |
+                | NOME_ATIVO_2 | XX.XX% |
+                | ... | ... |
+
+                **Justificativa Estratégica:**
+                [Texto da justificativa].
+            `;
+
+            copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
+        }
+
 
         window.onload = () => {
             loadStateFromLocalStorage();
