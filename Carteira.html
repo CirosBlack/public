@@ -31,10 +31,10 @@
             text-align: center;
             color: #2c3e50;
         }
-        /* Tabela Responsiva */
+        /* Tabela Responsiva e Ordenável */
         .table-container {
             width: 100%;
-            overflow-x: auto; /* Adiciona scroll horizontal APENAS na tabela se necessário */
+            overflow-x: auto; 
         }
         table {
             width: 100%;
@@ -43,10 +43,9 @@
         }
         th, td {
             border: 1px solid #dfe6e9;
-            padding: 12px 8px; /* Padding reduzido para ajudar no encaixe */
+            padding: 12px 8px;
             text-align: center;
             font-size: 14px;
-            /* white-space: nowrap; Removido para permitir quebra de linha */
         }
         th {
             background-color: #34495e;
@@ -55,6 +54,21 @@
             top: 0;
             z-index: 10;
         }
+        th.sortable {
+            cursor: pointer;
+            position: relative;
+        }
+        th.sortable:hover {
+            background-color: #4a627a;
+        }
+        .sort-arrow {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        th.sorted .sort-arrow {
+            opacity: 1;
+        }
+
         tr:nth-child(even) {
             background-color: #f8f9fa;
         }
@@ -294,21 +308,21 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Ativo</th>
-                        <th>Segmento</th>
-                        <th>% Alvo</th>
-                        <th>Minha Qtd.</th>
-                        <th>Preço Atual (R$)</th>
-                        <th>DY (12M) %</th>
+                        <th class="sortable" data-sort-key="name">Ativo <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="segment">Segmento <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="targetPct">% Alvo <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="myQty">Minha Qtd. <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="currentPrice">Preço Atual (R$) <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="dy">DY (12M) % <span class="sort-arrow"></span></th>
                         <th>Ações</th>
-                        <th>Meu Valor (R$)</th>
-                        <th>Dividendo Mensal (Est.)</th>
-                        <th>% Atual</th>
-                        <th>Distância (R$)</th>
-                        <th>Status</th>
-                        <th>Prioridade</th>
-                        <th>Cotas a Comprar</th>
-                        <th>Valor das Cotas (R$)</th>
+                        <th class="sortable" data-sort-key="myValue">Meu Valor (R$) <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="monthlyDividend">Dividendo Mensal (Est.) <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="currentPct">% Atual <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="gap">Distância (R$) <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="status">Status <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="priority">Prioridade <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="cotasComprar">Cotas a Comprar <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="valorFinalCotas">Valor das Cotas (R$) <span class="sort-arrow"></span></th>
                     </tr>
                 </thead>
                 <tbody id="portfolio-body"></tbody>
@@ -329,7 +343,7 @@
             <select id="chartTypeSelector" onchange="changeChartType()">
                 <option value="doughnut">Rosca</option>
                 <option value="pie">Pizza</option>
-                <option value="barVertical">Barras (Vertical)</option>
+                <option value="barVertical" selected>Barras (Vertical)</option>
                 <option value="bar">Barras (Horizontal)</option>
                 <option value="polarArea">Área Polar</option>
             </select>
@@ -410,7 +424,9 @@
         ];
 
         let targetChart, currentChart;
-        let currentChartType = 'doughnut';
+        let currentChartType = 'barVertical'; // Gráfico padrão
+        let sortConfig = { key: 'name', direction: 'asc' }; // Configuração de ordenação padrão
+
         Chart.register(ChartDataLabels);
 
         function renderTable() {
@@ -663,7 +679,7 @@
         
         function changeChartType() {
             currentChartType = document.getElementById('chartTypeSelector').value;
-            calculatePortfolio(); // Força o redesenho dos gráficos
+            calculatePortfolio();
         }
 
         function updateCharts(data, totalPatrimonio) {
@@ -757,7 +773,7 @@
         }
         
         async function copyPromptToClipboardAndOpenGemini(prompt, modalTitle, modalResultDiv) {
-            modalTitle.textContent = modalTitle.textContent; // Keep title
+            modalTitle.textContent = modalTitle.textContent;
             modalResultDiv.textContent = 'O prompt para a análise foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua análise.';
             aiModal.style.display = 'block';
 
