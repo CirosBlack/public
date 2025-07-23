@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v10 (API Individual)</title>
+    <title>Calculadora de Balanceamento de Carteira v11 (Servidor)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -107,7 +107,7 @@
             gap: 15px;
             margin: 20px 0;
         }
-        .asset-management button, .action-btn, .modal-button {
+        .asset-management button, .remove-btn, .modal-button, #fetchPricesBtn {
             background-color: #34495e;
             color: white;
             padding: 10px 20px;
@@ -119,16 +119,11 @@
             transition: background-color 0.3s;
         }
         .asset-management button:hover { background-color: #4a627a; }
-        .action-btn {
-            padding: 5px 10px;
-            margin: 0 2px;
-        }
-        .remove-btn { background-color: #c0392b; }
+        #fetchPricesBtn { background-color: #16a085; }
+        #fetchPricesBtn:hover { background-color: #1abc9c; }
+        #fetchPricesBtn:disabled { background-color: #7f8c8d; cursor: not-allowed; }
+        .remove-btn { background-color: #c0392b; padding: 5px 10px; }
         .remove-btn:hover { background-color: #e74c3c; }
-        .update-price-btn { background-color: #16a085; }
-        .update-price-btn:hover { background-color: #1abc9c; }
-        .update-price-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
-
 
         /* Resumo Inferior */
         .summary {
@@ -235,6 +230,7 @@
         <div class="asset-management">
             <button id="addAssetBtn">Adicionar Novo Ativo</button>
             <button id="removeAssetBtn">Remover Ativo</button>
+            <button id="fetchPricesBtn">Atualizar Preços (API)</button>
         </div>
 
          <div class="summary">
@@ -320,10 +316,7 @@
                     <td class="output" id="priority_${asset.id}">-</td>
                     <td class="output" id="shares_to_buy_${asset.id}">-</td>
                     <td class="output" id="value_to_buy_${asset.id}">-</td>
-                    <td class="actions-cell">
-                        <button class="action-btn update-price-btn" data-id="${asset.id}" data-name="${asset.name}" title="Atualizar Preço (API)">🔄</button>
-                        <button class="action-btn remove-btn" data-id="${asset.id}" title="Remover Ativo">🗑️</button>
-                    </td>
+                    <td><button class="action-btn remove-btn" data-id="${asset.id}" title="Remover Ativo">🗑️</button></td>
                 `;
                 tbody.appendChild(row);
             });
@@ -533,44 +526,60 @@
                     calculatePortfolio();
                 });
             });
-
-            document.querySelectorAll('.update-price-btn').forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    const assetId = e.target.getAttribute('data-id');
-                    const assetName = e.target.getAttribute('data-name');
-                    e.target.textContent = '...';
-                    e.target.disabled = true;
-
-                    try {
-                        const url = `https://brapi.dev/api/quote/${assetName}`;
-                        const response = await fetch(url);
-                        if (!response.ok) throw new Error(`Erro HTTP para ${assetName}`);
-                        
-                        const data = await response.json();
-                        if (data.results && data.results.length > 0) {
-                            const price = data.results[0].regularMarketPrice;
-                            const priceInput = document.getElementById(`price_${assetId}`);
-                            if (priceInput) {
-                                priceInput.value = price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                calculatePortfolio(); // Recalcula tudo após o sucesso
-                            }
-                        } else {
-                            alert(`Não foi possível encontrar o ticker "${assetName}".`);
-                        }
-                    } catch (error) {
-                        console.error(`Falha ao buscar o ativo: ${assetName}`, error);
-                        alert(`Falha ao buscar o preço de ${assetName}.`);
-                    } finally {
-                        e.target.textContent = '🔄';
-                        e.target.disabled = false;
-                    }
-                });
-            });
         }
+        
+        // --- Lógica da API ---
+        async function fetchAllPrices() {
+            const btn = document.getElementById('fetchPricesBtn');
+            btn.textContent = 'Buscando...';
+            btn.disabled = true;
+
+            const tickers = assetsState.map(asset => asset.name).join(',');
+            const url = `https://brapi.dev/api/quote/${tickers}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.statusText}`);
+                }
+                const data = await response.json();
+                
+                const foundTickers = new Set();
+                if (data.results) {
+                    data.results.forEach(result => {
+                        const asset = assetsState.find(a => a.name === result.symbol);
+                        if (asset) {
+                            const priceInput = document.getElementById(`price_${asset.id}`);
+                            if (priceInput) {
+                                priceInput.value = result.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            }
+                            foundTickers.add(result.symbol);
+                        }
+                    });
+                }
+
+                const notFoundTickers = assetsState.filter(a => !foundTickers.has(a.name)).map(a => a.name);
+                if (notFoundTickers.length > 0) {
+                    alert(`Não foi possível encontrar cotação para: ${notFoundTickers.join(', ')}. Verifique se os tickers estão corretos.`);
+                }
+
+            } catch (error) {
+                console.error("Falha ao buscar preços:", error);
+                alert("Ocorreu um erro ao buscar os preços. Verifique sua conexão ou tente mais tarde.");
+            } finally {
+                btn.textContent = 'Atualizar Preços (API)';
+                btn.disabled = false;
+                calculatePortfolio();
+            }
+        }
+
+        document.getElementById('fetchPricesBtn').addEventListener('click', fetchAllPrices);
 
         window.onload = () => {
             renderTable();
             calculatePortfolio();
+            fetchAllPrices(); // Busca os preços ao carregar a página
+            setInterval(fetchAllPrices, 15 * 60 * 1000); // Atualiza a cada 15 minutos
         };
     </script>
 </body>
