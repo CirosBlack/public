@@ -152,10 +152,10 @@
         .search-btn:hover {
             background-color: #3498db;
         }
-        #aiAnalysisBtn, #aiSuggestBtn {
+        #aiAnalysisBtn, #aiSuggestBtn, #aiSuggestFixedIncomeBtn, #aiSuggestOthersBtn {
             background-color: #8e44ad;
         }
-        #aiAnalysisBtn:hover, #aiSuggestBtn:hover {
+        #aiAnalysisBtn:hover, #aiSuggestBtn:hover, #aiSuggestFixedIncomeBtn:hover, #aiSuggestOthersBtn:hover {
             background-color: #9b59b6;
         }
 
@@ -318,8 +318,10 @@
         <div class="asset-management">
             <button id="addAssetBtn">Adicionar Novo Ativo</button>
             <button id="removeAssetBtn">Remover Ativo</button>
-            <button id="aiAnalysisBtn">✨ Analisar Carteira com IA</button>
-            <button id="aiSuggestBtn">✨ Sugerir Novo Ativo com IA</button>
+            <button id="aiAnalysisBtn">✨ Analisar Carteira</button>
+            <button id="aiSuggestBtn">✨ Sugerir FII/Fiagro</button>
+            <button id="aiSuggestFixedIncomeBtn">✨ Sugerir Renda Fixa</button>
+            <button id="aiSuggestOthersBtn">✨ Sugerir Outros Ativos</button>
         </div>
 
         <div class="charts-header">
@@ -573,6 +575,8 @@
         document.getElementById('removeAssetBtn').onclick = () => { removeModal.style.display = 'block'; };
         document.getElementById('aiAnalysisBtn').onclick = () => { analyzeWithAI(); };
         document.getElementById('aiSuggestBtn').onclick = () => { suggestAssetWithAI(); };
+        document.getElementById('aiSuggestFixedIncomeBtn').onclick = () => { suggestFixedIncomeWithAI(); };
+        document.getElementById('aiSuggestOthersBtn').onclick = () => { suggestOtherAssetsWithAI(); };
 
         document.getElementById('cancelAdd').onclick = () => { addModal.style.display = 'none'; };
         document.getElementById('cancelRemove').onclick = () => { removeModal.style.display = 'none'; };
@@ -695,14 +699,35 @@
                     plugins: {
                         legend: { display: false },
                         title: { display: true, text: title, font: { size: 16 } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const value = context.parsed.y !== undefined && indexAxis === 'x' ? context.parsed.y : context.parsed.x;
+                                    label += `${value.toFixed(2)}%`;
+                                    const dividend = context.dataset.dividends[context.dataIndex];
+                                    if(dividend > 0) {
+                                        label += ` (${formatCurrency(dividend)}/mês)`;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
                         datalabels: {
                             color: (currentChartType === 'bar' || currentChartType === 'barVertical') ? '#333' : '#fff',
                             anchor: (currentChartType === 'bar' || currentChartType === 'barVertical') ? 'end' : 'center',
-                            align: (currentChartType === 'bar' || currentChartType === 'barVertical') ? 'start' : 'center',
+                            align: (currentChartType === 'bar' || currentChartType === 'barVertical') ? 'end' : 'center',
+                            offset: (currentChartType === 'bar' || currentChartType === 'barVertical') ? 8 : 0,
                             textAlign: 'center',
                             font: { weight: 'bold', size: 11 },
                             formatter: (value, context) => {
-                                if (value < 4 && (currentChartType !== 'bar' && currentChartType !== 'barVertical')) return '';
+                                if (currentChartType === 'bar' || currentChartType === 'barVertical') {
+                                    return `${value.toFixed(1)}%`;
+                                }
+                                if (value < 4) return '';
                                 const label = context.chart.data.labels[context.dataIndex];
                                 const dividend = context.chart.data.datasets[0].dividends[context.dataIndex];
                                 const dividendString = dividend > 0 ? `\n${formatCurrency(dividend)}` : '';
@@ -731,14 +756,22 @@
             }
         }
         
+        async function copyPromptToClipboardAndOpenGemini(prompt, modalTitle, modalResultDiv) {
+            modalTitle.textContent = modalTitle.textContent; // Keep title
+            modalResultDiv.textContent = 'O prompt para a análise foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua análise.';
+            aiModal.style.display = 'block';
+
+            try {
+                await navigator.clipboard.writeText(prompt);
+                window.open('https://gemini.google.com/', '_blank');
+            } catch (err) {
+                console.error('Falha ao copiar o prompt: ', err);
+                modalResultDiv.textContent = 'Não foi possível copiar o prompt. Por favor, tente novamente.';
+            }
+        }
+
         async function analyzeWithAI() {
             syncStateWithDOM();
-            const aiModalTitle = document.getElementById('aiModalTitle');
-            const aiResultDiv = document.getElementById('aiResult');
-            aiModalTitle.textContent = 'Análise da Carteira com IA (Gemini)';
-            aiModal.style.display = 'block';
-            aiResultDiv.textContent = 'O prompt para a análise foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua análise.';
-
             const portfolioData = assetsState.map(asset => {
                 const totalPatrimonio = assetsState.reduce((sum, a) => sum + (a.myQty * a.currentPrice), 0) || 1;
                 return {
@@ -764,23 +797,11 @@
                 Seja direto e use uma linguagem fácil de entender.
             `;
             
-            try {
-                await navigator.clipboard.writeText(prompt);
-                window.open('https://gemini.google.com/', '_blank');
-            } catch (err) {
-                console.error('Falha ao copiar o prompt: ', err);
-                aiResultDiv.textContent = 'Não foi possível copiar o prompt. Por favor, tente novamente.';
-            }
+            copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
         }
 
         async function suggestAssetWithAI() {
             syncStateWithDOM();
-            const aiModalTitle = document.getElementById('aiModalTitle');
-            const aiResultDiv = document.getElementById('aiResult');
-            aiModalTitle.textContent = 'Sugestão de Novo Ativo com IA (Gemini)';
-            aiModal.style.display = 'block';
-            aiResultDiv.textContent = 'O prompt para a sugestão foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua sugestão.';
-
             const existingAssets = assetsState.map(a => a.name).join(', ');
             const portfolioData = assetsState.map(asset => ({
                 ativo: asset.name,
@@ -800,13 +821,41 @@
                 Justificativa: [Uma breve justificativa (2-3 frases) explicando por que este ativo é uma boa adição para esta carteira específica.]
             `;
 
-            try {
-                await navigator.clipboard.writeText(prompt);
-                window.open('https://gemini.google.com/', '_blank');
-            } catch (err) {
-                console.error('Falha ao copiar o prompt para sugestão:', err);
-                aiResultDiv.textContent = 'Não foi possível copiar o prompt. Por favor, tente novamente.';
-            }
+            copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
+        }
+
+        async function suggestFixedIncomeWithAI() {
+            syncStateWithDOM();
+            const portfolioData = assetsState.map(asset => ({
+                ativo: asset.name,
+                segmento: asset.segment,
+                percentual_alvo: (asset.targetPct * 100).toFixed(2) + '%'
+            }));
+
+            const prompt = `
+                Atue como um consultor financeiro. Um investidor possui a seguinte carteira de renda variável focada em dividendos:
+                ${JSON.stringify(portfolioData, null, 2)}
+
+                Sugira DUAS opções de investimentos em RENDA FIXA que seriam adequadas para este investidor. Considere objetivos como estabilidade, reserva de oportunidade ou complemento de renda. Para cada sugestão, explique brevemente (1-2 frases) o porquê da recomendação.
+            `;
+            copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
+        }
+
+        async function suggestOtherAssetsWithAI() {
+            syncStateWithDOM();
+            const portfolioData = assetsState.map(asset => ({
+                ativo: asset.name,
+                segmento: asset.segment,
+                percentual_alvo: (asset.targetPct * 100).toFixed(2) + '%'
+            }));
+
+            const prompt = `
+                Atue como um consultor financeiro. Um investidor possui a seguinte carteira de renda variável focada em dividendos:
+                ${JSON.stringify(portfolioData, null, 2)}
+
+                Sugira DUAS opções de investimentos em OUTRAS CLASSES DE ATIVOS (como Ações de crescimento, ETFs, BDRs ou Criptomoedas) para diversificar e complementar esta carteira. Para cada sugestão, explique brevemente (1-2 frases) o porquê da recomendação, focando em diversificação ou potencial de crescimento.
+            `;
+            copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
         }
 
         window.onload = () => {
