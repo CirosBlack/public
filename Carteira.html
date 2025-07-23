@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v11 (Servidor)</title>
+    <title>Calculadora de Balanceamento de Carteira v11 (API Corrigida)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -540,20 +540,24 @@
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`Erro na API: ${response.statusText}`);
+                    throw new Error(`A API retornou um erro: ${response.statusText}`);
                 }
                 const data = await response.json();
                 
                 const foundTickers = new Set();
                 if (data.results) {
                     data.results.forEach(result => {
-                        const asset = assetsState.find(a => a.name === result.symbol);
-                        if (asset) {
-                            const priceInput = document.getElementById(`price_${asset.id}`);
-                            if (priceInput) {
-                                priceInput.value = result.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        // **CORREÇÃO IMPORTANTE AQUI**
+                        // Verifica se o resultado NÃO tem erro e TEM preço antes de usar
+                        if (!result.error && result.regularMarketPrice) {
+                            const asset = assetsState.find(a => a.name === result.symbol);
+                            if (asset) {
+                                const priceInput = document.getElementById(`price_${asset.id}`);
+                                if (priceInput) {
+                                    priceInput.value = result.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                }
+                                foundTickers.add(result.symbol);
                             }
-                            foundTickers.add(result.symbol);
                         }
                     });
                 }
@@ -578,8 +582,8 @@
         window.onload = () => {
             renderTable();
             calculatePortfolio();
-            fetchAllPrices(); // Busca os preços ao carregar a página
-            setInterval(fetchAllPrices, 15 * 60 * 1000); // Atualiza a cada 15 minutos
+            fetchAllPrices(); 
+            setInterval(fetchAllPrices, 15 * 60 * 1000);
         };
     </script>
 </body>
