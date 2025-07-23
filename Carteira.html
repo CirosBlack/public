@@ -65,35 +65,45 @@
             outline: none;
             border-color: #c0392b;
         }
-        /* Controles Superiores */
-        .controls {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin: 25px 0;
+        /* NOVO PAINEL DE CONTROLO (DASHBOARD) */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
             padding: 20px;
             background-color: #f8f9fa;
             border-radius: 8px;
+            margin-bottom: 25px;
         }
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .dashboard-card {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
         }
-        .control-group label, .patrimonio-label, .target-total-label {
-            font-weight: bold;
-            font-size: 18px;
+        .dashboard-card label {
+            font-size: 14px;
+            color: #7f8c8d;
+            display: block;
+            margin-bottom: 8px;
         }
-        #totalPatrimonioTop, #targetPctTotal {
-            font-size: 24px;
+        .dashboard-card .value, .dashboard-card input {
+            font-size: 22px;
             font-weight: bold;
             color: #2c3e50;
+        }
+        .dashboard-card input {
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            background: transparent;
+            padding: 0;
         }
         #targetPctTotal.invalid {
             color: #c0392b;
         }
+
         .output { font-weight: bold; }
         .status-aportar { color: #27ae60; }
         .status-aguardar { color: #7f8c8d; }
@@ -119,7 +129,7 @@
             font-size: 14px;
             font-weight: bold;
             transition: background-color 0.3s;
-            text-decoration: none; /* Para o link parecer um botão */
+            text-decoration: none;
         }
         .asset-management button:hover { background-color: #4a627a; }
         .action-btn {
@@ -144,24 +154,13 @@
             justify-content: space-around;
             margin-top: 30px;
             flex-wrap: wrap;
+            gap: 20px;
         }
         .chart-wrapper {
             width: 100%;
-            max-width: 45%;
+            max-width: 48%;
             min-width: 300px;
         }
-
-        /* Resumo Inferior */
-        .summary {
-            margin-top: 25px;
-            padding: 20px;
-            background-color: #ecf0f1;
-            border-radius: 8px;
-            text-align: center;
-            border-left: 5px solid #c0392b;
-        }
-        .summary p { font-size: 18px; margin: 8px 0; }
-        .summary span { font-weight: bold; color: #2c3e50; }
 
         /* Estilos do Modal (Pop-up) */
         .modal {
@@ -227,18 +226,31 @@
     <div class="container">
         <h1>Calculadora de Balanceamento de Carteira</h1>
 
-        <div class="controls">
-            <div>
-                <span class="patrimonio-label">Patrimônio Total: </span>
-                <span id="totalPatrimonioTop">R$ 0,00</span>
+        <!-- NOVO DASHBOARD -->
+        <div class="dashboard">
+            <div class="dashboard-card">
+                <label>💰 Patrimônio Total</label>
+                <span id="totalPatrimonioTop" class="value">R$ 0,00</span>
             </div>
-             <div>
-                <span class="target-total-label">Soma % Alvo: </span>
-                <span id="targetPctTotal">100.00%</span>
+            <div class="dashboard-card">
+                <label>🎯 Soma % Alvo</label>
+                <span id="targetPctTotal" class="value">100.00%</span>
             </div>
-            <div class="control-group">
-                <label for="aporteMensal">Aporte Mensal (R$):</label>
+            <div class="dashboard-card">
+                <label>💸 Aporte Mensal (R$)</label>
                 <input type="number" id="aporteMensal" value="500" step="50" oninput="calculatePortfolio()">
+            </div>
+            <div class="dashboard-card">
+                <label>📈 Total a Investir</label>
+                <span id="totalAporteReal" class="value">R$ 0,00</span>
+            </div>
+             <div class="dashboard-card">
+                <label>📦 Total de Cotas</label>
+                <span id="totalCotasComprar" class="value">0</span>
+            </div>
+            <div class="dashboard-card">
+                <label>💵 Renda Mensal (Est.)</label>
+                <span id="monthlyDividends" class="value">R$ 0,00</span>
             </div>
         </div>
 
@@ -279,13 +291,6 @@
                 <canvas id="currentAllocationChart"></canvas>
             </div>
         </div>
-
-         <div class="summary">
-            <h2>Resumo do Aporte e Projeções</h2>
-            <p>Total a Investir este Mês: <span id="totalAporteReal">R$ 0,00</span></p>
-            <p>Total de Cotas a Comprar: <span id="totalCotasComprar">0</span></p>
-            <p>Renda Mensal Estimada (Dividendos): <span id="monthlyDividends">R$ 0,00</span></p>
-         </div>
     </div>
 
     <!-- Modais -->
