@@ -172,6 +172,53 @@
         #aiAnalysisBtn:hover, #aiSuggestBtn:hover, #aiSuggestFixedIncomeBtn:hover, #aiSuggestOthersBtn:hover, #aiOptimizeBtn:hover {
             background-color: #9b59b6;
         }
+        
+        /* NOVO PAINEL DE COMPRA RÁPIDA */
+        .quick-add-panel {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 25px;
+            border-left: 5px solid #2980b9;
+        }
+        .quick-add-panel h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .quick-add-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .quick-add-form .form-group {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .quick-add-form label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .quick-add-form input {
+            min-width: 150px;
+        }
+        .quick-add-form button {
+            background-color: #2980b9;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .quick-add-form button:hover {
+            background-color: #3498db;
+        }
+
 
         /* Gráficos */
         .charts-header {
@@ -973,6 +1020,41 @@
             `;
 
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
+        }
+        
+        // CORREÇÃO: Lógica do painel de compra rápida
+        document.getElementById('quickAddForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const assetName = document.getElementById('quickAddAssetName').value.toUpperCase();
+            const assetQty = parseInt(document.getElementById('quickAddAssetQty').value);
+
+            if (!assetName || isNaN(assetQty) || assetQty <= 0) {
+                alert('Por favor, preencha o nome do ativo e uma quantidade válida.');
+                return;
+            }
+
+            const assetToUpdate = assetsState.find(a => a.name === assetName);
+
+            if (assetToUpdate) {
+                assetToUpdate.myQty += assetQty;
+                renderTable();
+                calculatePortfolio();
+                // Limpa os campos após o sucesso
+                document.getElementById('quickAddAssetName').value = '';
+                document.getElementById('quickAddAssetQty').value = '';
+            } else {
+                alert(`Ativo "${assetName}" não encontrado na sua carteira. Adicione-o primeiro através do botão "Adicionar Novo Ativo".`);
+            }
+        });
+
+        function updateAssetDatalist() {
+            const datalist = document.getElementById('asset-list');
+            datalist.innerHTML = '';
+            assetsState.forEach(asset => {
+                const option = document.createElement('option');
+                option.value = asset.name;
+                datalist.appendChild(option);
+            });
         }
 
 
