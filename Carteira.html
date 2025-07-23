@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v14 (Manual)</title>
+    <title>Calculadora de Balanceamento de Carteira (com Metas)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -289,12 +289,11 @@
     <script>
         let assetsState = [
             { id: 'cacr11', name: 'CACR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 10, currentPrice: 0 },
-            { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 22, currentPrice: 0 },
-            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.10, myQty: 23, currentPrice: 0 },
-            { id: 'vgir11', name: 'VGIR11', segment: 'Papel', type: 'fiis', targetPct: 0.05, myQty: 17, currentPrice: 0 },
+            { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', type: 'fiis', targetPct: 0.15, myQty: 22, currentPrice: 0 },
+            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.20, myQty: 23, currentPrice: 0 },
+            { id: 'vgir11', name: 'VGIR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 17, currentPrice: 0 },
             { id: 'habt11', name: 'HABT11', segment: 'Papel', type: 'fiis', targetPct: 0.05, myQty: 1, currentPrice: 0 },
             { id: 'snag11', name: 'SNAG11', segment: 'Fiagro', type: 'fiagros', targetPct: 0.20, myQty: 0, currentPrice: 0 },
-            { id: 'ggrc11', name: 'GGRC11', segment: 'Tijolo', type: 'fiis', targetPct: 0.20, myQty: 0, currentPrice: 0 },
             { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', type: 'fiis', targetPct: 0.20, myQty: 0, currentPrice: 0 },
             { id: 'mana11', name: 'MANA11', segment: 'Outro', type: 'fiis', targetPct: 0.00, myQty: 1, currentPrice: 0 }
         ];
@@ -308,8 +307,7 @@
                 row.id = `row_${asset.id}`;
                 const priceValue = asset.currentPrice > 0 ? asset.currentPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
                 
-                // Lógica para construir a URL do Investidor10
-                const assetTypePath = asset.type || 'fiis'; // Padrão para 'fiis' se não especificado
+                const assetTypePath = asset.type || 'fiis';
                 const investidor10Url = `https://investidor10.com.br/${assetTypePath}/${asset.name.toLowerCase()}/`;
                 
                 row.innerHTML = `
@@ -464,14 +462,12 @@
                 return;
             }
             
-            // Lógica simples para determinar o tipo de ativo para a URL
             let type = 'fiis';
             if (segment.toLowerCase().includes('fiagro')) {
                 type = 'fiagros';
             } else if (segment.toLowerCase().includes('aç') || segment.toLowerCase().includes('açao') || segment.toLowerCase().includes('acoes')) {
                  type = 'acoes';
             }
-
 
             const scaleFactor = 1 - targetPct;
             assetsState.forEach(asset => { asset.targetPct *= scaleFactor; });
