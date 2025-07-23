@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v15 (Final)</title>
+    <title>Calculadora de Balanceamento de Carteira (com IA)</title>
     <!-- Chart.js e plugin de datalabels -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -152,10 +152,10 @@
         .search-btn:hover {
             background-color: #3498db;
         }
-        #aiAnalysisBtn {
+        #aiAnalysisBtn, #aiSuggestBtn {
             background-color: #8e44ad;
         }
-        #aiAnalysisBtn:hover {
+        #aiAnalysisBtn:hover, #aiSuggestBtn:hover {
             background-color: #9b59b6;
         }
 
@@ -231,6 +231,21 @@
         .modal-button.confirm:hover { background-color: #2ecc71; }
         .modal-button.cancel { background-color: #7f8c8d; }
         .modal-button.cancel:hover { background-color: #95a5a6; }
+
+        /* Media Queries para Responsividade */
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 576px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .chart-wrapper {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -293,7 +308,8 @@
         <div class="asset-management">
             <button id="addAssetBtn">Adicionar Novo Ativo</button>
             <button id="removeAssetBtn">Remover Ativo</button>
-            <button id="aiAnalysisBtn">Analisar Carteira com IA</button>
+            <button id="aiAnalysisBtn">✨ Analisar Carteira com IA</button>
+            <button id="aiSuggestBtn">✨ Sugerir Novo Ativo com IA</button>
         </div>
 
         <div class="charts-container">
@@ -349,7 +365,7 @@
     
     <div id="aiAnalysisModal" class="modal">
         <div class="modal-content">
-            <h3>Análise da Carteira com IA (Gemini)</h3>
+            <h3 id="aiModalTitle">Análise da Carteira com IA (Gemini)</h3>
             <div id="aiResult">Aguardando análise...</div>
             <div class="modal-buttons">
                 <button type="button" class="modal-button cancel" id="cancelAi">Fechar</button>
@@ -371,7 +387,7 @@
         ];
 
         let targetChart, currentChart;
-        Chart.register(ChartDataLabels); // Registra o plugin de labels
+        Chart.register(ChartDataLabels);
 
         function renderTable() {
             const tbody = document.getElementById('portfolio-body');
@@ -534,6 +550,7 @@
         document.getElementById('addAssetBtn').onclick = () => { addModal.style.display = 'block'; };
         document.getElementById('removeAssetBtn').onclick = () => { removeModal.style.display = 'block'; };
         document.getElementById('aiAnalysisBtn').onclick = () => { analyzeWithAI(); };
+        document.getElementById('aiSuggestBtn').onclick = () => { suggestAssetWithAI(); };
 
         document.getElementById('cancelAdd').onclick = () => { addModal.style.display = 'none'; };
         document.getElementById('cancelRemove').onclick = () => { removeModal.style.display = 'none'; };
@@ -681,11 +698,46 @@
             }
         }
         
+        // --- Lógica da API do Gemini ---
+        async function callGeminiAPI(prompt) {
+            const apiKey = ""; // Deixado em branco para ser preenchido pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro na API do Gemini: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+                throw new Error("A resposta da API do Gemini não contém o texto esperado.");
+            }
+        }
+
         async function analyzeWithAI() {
             syncStateWithDOM();
+            const aiModalTitle = document.getElementById('aiModalTitle');
             const aiResultDiv = document.getElementById('aiResult');
+            aiModalTitle.textContent = 'Análise da Carteira com IA (Gemini)';
             aiModal.style.display = 'block';
-            aiResultDiv.textContent = 'O prompt para a análise foi copiado para a sua área de transferência. Cole-o (Ctrl+V) na conversa com a IA que abriu na nova aba para obter a sua análise.';
+            aiResultDiv.textContent = 'Analisando sua carteira... Por favor, aguarde.';
 
             const portfolioData = assetsState.map(asset => {
                 const totalPatrimonio = assetsState.reduce((sum, a) => sum + (a.myQty * a.currentPrice), 0) || 1;
@@ -713,11 +765,47 @@
             `;
             
             try {
-                await navigator.clipboard.writeText(prompt);
-                window.open('https://gemini.google.com/', '_blank');
-            } catch (err) {
-                console.error('Falha ao copiar o prompt: ', err);
-                aiResultDiv.textContent = 'Não foi possível copiar o prompt. Por favor, tente novamente.';
+                const analysisText = await callGeminiAPI(prompt);
+                aiResultDiv.textContent = analysisText;
+            } catch (error) {
+                console.error("Erro ao chamar a API do Gemini:", error);
+                aiResultDiv.textContent = "Ocorreu um erro ao tentar analisar a carteira. Por favor, tente novamente mais tarde.";
+            }
+        }
+
+        async function suggestAssetWithAI() {
+            syncStateWithDOM();
+            const aiModalTitle = document.getElementById('aiModalTitle');
+            const aiResultDiv = document.getElementById('aiResult');
+            aiModalTitle.textContent = 'Sugestão de Novo Ativo com IA (Gemini)';
+            aiModal.style.display = 'block';
+            aiResultDiv.textContent = 'Buscando uma boa oportunidade para sua carteira...';
+
+            const existingAssets = assetsState.map(a => a.name).join(', ');
+            const portfolioData = assetsState.map(asset => ({
+                ativo: asset.name,
+                segmento: asset.segment,
+                percentual_alvo: (asset.targetPct * 100).toFixed(2) + '%'
+            }));
+
+            const prompt = `
+                Atue como um analista de investimentos focado no mercado brasileiro. A carteira de um investidor, que busca altos dividendos mensais, é a seguinte:
+                ${JSON.stringify(portfolioData, null, 2)}
+
+                Sugira UM ÚNICO novo ativo (FII ou Fiagro) que complementaria bem esta carteira, focando em diversificação e potencial de dividendos. Não sugira nenhum dos seguintes ativos que já estão na carteira: ${existingAssets}.
+
+                Forneça sua resposta em formato de texto simples, com a seguinte estrutura:
+                Ativo: [TICKER DO ATIVO]
+                Segmento: [SEGMENTO DO ATIVO]
+                Justificativa: [Uma breve justificativa (2-3 frases) explicando por que este ativo é uma boa adição para esta carteira específica.]
+            `;
+
+            try {
+                const suggestionText = await callGeminiAPI(prompt);
+                aiResultDiv.textContent = suggestionText;
+            } catch (error) {
+                console.error("Erro ao chamar a API do Gemini para sugestão:", error);
+                aiResultDiv.textContent = "Ocorreu um erro ao buscar a sugestão. Por favor, tente novamente mais tarde.";
             }
         }
 
