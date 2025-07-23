@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v12 (API Final)</title>
+    <title>Calculadora de Balanceamento de Carteira v13 (API Estável)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -535,27 +535,30 @@
             btn.disabled = true;
 
             const tickers = assetsState.map(asset => asset.name).join(',');
-            const url = `https://brapi.dev/api/quote/${tickers}`;
+            // **NOVA API MAIS ESTÁVEL**
+            const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers}.SA`;
+            // Usamos um proxy para evitar problemas de CORS
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 
             try {
-                const response = await fetch(url);
+                const response = await fetch(proxyUrl);
                 if (!response.ok) {
                     throw new Error(`A API retornou um erro: ${response.statusText}`);
                 }
                 const data = await response.json();
+                const quoteResponse = JSON.parse(data.contents);
                 
                 const foundTickers = new Set();
-                if (data.results) {
-                    data.results.forEach(result => {
-                        if (!result.error && result.regularMarketPrice) {
-                            const asset = assetsState.find(a => a.name === result.symbol);
-                            if (asset) {
-                                const priceInput = document.getElementById(`price_${asset.id}`);
-                                if (priceInput) {
-                                    priceInput.value = result.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                }
-                                foundTickers.add(result.symbol);
+                if (quoteResponse.quoteResponse && quoteResponse.quoteResponse.result) {
+                    quoteResponse.quoteResponse.result.forEach(result => {
+                        const ticker = result.symbol.replace('.SA', '');
+                        const asset = assetsState.find(a => a.name === ticker);
+                        if (asset && result.regularMarketPrice) {
+                            const priceInput = document.getElementById(`price_${asset.id}`);
+                            if (priceInput) {
+                                priceInput.value = result.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                             }
+                            foundTickers.add(ticker);
                         }
                     });
                 }
