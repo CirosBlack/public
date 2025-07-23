@@ -360,7 +360,7 @@
                         <th class="sortable" data-sort-key="targetPct">% Alvo <span class="sort-arrow"></span></th>
                         <th class="sortable" data-sort-key="myQty">Minha Qtd. <span class="sort-arrow"></span></th>
                         <th class="sortable" data-sort-key="currentPrice">Preço Atual (R$) <span class="sort-arrow"></span></th>
-                        <th class="sortable" data-sort-key="dy">DY (12M) % <span class="sort-arrow"></span></th>
+                        <th class="sortable" data-sort-key="lastDividend">Últ. Rend. (R$) <span class="sort-arrow"></span></th>
                         <th>Ações</th>
                         <th class="sortable" data-sort-key="myValue">Meu Valor (R$) <span class="sort-arrow"></span></th>
                         <th class="sortable" data-sort-key="monthlyDividend">Dividendo Mensal (Est.) <span class="sort-arrow"></span></th>
@@ -477,15 +477,15 @@
 
     <script>
         let assetsState = [
-            { id: 'cacr11', name: 'CACR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 10, currentPrice: 0, dy: 0 },
-            { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', type: 'fiis', targetPct: 0.15, myQty: 22, currentPrice: 0, dy: 0 },
-            { id: 'vgir11', name: 'VGIR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 17, currentPrice: 0, dy: 0 },
-            { id: 'habt11', name: 'HABT11', segment: 'Papel', type: 'fiis', targetPct: 0.05, myQty: 1, currentPrice: 0, dy: 0 },
-            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.10, myQty: 23, currentPrice: 0, dy: 0 },
-            { id: 'ggrc11', name: 'GGRC11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0, dy: 0 },
-            { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0, dy: 0 },
-            { id: 'snag11', name: 'SNAG11', segment: 'Fiagro', type: 'fiagros', targetPct: 0.20, myQty: 0, currentPrice: 0, dy: 0 },
-            { id: 'mana11', name: 'MANA11', segment: 'Outro', type: 'fiis', targetPct: 0.00, myQty: 1, currentPrice: 0, dy: 0 }
+            { id: 'cacr11', name: 'CACR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 10, currentPrice: 0, lastDividend: 0 },
+            { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', type: 'fiis', targetPct: 0.15, myQty: 22, currentPrice: 0, lastDividend: 0 },
+            { id: 'vgir11', name: 'VGIR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 17, currentPrice: 0, lastDividend: 0 },
+            { id: 'habt11', name: 'HABT11', segment: 'Papel', type: 'fiis', targetPct: 0.05, myQty: 1, currentPrice: 0, lastDividend: 0 },
+            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.10, myQty: 23, currentPrice: 0, lastDividend: 0 },
+            { id: 'ggrc11', name: 'GGRC11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0, lastDividend: 0 },
+            { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0, lastDividend: 0 },
+            { id: 'snag11', name: 'SNAG11', segment: 'Fiagro', type: 'fiagros', targetPct: 0.20, myQty: 0, currentPrice: 0, lastDividend: 0 },
+            { id: 'mana11', name: 'MANA11', segment: 'Outro', type: 'fiis', targetPct: 0.00, myQty: 1, currentPrice: 0, lastDividend: 0 }
         ];
 
         let targetChart, currentChart;
@@ -502,7 +502,7 @@
                 const row = document.createElement('tr');
                 row.id = `row_${asset.id}`;
                 const priceValue = asset.currentPrice > 0 ? asset.currentPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
-                const dyValue = asset.dy > 0 ? asset.dy.toFixed(2) : '';
+                const lastDividendValue = asset.lastDividend > 0 ? asset.lastDividend.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
                 
                 const assetTypePath = asset.type || 'fiis';
                 const investidor10Url = `https://investidor10.com.br/${assetTypePath}/${asset.name.toLowerCase()}/`;
@@ -513,7 +513,7 @@
                     <td><input type="number" id="target_pct_${asset.id}" value="${(asset.targetPct * 100).toFixed(2)}" step="0.1" oninput="calculatePortfolio()"></td>
                     <td><input type="number" id="qty_${asset.id}" value="${asset.myQty}" step="1" oninput="calculatePortfolio()"></td>
                     <td><input type="text" class="price-input" id="price_${asset.id}" value="${priceValue}" placeholder="0,00" onblur="formatAndRecalculate(this)" onfocus="this.select()"></td>
-                    <td><input type="number" id="dy_${asset.id}" value="${dyValue}" step="0.1" placeholder="0.00" oninput="calculatePortfolio()"></td>
+                    <td><input type="text" id="last_dividend_${asset.id}" value="${lastDividendValue}" placeholder="0,00" onblur="formatAndRecalculate(this)" onfocus="this.select()"></td>
                     <td><a href="${investidor10Url}" target="_blank" class="action-btn search-btn" title="Ver no Investidor10">🔍</a></td>
                     <td class="output" id="value_${asset.id}">-</td>
                     <td class="output" id="monthly_dividend_${asset.id}">-</td>
@@ -554,7 +554,7 @@
                 const targetPctInput = document.getElementById(`target_pct_${asset.id}`);
                 const qtyInput = document.getElementById(`qty_${asset.id}`);
                 const priceInput = document.getElementById(`price_${asset.id}`);
-                const dyInput = document.getElementById(`dy_${asset.id}`);
+                const lastDividendInput = document.getElementById(`last_dividend_${asset.id}`);
 
                 if (targetPctInput) asset.targetPct = parseFloat(targetPctInput.value) / 100 || 0;
                 if (qtyInput) asset.myQty = parseInt(qtyInput.value) || 0;
@@ -562,7 +562,10 @@
                     const priceStr = priceInput.value || '0';
                     asset.currentPrice = parseFloat(priceStr.replace(/\./g, '').replace(',', '.')) || 0;
                 }
-                if (dyInput) asset.dy = parseFloat(dyInput.value) || 0;
+                if (lastDividendInput) {
+                    const dividendStr = lastDividendInput.value || '0';
+                    asset.lastDividend = parseFloat(dividendStr.replace(/\./g, '').replace(',', '.')) || 0;
+                }
             });
         }
 
@@ -572,16 +575,16 @@
             const aporteMensal = parseFloat(document.getElementById('aporteMensal').value) || 0;
             let totalPatrimonio = 0;
             let totalTargetPct = 0;
-            let totalAnnualDividends = 0;
+            let totalMonthlyDividends = 0;
             
             let currentAssets = assetsState.map(asset => {
                 const myValue = asset.myQty * asset.currentPrice;
+                const monthlyDividend = asset.myQty * asset.lastDividend;
                 totalPatrimonio += myValue;
                 totalTargetPct += asset.targetPct;
-                if (asset.dy > 0) {
-                    totalAnnualDividends += myValue * (asset.dy / 100);
-                }
-                return { ...asset, myValue };
+                totalMonthlyDividends += monthlyDividend;
+
+                return { ...asset, myValue, monthlyDividend };
             });
 
             currentAssets = currentAssets.map(asset => {
@@ -589,8 +592,7 @@
                 const targetValue = (totalPatrimonio + aporteMensal) * asset.targetPct;
                 const gap = targetValue - asset.myValue;
                 const status = gap > 0 && asset.currentPrice > 0 ? "Aportar" : "Aguardar";
-                const monthlyDividend = (asset.myValue * (asset.dy / 100)) / 12;
-                return { ...asset, currentPct, gap, status, monthlyDividend };
+                return { ...asset, currentPct, gap, status };
             });
 
             const assetsToRank = currentAssets.filter(a => a.status === 'Aportar').sort((a, b) => b.gap - a.gap);
@@ -644,9 +646,9 @@
             targetPctTotalEl.classList.toggle('invalid', Math.abs(totalTargetPct - 1.0) > 0.001);
             document.getElementById('totalAporteReal').textContent = formatCurrency(totalAporteReal);
             document.getElementById('totalCotasComprar').textContent = totalCotasComprar;
-            document.getElementById('monthlyDividends').textContent = formatCurrency(totalAnnualDividends / 12);
+            document.getElementById('monthlyDividends').textContent = formatCurrency(totalMonthlyDividends);
 
-            updateCharts(currentAssets, totalPatrimonio);
+            updateCharts(currentAssets);
         }
 
         const addModal = document.getElementById('addAssetModal');
@@ -703,7 +705,7 @@
                 targetPct: targetPct,
                 myQty: 0,
                 currentPrice: 0,
-                dy: 0
+                lastDividend: 0
             };
             assetsState.push(newAsset);
             
@@ -749,12 +751,12 @@
             calculatePortfolio();
         }
 
-        function updateCharts(data, totalPatrimonio) {
+        function updateCharts(data) {
             const labels = data.map(a => a.name);
             const targetData = data.map(a => a.targetPct * 100);
             const currentData = data.map(a => a.currentPct * 100);
 
-            const targetDividends = data.map(a => (totalPatrimonio * a.targetPct * (a.dy / 100)) / 12);
+            const targetDividends = data.map(a => (a.myValue / (a.currentPct || 1) * a.targetPct * (a.lastDividend / (a.currentPrice || 1))));
             const currentDividends = data.map(a => a.monthlyDividend);
             
             const chartTypeForJs = currentChartType === 'barVertical' ? 'bar' : currentChartType;
