@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira (com Metas)</title>
+    <title>Calculadora de Balanceamento de Carteira (com IA)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -129,6 +129,12 @@
         .search-btn:hover {
             background-color: #3498db;
         }
+        #aiAnalysisBtn {
+            background-color: #8e44ad;
+        }
+        #aiAnalysisBtn:hover {
+            background-color: #9b59b6;
+        }
 
         /* Resumo Inferior */
         .summary {
@@ -160,11 +166,21 @@
             padding: 25px;
             border: 1px solid #888;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             border-radius: 8px;
             display: flex;
             flex-direction: column;
             gap: 15px;
+        }
+        #aiResult {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+            border: 1px solid #dfe6e9;
         }
         .modal-form-group {
             display: flex;
@@ -235,6 +251,7 @@
         <div class="asset-management">
             <button id="addAssetBtn">Adicionar Novo Ativo</button>
             <button id="removeAssetBtn">Remover Ativo</button>
+            <button id="aiAnalysisBtn">Analisar Carteira com IA</button>
         </div>
 
          <div class="summary">
@@ -244,7 +261,7 @@
          </div>
     </div>
 
-    <!-- Modal para Adicionar Ativo -->
+    <!-- Modais -->
     <div id="addAssetModal" class="modal">
         <div class="modal-content">
             <h3>Adicionar Novo Ativo</h3>
@@ -269,7 +286,6 @@
         </div>
     </div>
 
-    <!-- Modal para Remover Ativo -->
     <div id="removeAssetModal" class="modal">
         <div class="modal-content">
             <h3>Remover Ativo</h3>
@@ -285,16 +301,27 @@
             </form>
         </div>
     </div>
+    
+    <div id="aiAnalysisModal" class="modal">
+        <div class="modal-content">
+            <h3>Análise da Carteira com IA (Gemini)</h3>
+            <div id="aiResult">Aguardando análise...</div>
+            <div class="modal-buttons">
+                <button type="button" class="modal-button cancel" id="cancelAi">Fechar</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let assetsState = [
             { id: 'cacr11', name: 'CACR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 10, currentPrice: 0 },
             { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', type: 'fiis', targetPct: 0.15, myQty: 22, currentPrice: 0 },
-            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.20, myQty: 23, currentPrice: 0 },
             { id: 'vgir11', name: 'VGIR11', segment: 'Papel', type: 'fiis', targetPct: 0.10, myQty: 17, currentPrice: 0 },
             { id: 'habt11', name: 'HABT11', segment: 'Papel', type: 'fiis', targetPct: 0.05, myQty: 1, currentPrice: 0 },
+            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', type: 'fiis', targetPct: 0.10, myQty: 23, currentPrice: 0 },
+            { id: 'ggrc11', name: 'GGRC11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0 },
+            { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', type: 'fiis', targetPct: 0.15, myQty: 0, currentPrice: 0 },
             { id: 'snag11', name: 'SNAG11', segment: 'Fiagro', type: 'fiagros', targetPct: 0.20, myQty: 0, currentPrice: 0 },
-            { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', type: 'fiis', targetPct: 0.20, myQty: 0, currentPrice: 0 },
             { id: 'mana11', name: 'MANA11', segment: 'Outro', type: 'fiis', targetPct: 0.00, myQty: 1, currentPrice: 0 }
         ];
 
@@ -439,14 +466,21 @@
 
         const addModal = document.getElementById('addAssetModal');
         const removeModal = document.getElementById('removeAssetModal');
+        const aiModal = document.getElementById('aiAnalysisModal');
+        
         document.getElementById('addAssetBtn').onclick = () => { addModal.style.display = 'block'; };
         document.getElementById('removeAssetBtn').onclick = () => { removeModal.style.display = 'block'; };
+        document.getElementById('aiAnalysisBtn').onclick = () => { analyzeWithAI(); };
+
         document.getElementById('cancelAdd').onclick = () => { addModal.style.display = 'none'; };
         document.getElementById('cancelRemove').onclick = () => { removeModal.style.display = 'none'; };
+        document.getElementById('cancelAi').onclick = () => { aiModal.style.display = 'none'; };
+        
         window.onclick = (event) => {
-            if (event.target == addModal || event.target == removeModal) {
+            if (event.target == addModal || event.target == removeModal || event.target == aiModal) {
                 addModal.style.display = "none";
                 removeModal.style.display = "none";
+                aiModal.style.display = "none";
             }
         };
 
@@ -520,6 +554,72 @@
             e.target.reset();
         });
         
+        // --- Lógica da API do Gemini ---
+        async function analyzeWithAI() {
+            syncStateWithDOM();
+            const aiResultDiv = document.getElementById('aiResult');
+            aiModal.style.display = 'block';
+            aiResultDiv.textContent = 'Analisando sua carteira... Por favor, aguarde.';
+
+            const portfolioData = assetsState.map(asset => {
+                const totalPatrimonio = assetsState.reduce((sum, a) => sum + (a.myQty * a.currentPrice), 0) || 1;
+                return {
+                    ativo: asset.name,
+                    segmento: asset.segment,
+                    percentual_atual: ((asset.myQty * asset.currentPrice) / totalPatrimonio * 100).toFixed(2) + '%',
+                    percentual_alvo: (asset.targetPct * 100).toFixed(2) + '%'
+                }
+            });
+
+            const prompt = `
+                Por favor, atue como um analista de investimentos. Analise a seguinte carteira de investimentos de um investidor brasileiro cujo objetivo principal é receber altos dividendos mensais.
+
+                Dados da Carteira:
+                ${JSON.stringify(portfolioData, null, 2)}
+
+                Com base nestes dados, forneça uma análise concisa e objetiva em português do Brasil, seguindo os seguintes pontos:
+                1.  **Ponto Forte Principal:** Identifique o principal ponto positivo da carteira.
+                2.  **Ponto de Atenção Principal:** Aponte o principal risco ou ponto a ser melhorado (ex: concentração em um ativo ou setor).
+                3.  **Sugestão de Melhoria:** Dê uma sugestão clara e prática de como o investidor pode melhorar a carteira, considerando o objetivo de dividendos. Pode sugerir rebalanceamento ou a inclusão de um tipo de ativo que está em falta.
+                4.  **Conclusão:** Uma frase final de encorajamento.
+
+                Seja direto e use uma linguagem fácil de entender.
+            `;
+            
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Deixado em branco para ser preenchido pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro na API do Gemini: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const analysisText = result.candidates[0].content.parts[0].text;
+                    aiResultDiv.textContent = analysisText;
+                } else {
+                    throw new Error("A resposta da API do Gemini não contém o texto esperado.");
+                }
+
+            } catch (error) {
+                console.error("Erro ao chamar a API do Gemini:", error);
+                aiResultDiv.textContent = "Ocorreu um erro ao tentar analisar a carteira. Por favor, tente novamente mais tarde.";
+            }
+        }
+
         window.onload = () => {
             renderTable();
             calculatePortfolio();
