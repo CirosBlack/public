@@ -30,13 +30,15 @@
             text-align: center;
             color: #2c3e50;
         }
-        /* Tabela */
+        /* Tabela Responsiva */
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* Adiciona scroll horizontal apenas na tabela */
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            overflow-x: auto;
-            display: block;
         }
         th, td {
             border: 1px solid #dfe6e9;
@@ -68,10 +70,10 @@
             outline: none;
             border-color: #c0392b;
         }
-        /* NOVO PAINEL DE CONTROLO (DASHBOARD) */
+        /* PAINEL DE CONTROLO (DASHBOARD) */
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             padding: 20px;
             background-color: #f8f9fa;
@@ -84,6 +86,9 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .dashboard-card label {
             font-size: 14px;
@@ -271,29 +276,31 @@
                 <span id="totalCotasComprar" class="value">0</span>
             </div>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Ativo</th>
-                    <th>Segmento</th>
-                    <th>% Alvo</th>
-                    <th>Minha Qtd.</th>
-                    <th>Preço Atual (R$)</th>
-                    <th>DY (12M) %</th>
-                    <th>Ações</th>
-                    <th>Meu Valor (R$)</th>
-                    <th>Dividendo Mensal (Est.)</th>
-                    <th>% Atual</th>
-                    <th>Distância (R$)</th>
-                    <th>Status</th>
-                    <th>Prioridade</th>
-                    <th>Cotas a Comprar</th>
-                    <th>Valor das Cotas (R$)</th>
-                </tr>
-            </thead>
-            <tbody id="portfolio-body"></tbody>
-        </table>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ativo</th>
+                        <th>Segmento</th>
+                        <th>% Alvo</th>
+                        <th>Minha Qtd.</th>
+                        <th>Preço Atual (R$)</th>
+                        <th>DY (12M) %</th>
+                        <th>Ações</th>
+                        <th>Meu Valor (R$)</th>
+                        <th>Dividendo Mensal (Est.)</th>
+                        <th>% Atual</th>
+                        <th>Distância (R$)</th>
+                        <th>Status</th>
+                        <th>Prioridade</th>
+                        <th>Cotas a Comprar</th>
+                        <th>Valor das Cotas (R$)</th>
+                    </tr>
+                </thead>
+                <tbody id="portfolio-body"></tbody>
+            </table>
+        </div>
 
         <div class="asset-management">
             <button id="addAssetBtn">Adicionar Novo Ativo</button>
