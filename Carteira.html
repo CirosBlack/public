@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v11 (API Corrigida)</title>
+    <title>Calculadora de Balanceamento de Carteira v12 (API Final)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -547,8 +547,6 @@
                 const foundTickers = new Set();
                 if (data.results) {
                     data.results.forEach(result => {
-                        // **CORREÇÃO IMPORTANTE AQUI**
-                        // Verifica se o resultado NÃO tem erro e TEM preço antes de usar
                         if (!result.error && result.regularMarketPrice) {
                             const asset = assetsState.find(a => a.name === result.symbol);
                             if (asset) {
