@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Balanceamento de Carteira v15 (Final)</title>
-    <!-- Chart.js para os gráficos -->
+    <!-- Chart.js e plugin de datalabels -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
         /* Estilos Gerais */
         body {
@@ -34,10 +35,12 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            overflow-x: auto;
+            display: block;
         }
         th, td {
             border: 1px solid #dfe6e9;
-            padding: 12px 8px;
+            padding: 12px 15px;
             text-align: center;
             font-size: 14px;
             white-space: nowrap;
@@ -59,7 +62,7 @@
             border-radius: 4px;
             text-align: center;
             font-size: 14px;
-            min-width: 60px;
+            min-width: 70px;
         }
         input:focus {
             outline: none;
@@ -68,7 +71,7 @@
         /* NOVO PAINEL DE CONTROLO (DASHBOARD) */
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             padding: 20px;
             background-color: #f8f9fa;
@@ -158,8 +161,8 @@
         }
         .chart-wrapper {
             width: 100%;
-            max-width: 48%;
-            min-width: 300px;
+            max-width: 450px; /* Tamanho máximo dos gráficos */
+            margin: 0 auto;
         }
 
         /* Estilos do Modal (Pop-up) */
@@ -220,6 +223,21 @@
         .modal-button.confirm:hover { background-color: #2ecc71; }
         .modal-button.cancel { background-color: #7f8c8d; }
         .modal-button.cancel:hover { background-color: #95a5a6; }
+
+        /* Media Queries para Responsividade */
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 576px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .chart-wrapper {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -231,6 +249,10 @@
             <div class="dashboard-card">
                 <label>💰 Patrimônio Total</label>
                 <span id="totalPatrimonioTop" class="value">R$ 0,00</span>
+            </div>
+            <div class="dashboard-card">
+                <label>💵 Renda Mensal (Est.)</label>
+                <span id="monthlyDividends" class="value">R$ 0,00</span>
             </div>
             <div class="dashboard-card">
                 <label>🎯 Soma % Alvo</label>
@@ -247,10 +269,6 @@
              <div class="dashboard-card">
                 <label>📦 Total de Cotas</label>
                 <span id="totalCotasComprar" class="value">0</span>
-            </div>
-            <div class="dashboard-card">
-                <label>💵 Renda Mensal (Est.)</label>
-                <span id="monthlyDividends" class="value">R$ 0,00</span>
             </div>
         </div>
 
@@ -358,6 +376,7 @@
         ];
 
         let targetChart, currentChart;
+        Chart.register(ChartDataLabels); // Registra o plugin de labels
 
         function renderTable() {
             const tbody = document.getElementById('portfolio-body');
@@ -510,7 +529,7 @@
             document.getElementById('totalCotasComprar').textContent = totalCotasComprar;
             document.getElementById('monthlyDividends').textContent = formatCurrency(totalAnnualDividends / 12);
 
-            updateCharts(currentAssets);
+            updateCharts(currentAssets, totalPatrimonio);
         }
 
         const addModal = document.getElementById('addAssetModal');
@@ -604,20 +623,25 @@
             e.target.reset();
         });
         
-        function updateCharts(data) {
+        function updateCharts(data, totalPatrimonio) {
             const labels = data.map(a => a.name);
             const targetData = data.map(a => a.targetPct * 100);
             const currentData = data.map(a => a.currentPct * 100);
 
-            const chartConfig = (title, chartData) => ({
+            // Calcula os dividendos para cada slice do gráfico
+            const targetDividends = data.map(a => (totalPatrimonio * a.targetPct * (a.dy / 100)) / 12);
+            const currentDividends = data.map(a => a.monthlyDividend);
+            
+            const chartConfig = (title, chartData, dividendData) => ({
                 type: 'doughnut',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: '% da Carteira',
                         data: chartData,
+                        dividends: dividendData, // Passa os dividendos para o plugin
                         backgroundColor: [
-                            '#2c3e50', '#e74c3c', '#ecf0f1', '#3498db', '#f1c40f',
+                            '#2c3e50', '#e74c3c', '#3498db', '#f1c40f',
                             '#1abc9c', '#9b59b6', '#34495e', '#e67e22', '#95a5a6'
                         ],
                         borderColor: '#fff',
@@ -627,17 +651,29 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: { position: 'top' },
-                        title: { display: true, text: title, font: { size: 16 } }
+                        legend: { display: false },
+                        title: { display: true, text: title, font: { size: 16 } },
+                        datalabels: {
+                            color: '#fff',
+                            textAlign: 'center',
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (value, context) => {
+                                if (value < 4) return ''; // Oculta labels de fatias muito pequenas
+                                const label = context.chart.data.labels[context.dataIndex];
+                                const dividend = context.chart.data.datasets[0].dividends[context.dataIndex];
+                                const dividendString = dividend > 0 ? `\n${formatCurrency(dividend)}` : '';
+                                return `${label}\n${value.toFixed(1)}%${dividendString}`;
+                            }
+                        }
                     }
                 }
             });
 
             if (targetChart) targetChart.destroy();
-            targetChart = new Chart(document.getElementById('targetAllocationChart'), chartConfig('Alocação Ideal (% Alvo)', targetData));
+            targetChart = new Chart(document.getElementById('targetAllocationChart'), chartConfig('Alocação Ideal (% Alvo)', targetData, targetDividends));
 
             if (currentChart) currentChart.destroy();
-            currentChart = new Chart(document.getElementById('currentAllocationChart'), chartConfig('Alocação Atual (%)', currentData));
+            currentChart = new Chart(document.getElementById('currentAllocationChart'), chartConfig('Alocação Atual (%)', currentData, currentDividends));
         }
 
         function saveStateToLocalStorage() {
