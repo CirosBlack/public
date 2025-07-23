@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Balanceamento de Carteira v10 (API Individual)</title>
+    <style>
+        /* Estilos Gerais */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 1500px;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dfe6e9;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        th {
+            background-color: #34495e;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        input[type="number"], input[type="text"] {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #b2bec3;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+            min-width: 60px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #c0392b;
+        }
+        /* Controles Superiores */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-group label, .patrimonio-label, .target-total-label {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        #totalPatrimonioTop, #targetPctTotal {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        #targetPctTotal.invalid {
+            color: #c0392b;
+        }
+        .output { font-weight: bold; }
+        .status-aportar { color: #27ae60; }
+        .status-aguardar { color: #7f8c8d; }
+        .priority-alta { background-color: #f8d7da; color: #721c24; font-weight: bold; }
+        .priority-media { background-color: #fff3cd; color: #856404; font-weight: bold; }
+        .priority-baixa { background-color: #d4edda; color: #155724; font-weight: bold; }
+        .priority-nenhuma { background-color: #e9ecef; color: #495057; }
+        
+        /* Gerenciamento de Ativos (Botões) */
+        .asset-management {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .asset-management button, .action-btn, .modal-button {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .asset-management button:hover { background-color: #4a627a; }
+        .action-btn {
+            padding: 5px 10px;
+            margin: 0 2px;
+        }
+        .remove-btn { background-color: #c0392b; }
+        .remove-btn:hover { background-color: #e74c3c; }
+        .update-price-btn { background-color: #16a085; }
+        .update-price-btn:hover { background-color: #1abc9c; }
+        .update-price-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+
+
+        /* Resumo Inferior */
+        .summary {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 5px solid #c0392b;
+        }
+        .summary p { font-size: 18px; margin: 8px 0; }
+        .summary span { font-weight: bold; color: #2c3e50; }
+
+        /* Estilos do Modal (Pop-up) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .modal-form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .modal-form-group input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .modal-button.confirm { background-color: #27ae60; }
+        .modal-button.confirm:hover { background-color: #2ecc71; }
+        .modal-button.cancel { background-color: #7f8c8d; }
+        .modal-button.cancel:hover { background-color: #95a5a6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Balanceamento de Carteira</h1>
+
+        <div class="controls">
+            <div>
+                <span class="patrimonio-label">Patrimônio Total: </span>
+                <span id="totalPatrimonioTop">R$ 0,00</span>
+            </div>
+             <div>
+                <span class="target-total-label">Soma % Alvo: </span>
+                <span id="targetPctTotal">100.00%</span>
+            </div>
+            <div class="control-group">
+                <label for="aporteMensal">Aporte Mensal (R$):</label>
+                <input type="number" id="aporteMensal" value="500" step="50" oninput="calculatePortfolio()">
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Ativo</th>
+                    <th>Segmento</th>
+                    <th>% Alvo</th>
+                    <th>Minha Qtd.</th>
+                    <th>Preço Atual (R$)</th>
+                    <th>Meu Valor (R$)</th>
+                    <th>% Atual</th>
+                    <th>Distância (R$)</th>
+                    <th>Status</th>
+                    <th>Prioridade</th>
+                    <th>Cotas a Comprar</th>
+                    <th>Valor das Cotas (R$)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="portfolio-body"></tbody>
+        </table>
+
+        <div class="asset-management">
+            <button id="addAssetBtn">Adicionar Novo Ativo</button>
+            <button id="removeAssetBtn">Remover Ativo</button>
+        </div>
+
+         <div class="summary">
+            <h2>Resumo do Aporte Mensal</h2>
+            <p>Total a Investir este Mês: <span id="totalAporteReal">R$ 0,00</span></p>
+            <p>Total de Cotas a Comprar: <span id="totalCotasComprar">0</span></p>
+         </div>
+    </div>
+
+    <!-- Modal para Adicionar Ativo -->
+    <div id="addAssetModal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar Novo Ativo</h3>
+            <form id="addAssetForm">
+                <div class="modal-form-group">
+                    <label for="newAssetName">Nome do Ativo (ex: ITSA4)</label>
+                    <input type="text" id="newAssetName" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="newAssetSegment">Segmento (ex: Ações, FII)</label>
+                    <input type="text" id="newAssetSegment" required>
+                </div>
+                <div class="modal-form-group">
+                    <label for="newAssetTargetPct">% Alvo (apenas o número)</label>
+                    <input type="number" id="newAssetTargetPct" step="0.1" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-button cancel" id="cancelAdd">Cancelar</button>
+                    <button type="submit" class="modal-button confirm">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Remover Ativo -->
+    <div id="removeAssetModal" class="modal">
+        <div class="modal-content">
+            <h3>Remover Ativo</h3>
+            <form id="removeAssetForm">
+                <div class="modal-form-group">
+                    <label for="removeAssetName">Digite o nome do ativo a ser removido</label>
+                    <input type="text" id="removeAssetName" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-button cancel" id="cancelRemove">Cancelar</button>
+                    <button type="submit" class="modal-button confirm">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let assetsState = [
+            { id: 'cacr11', name: 'CACR11', segment: 'Papel', targetPct: 0.10, myQty: 10, currentPrice: 0 },
+            { id: 'mxrf11', name: 'MXRF11', segment: 'Papel', targetPct: 0.10, myQty: 22, currentPrice: 0 },
+            { id: 'gare11', name: 'GARE11', segment: 'Tijolo', targetPct: 0.10, myQty: 23, currentPrice: 0 },
+            { id: 'vgir11', name: 'VGIR11', segment: 'Papel', targetPct: 0.05, myQty: 17, currentPrice: 0 },
+            { id: 'habt11', name: 'HABT11', segment: 'Papel', targetPct: 0.05, myQty: 1, currentPrice: 0 },
+            { id: 'snag11', name: 'SNAG11', segment: 'Fiagro', targetPct: 0.20, myQty: 0, currentPrice: 0 },
+            { id: 'ggrc11', name: 'GGRC11', segment: 'Tijolo', targetPct: 0.20, myQty: 0, currentPrice: 0 },
+            { id: 'xpml11', name: 'XPML11', segment: 'Tijolo', targetPct: 0.20, myQty: 0, currentPrice: 0 },
+            { id: 'mana11', name: 'MANA11', segment: 'Outro', targetPct: 0.00, myQty: 1, currentPrice: 0 }
+        ];
+
+        function renderTable() {
+            const tbody = document.getElementById('portfolio-body');
+            tbody.innerHTML = ''; 
+            
+            assetsState.forEach(asset => {
+                const row = document.createElement('tr');
+                row.id = `row_${asset.id}`;
+                const priceValue = asset.currentPrice > 0 ? asset.currentPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+                row.innerHTML = `
+                    <td><b>${asset.name}</b></td>
+                    <td>${asset.segment}</td>
+                    <td><input type="number" id="target_pct_${asset.id}" value="${(asset.targetPct * 100).toFixed(2)}" step="0.1" oninput="calculatePortfolio()"></td>
+                    <td><input type="number" id="qty_${asset.id}" value="${asset.myQty}" step="1" oninput="calculatePortfolio()"></td>
+                    <td><input type="text" class="price-input" id="price_${asset.id}" value="${priceValue}" placeholder="0,00" onblur="formatAndRecalculate(this)" onfocus="this.select()"></td>
+                    <td class="output" id="value_${asset.id}">-</td>
+                    <td class="output" id="pct_${asset.id}">-</td>
+                    <td class="output" id="gap_${asset.id}">-</td>
+                    <td class="output" id="status_${asset.id}">-</td>
+                    <td class="output" id="priority_${asset.id}">-</td>
+                    <td class="output" id="shares_to_buy_${asset.id}">-</td>
+                    <td class="output" id="value_to_buy_${asset.id}">-</td>
+                    <td class="actions-cell">
+                        <button class="action-btn update-price-btn" data-id="${asset.id}" data-name="${asset.name}" title="Atualizar Preço (API)">🔄</button>
+                        <button class="action-btn remove-btn" data-id="${asset.id}" title="Remover Ativo">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            addTableButtonListeners();
+        }
+        
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+        
+        function formatAndRecalculate(element) {
+            let value = element.value;
+            if (!value) {
+                calculatePortfolio();
+                return;
+            };
+            let numericValue = parseFloat(value.replace(/[^\d]/g, ''));
+            if (isNaN(numericValue)) {
+                element.value = '';
+            } else {
+                numericValue /= 100;
+                element.value = numericValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            calculatePortfolio();
+        }
+        
+        function syncStateWithDOM() {
+            assetsState.forEach(asset => {
+                const targetPctInput = document.getElementById(`target_pct_${asset.id}`);
+                const qtyInput = document.getElementById(`qty_${asset.id}`);
+                const priceInput = document.getElementById(`price_${asset.id}`);
+
+                if (targetPctInput) asset.targetPct = parseFloat(targetPctInput.value) / 100 || 0;
+                if (qtyInput) asset.myQty = parseInt(qtyInput.value) || 0;
+                if (priceInput) {
+                    const priceStr = priceInput.value || '0';
+                    asset.currentPrice = parseFloat(priceStr.replace(/\./g, '').replace(',', '.')) || 0;
+                }
+            });
+        }
+
+        function calculatePortfolio() {
+            syncStateWithDOM();
+            const aporteMensal = parseFloat(document.getElementById('aporteMensal').value) || 0;
+            let totalPatrimonio = 0;
+            let totalTargetPct = 0;
+            
+            let currentAssets = assetsState.map(asset => {
+                const myValue = asset.myQty * asset.currentPrice;
+                totalPatrimonio += myValue;
+                totalTargetPct += asset.targetPct;
+                return { ...asset, myValue };
+            });
+
+            currentAssets = currentAssets.map(asset => {
+                const currentPct = totalPatrimonio > 0 ? asset.myValue / totalPatrimonio : 0;
+                const targetValue = (totalPatrimonio + aporteMensal) * asset.targetPct;
+                const gap = targetValue - asset.myValue;
+                const status = gap > 0 && asset.currentPrice > 0 ? "Aportar" : "Aguardar";
+                return { ...asset, currentPct, gap, status };
+            });
+
+            const assetsToRank = currentAssets.filter(a => a.status === 'Aportar').sort((a, b) => b.gap - a.gap);
+            currentAssets = currentAssets.map(asset => {
+                const rank = assetsToRank.findIndex(a => a.id === asset.id);
+                let priority = "Nenhuma";
+                let priorityClass = "priority-nenhuma";
+                if (rank !== -1) {
+                    if (rank <= 1) { priority = "ALTA"; priorityClass = "priority-alta"; } 
+                    else if (rank <= 3) { priority = "MÉDIA"; priorityClass = "priority-media"; } 
+                    else { priority = "BAIXA"; priorityClass = "priority-baixa"; }
+                }
+                return { ...asset, rank, priority, priorityClass };
+            });
+
+            let aporteRestante = aporteMensal;
+            let totalCotasComprar = 0;
+            let totalAporteReal = 0;
+            currentAssets.sort((a, b) => (a.rank === -1 ? 99 : a.rank) - (b.rank === -1 ? 99 : b.rank));
+            currentAssets.forEach(asset => {
+                let aporteReal = 0;
+                if (asset.status === 'Aportar' && aporteRestante > 0) {
+                    aporteReal = Math.min(asset.gap, aporteRestante);
+                }
+                const cotasComprar = asset.currentPrice > 0 ? Math.floor(aporteReal / asset.currentPrice) : 0;
+                const valorFinalCotas = cotasComprar * asset.currentPrice;
+                asset.cotasComprar = cotasComprar;
+                asset.valorFinalCotas = valorFinalCotas;
+                aporteRestante -= valorFinalCotas;
+                totalCotasComprar += cotasComprar;
+                totalAporteReal += valorFinalCotas;
+            });
+
+            currentAssets.sort((a,b) => assetsState.findIndex(p => p.id === a.id) - assetsState.findIndex(p => p.id === b.id));
+            currentAssets.forEach(asset => {
+                document.getElementById(`value_${asset.id}`).textContent = formatCurrency(asset.myValue);
+                document.getElementById(`pct_${asset.id}`).textContent = `${(asset.currentPct * 100).toFixed(2)}%`;
+                document.getElementById(`gap_${asset.id}`).textContent = formatCurrency(asset.gap);
+                document.getElementById(`status_${asset.id}`).className = `output ${asset.status === 'Aportar' ? 'status-aportar' : 'status-aguardar'}`;
+                document.getElementById(`status_${asset.id}`).textContent = asset.status;
+                document.getElementById(`priority_${asset.id}`).className = `output ${asset.priorityClass}`;
+                document.getElementById(`priority_${asset.id}`).textContent = asset.priority;
+                document.getElementById(`shares_to_buy_${asset.id}`).textContent = asset.cotasComprar > 0 ? asset.cotasComprar : '-';
+                document.getElementById(`value_to_buy_${asset.id}`).textContent = asset.valorFinalCotas > 0 ? formatCurrency(asset.valorFinalCotas) : '-';
+            });
+
+            document.getElementById('totalPatrimonioTop').textContent = formatCurrency(totalPatrimonio);
+            const targetPctTotalEl = document.getElementById('targetPctTotal');
+            targetPctTotalEl.textContent = `${(totalTargetPct * 100).toFixed(2)}%`;
+            targetPctTotalEl.classList.toggle('invalid', Math.abs(totalTargetPct - 1.0) > 0.001);
+            document.getElementById('totalAporteReal').textContent = formatCurrency(totalAporteReal);
+            document.getElementById('totalCotasComprar').textContent = totalCotasComprar;
+        }
+
+        const addModal = document.getElementById('addAssetModal');
+        const removeModal = document.getElementById('removeAssetModal');
+        document.getElementById('addAssetBtn').onclick = () => { addModal.style.display = 'block'; };
+        document.getElementById('removeAssetBtn').onclick = () => { removeModal.style.display = 'block'; };
+        document.getElementById('cancelAdd').onclick = () => { addModal.style.display = 'none'; };
+        document.getElementById('cancelRemove').onclick = () => { removeModal.style.display = 'none'; };
+        window.onclick = (event) => {
+            if (event.target == addModal || event.target == removeModal) {
+                addModal.style.display = "none";
+                removeModal.style.display = "none";
+            }
+        };
+
+        document.getElementById('addAssetForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            syncStateWithDOM();
+            const name = document.getElementById('newAssetName').value;
+            const segment = document.getElementById('newAssetSegment').value;
+            const targetPct = parseFloat(document.getElementById('newAssetTargetPct').value) / 100;
+
+            if (!name || !segment || isNaN(targetPct) || targetPct <= 0 || targetPct >= 1) {
+                alert("Dados inválidos. Verifique os campos e tente novamente.");
+                return;
+            }
+
+            const scaleFactor = 1 - targetPct;
+            assetsState.forEach(asset => { asset.targetPct *= scaleFactor; });
+
+            const newAsset = {
+                id: name.toLowerCase().replace(/[^a-z0-9]/g, '') + Date.now(),
+                name: name.toUpperCase(),
+                segment: segment,
+                targetPct: targetPct,
+                myQty: 0,
+                currentPrice: 0
+            };
+            assetsState.push(newAsset);
+            
+            const totalPctSum = assetsState.reduce((sum, asset) => sum + asset.targetPct, 0);
+            assetsState.forEach(asset => asset.targetPct /= totalPctSum);
+
+            renderTable();
+            calculatePortfolio();
+            addModal.style.display = 'none';
+            e.target.reset();
+        });
+
+        document.getElementById('removeAssetForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            syncStateWithDOM();
+            const nameToRemove = document.getElementById('removeAssetName').value.toUpperCase();
+            const assetIndex = assetsState.findIndex(asset => asset.name === nameToRemove);
+
+            if (assetIndex === -1) {
+                alert(`Ativo "${nameToRemove}" não encontrado na carteira.`);
+                return;
+            }
+            if (assetsState.length <= 1) {
+                alert("Não é possível remover o último ativo.");
+                return;
+            }
+
+            assetsState.splice(assetIndex, 1);
+            
+            const remainingSum = assetsState.reduce((sum, asset) => sum + asset.targetPct, 0);
+            if (remainingSum > 0) {
+                 assetsState.forEach(asset => { asset.targetPct /= remainingSum; });
+            }
+
+            renderTable();
+            calculatePortfolio();
+            removeModal.style.display = 'none';
+            e.target.reset();
+        });
+        
+        function addTableButtonListeners() {
+            document.querySelectorAll('.remove-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    syncStateWithDOM();
+                    if (assetsState.length <= 1) {
+                        alert("Não é possível remover o último ativo.");
+                        return;
+                    }
+                    const idToRemove = e.target.getAttribute('data-id');
+                    assetsState = assetsState.filter(asset => asset.id !== idToRemove);
+
+                    const remainingSum = assetsState.reduce((sum, asset) => sum + asset.targetPct, 0);
+                     if (remainingSum > 0) {
+                        assetsState.forEach(asset => { asset.targetPct /= remainingSum; });
+                    }
+
+                    renderTable();
+                    calculatePortfolio();
+                });
+            });
+
+            document.querySelectorAll('.update-price-btn').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const assetId = e.target.getAttribute('data-id');
+                    const assetName = e.target.getAttribute('data-name');
+                    e.target.textContent = '...';
+                    e.target.disabled = true;
+
+                    try {
+                        const url = `https://brapi.dev/api/quote/${assetName}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`Erro HTTP para ${assetName}`);
+                        
+                        const data = await response.json();
+                        if (data.results && data.results.length > 0) {
+                            const price = data.results[0].regularMarketPrice;
+                            const priceInput = document.getElementById(`price_${assetId}`);
+                            if (priceInput) {
+                                priceInput.value = price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                calculatePortfolio(); // Recalcula tudo após o sucesso
+                            }
+                        } else {
+                            alert(`Não foi possível encontrar o ticker "${assetName}".`);
+                        }
+                    } catch (error) {
+                        console.error(`Falha ao buscar o ativo: ${assetName}`, error);
+                        alert(`Falha ao buscar o preço de ${assetName}.`);
+                    } finally {
+                        e.target.textContent = '🔄';
+                        e.target.disabled = false;
+                    }
+                });
+            });
+        }
+
+        window.onload = () => {
+            renderTable();
+            calculatePortfolio();
+        };
+    </script>
+</body>
+</html>
