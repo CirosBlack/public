@@ -253,6 +253,7 @@
                     <th>DY (12M) %</th>
                     <th>Ações</th>
                     <th>Meu Valor (R$)</th>
+                    <th>Dividendo Mensal (Est.)</th>
                     <th>% Atual</th>
                     <th>Distância (R$)</th>
                     <th>Status</th>
@@ -375,6 +376,7 @@
                     <td><input type="number" id="dy_${asset.id}" value="${dyValue}" step="0.1" placeholder="0.00" oninput="calculatePortfolio()"></td>
                     <td><a href="${investidor10Url}" target="_blank" class="action-btn search-btn" title="Ver no Investidor10">🔍</a></td>
                     <td class="output" id="value_${asset.id}">-</td>
+                    <td class="output" id="monthly_dividend_${asset.id}">-</td>
                     <td class="output" id="pct_${asset.id}">-</td>
                     <td class="output" id="gap_${asset.id}">-</td>
                     <td class="output" id="status_${asset.id}">-</td>
@@ -446,7 +448,8 @@
                 const targetValue = (totalPatrimonio + aporteMensal) * asset.targetPct;
                 const gap = targetValue - asset.myValue;
                 const status = gap > 0 && asset.currentPrice > 0 ? "Aportar" : "Aguardar";
-                return { ...asset, currentPct, gap, status };
+                const monthlyDividend = (asset.myValue * (asset.dy / 100)) / 12;
+                return { ...asset, currentPct, gap, status, monthlyDividend };
             });
 
             const assetsToRank = currentAssets.filter(a => a.status === 'Aportar').sort((a, b) => b.gap - a.gap);
@@ -483,6 +486,7 @@
             currentAssets.sort((a,b) => assetsState.findIndex(p => p.id === a.id) - assetsState.findIndex(p => p.id === b.id));
             currentAssets.forEach(asset => {
                 document.getElementById(`value_${asset.id}`).textContent = formatCurrency(asset.myValue);
+                document.getElementById(`monthly_dividend_${asset.id}`).textContent = formatCurrency(asset.monthlyDividend);
                 document.getElementById(`pct_${asset.id}`).textContent = `${(asset.currentPct * 100).toFixed(2)}%`;
                 document.getElementById(`gap_${asset.id}`).textContent = formatCurrency(asset.gap);
                 document.getElementById(`status_${asset.id}`).className = `output ${asset.status === 'Aportar' ? 'status-aportar' : 'status-aguardar'}`;
