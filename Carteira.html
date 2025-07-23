@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v13 (API Estável)</title>
+    <title>Calculadora de Balanceamento de Carteira v13 (API Corrigida)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -534,10 +534,9 @@
             btn.textContent = 'Buscando...';
             btn.disabled = true;
 
-            const tickers = assetsState.map(asset => asset.name).join(',');
-            // **NOVA API MAIS ESTÁVEL**
-            const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers}.SA`;
-            // Usamos um proxy para evitar problemas de CORS
+            // **LÓGICA CORRIGIDA**
+            const tickers = assetsState.map(asset => asset.name + '.SA').join(',');
+            const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers}`;
             const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 
             try {
