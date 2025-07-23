@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v15 (Busca Individual)</title>
+    <title>Calculadora de Balanceamento de Carteira v14 (Manual)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -117,20 +117,17 @@
             font-size: 14px;
             font-weight: bold;
             transition: background-color 0.3s;
+            text-decoration: none; /* Para o link parecer um botão */
         }
         .asset-management button:hover { background-color: #4a627a; }
         .action-btn {
              padding: 5px 12px;
         }
-        .update-price-btn {
+        .search-btn {
             background-color: #2980b9;
         }
-        .update-price-btn:hover {
+        .search-btn:hover {
             background-color: #3498db;
-        }
-        .update-price-btn:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
         }
 
         /* Resumo Inferior */
@@ -310,6 +307,7 @@
                 const row = document.createElement('tr');
                 row.id = `row_${asset.id}`;
                 const priceValue = asset.currentPrice > 0 ? asset.currentPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+                const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(asset.name + ' cotação')}`;
                 
                 row.innerHTML = `
                     <td><b>${asset.name}</b></td>
@@ -317,7 +315,7 @@
                     <td><input type="number" id="target_pct_${asset.id}" value="${(asset.targetPct * 100).toFixed(2)}" step="0.1" oninput="calculatePortfolio()"></td>
                     <td><input type="number" id="qty_${asset.id}" value="${asset.myQty}" step="1" oninput="calculatePortfolio()"></td>
                     <td><input type="text" class="price-input" id="price_${asset.id}" value="${priceValue}" placeholder="0,00" onblur="formatAndRecalculate(this)" onfocus="this.select()"></td>
-                    <td><button class="action-btn update-price-btn" data-id="${asset.id}" data-name="${asset.name}" title="Buscar Preço (API)">🔄</button></td>
+                    <td><a href="${googleSearchUrl}" target="_blank" class="action-btn search-btn" title="Buscar cotação no Google">🔍</a></td>
                     <td class="output" id="value_${asset.id}">-</td>
                     <td class="output" id="pct_${asset.id}">-</td>
                     <td class="output" id="gap_${asset.id}">-</td>
@@ -328,7 +326,6 @@
                 `;
                 tbody.appendChild(row);
             });
-            addTableButtonListeners();
         }
         
         function formatCurrency(value) {
@@ -514,44 +511,6 @@
             e.target.reset();
         });
         
-        function addTableButtonListeners() {
-            document.querySelectorAll('.update-price-btn').forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    const assetId = e.target.getAttribute('data-id');
-                    const assetName = e.target.getAttribute('data-name');
-                    e.target.textContent = '...';
-                    e.target.disabled = true;
-
-                    try {
-                        const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${assetName}.SA`;
-                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-                        const response = await fetch(proxyUrl);
-                        if (!response.ok) throw new Error(`Erro de rede`);
-                        
-                        const data = await response.json();
-                        const quoteResponse = JSON.parse(data.contents);
-
-                        if (quoteResponse.quoteResponse && quoteResponse.quoteResponse.result && quoteResponse.quoteResponse.result.length > 0) {
-                            const price = quoteResponse.quoteResponse.result[0].regularMarketPrice;
-                            const priceInput = document.getElementById(`price_${assetId}`);
-                            if (priceInput) {
-                                priceInput.value = price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                calculatePortfolio();
-                            }
-                        } else {
-                            alert(`Não foi possível encontrar o ticker "${assetName}".`);
-                        }
-                    } catch (error) {
-                        console.error(`Falha ao buscar o ativo: ${assetName}`, error);
-                        alert(`Falha ao buscar o preço de ${assetName}.`);
-                    } finally {
-                        e.target.textContent = '🔄';
-                        e.target.disabled = false;
-                    }
-                });
-            });
-        }
-
         window.onload = () => {
             renderTable();
             calculatePortfolio();
