@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Balanceamento de Carteira v13 (API Corrigida)</title>
+    <title>Calculadora de Balanceamento de Carteira v14 (Manual)</title>
     <style>
         /* Estilos Gerais */
         body {
@@ -107,7 +107,7 @@
             gap: 15px;
             margin: 20px 0;
         }
-        .asset-management button, .remove-btn, .modal-button, #fetchPricesBtn {
+        .asset-management button, .modal-button {
             background-color: #34495e;
             color: white;
             padding: 10px 20px;
@@ -119,11 +119,6 @@
             transition: background-color 0.3s;
         }
         .asset-management button:hover { background-color: #4a627a; }
-        #fetchPricesBtn { background-color: #16a085; }
-        #fetchPricesBtn:hover { background-color: #1abc9c; }
-        #fetchPricesBtn:disabled { background-color: #7f8c8d; cursor: not-allowed; }
-        .remove-btn { background-color: #c0392b; padding: 5px 10px; }
-        .remove-btn:hover { background-color: #e74c3c; }
 
         /* Resumo Inferior */
         .summary {
@@ -221,7 +216,6 @@
                     <th>Prioridade</th>
                     <th>Cotas a Comprar</th>
                     <th>Valor das Cotas (R$)</th>
-                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody id="portfolio-body"></tbody>
@@ -230,7 +224,6 @@
         <div class="asset-management">
             <button id="addAssetBtn">Adicionar Novo Ativo</button>
             <button id="removeAssetBtn">Remover Ativo</button>
-            <button id="fetchPricesBtn">Atualizar Preços (API)</button>
         </div>
 
          <div class="summary">
@@ -316,11 +309,9 @@
                     <td class="output" id="priority_${asset.id}">-</td>
                     <td class="output" id="shares_to_buy_${asset.id}">-</td>
                     <td class="output" id="value_to_buy_${asset.id}">-</td>
-                    <td><button class="action-btn remove-btn" data-id="${asset.id}" title="Remover Ativo">🗑️</button></td>
                 `;
                 tbody.appendChild(row);
             });
-            addTableButtonListeners();
         }
         
         function formatCurrency(value) {
@@ -506,84 +497,9 @@
             e.target.reset();
         });
         
-        function addTableButtonListeners() {
-            document.querySelectorAll('.remove-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    syncStateWithDOM();
-                    if (assetsState.length <= 1) {
-                        alert("Não é possível remover o último ativo.");
-                        return;
-                    }
-                    const idToRemove = e.target.getAttribute('data-id');
-                    assetsState = assetsState.filter(asset => asset.id !== idToRemove);
-
-                    const remainingSum = assetsState.reduce((sum, asset) => sum + asset.targetPct, 0);
-                     if (remainingSum > 0) {
-                        assetsState.forEach(asset => { asset.targetPct /= remainingSum; });
-                    }
-
-                    renderTable();
-                    calculatePortfolio();
-                });
-            });
-        }
-        
-        // --- Lógica da API ---
-        async function fetchAllPrices() {
-            const btn = document.getElementById('fetchPricesBtn');
-            btn.textContent = 'Buscando...';
-            btn.disabled = true;
-
-            // **LÓGICA CORRIGIDA**
-            const tickers = assetsState.map(asset => asset.name + '.SA').join(',');
-            const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers}`;
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-
-            try {
-                const response = await fetch(proxyUrl);
-                if (!response.ok) {
-                    throw new Error(`A API retornou um erro: ${response.statusText}`);
-                }
-                const data = await response.json();
-                const quoteResponse = JSON.parse(data.contents);
-                
-                const foundTickers = new Set();
-                if (quoteResponse.quoteResponse && quoteResponse.quoteResponse.result) {
-                    quoteResponse.quoteResponse.result.forEach(result => {
-                        const ticker = result.symbol.replace('.SA', '');
-                        const asset = assetsState.find(a => a.name === ticker);
-                        if (asset && result.regularMarketPrice) {
-                            const priceInput = document.getElementById(`price_${asset.id}`);
-                            if (priceInput) {
-                                priceInput.value = result.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                            }
-                            foundTickers.add(ticker);
-                        }
-                    });
-                }
-
-                const notFoundTickers = assetsState.filter(a => !foundTickers.has(a.name)).map(a => a.name);
-                if (notFoundTickers.length > 0) {
-                    alert(`Não foi possível encontrar cotação para: ${notFoundTickers.join(', ')}. Verifique se os tickers estão corretos.`);
-                }
-
-            } catch (error) {
-                console.error("Falha ao buscar preços:", error);
-                alert("Ocorreu um erro ao buscar os preços. Verifique sua conexão ou tente mais tarde.");
-            } finally {
-                btn.textContent = 'Atualizar Preços (API)';
-                btn.disabled = false;
-                calculatePortfolio();
-            }
-        }
-
-        document.getElementById('fetchPricesBtn').addEventListener('click', fetchAllPrices);
-
         window.onload = () => {
             renderTable();
             calculatePortfolio();
-            fetchAllPrices(); 
-            setInterval(fetchAllPrices, 15 * 60 * 1000);
         };
     </script>
 </body>
