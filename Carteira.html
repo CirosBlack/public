@@ -799,18 +799,33 @@
             });
 
             const prompt = `
-                Por favor, atue como um analista de investimentos. Analise a seguinte carteira de investimentos de um investidor brasileiro cujo objetivo principal é receber altos dividendos mensais.
+                Por favor, atue como um analista de investimentos certificado (CFA) especializado em estratégias de renda passiva para investidores brasileiros. Considere o cenário macroeconômico atual do Brasil (taxa Selic, inflação, etc.).
 
-                Dados da Carteira:
+                Analise a seguinte carteira de investimentos, cujo objetivo principal é maximizar a geração de dividendos mensais de forma sustentável e segura.
+
+                **Dados da Carteira:**
                 ${JSON.stringify(portfolioData, null, 2)}
 
-                Com base nestes dados, forneça uma análise concisa e objetiva em português do Brasil, seguindo os seguintes pontos:
-                1.  **Ponto Forte Principal:** Identifique o principal ponto positivo da carteira.
-                2.  **Ponto de Atenção Principal:** Aponte o principal risco ou ponto a ser melhorado (ex: concentração em um ativo ou setor).
-                3.  **Sugestão de Melhoria:** Dê uma sugestão clara e prática de como o investidor pode melhorar a carteira, considerando o objetivo de dividendos. Pode sugerir rebalanceamento ou a inclusão de um tipo de ativo que está em falta.
-                4.  **Conclusão:** Uma frase final de encorajamento.
+                **Sua análise deve seguir estritamente a seguinte estrutura:**
 
-                Seja direto e use uma linguagem fácil de entender.
+                **1. Diagnóstico Geral:**
+                   - **Pontuação de Diversificação (0-10):** [Atribua uma nota e justifique brevemente].
+                   - **Ponto Forte Principal:** [Identifique o principal acerto da estratégia atual].
+                   - **Ponto de Atenção Crítico:** [Aponte o principal risco ou erro na alocação atual].
+
+                **2. Análise de Riscos (Top 3):**
+                   - **Risco 1:** [Descreva o risco].
+                   - **Risco 2:** [Descreva o risco].
+                   - **Risco 3:** [Descreva o risco].
+
+                **3. Plano de Ação e Sugestões:**
+                   - **Rebalanceamento:** [Dê uma sugestão clara sobre quais posições devem ser aumentadas ou diminuídas para mitigar os riscos e otimizar os dividendos].
+                   - **Sugestão de Ativo:** [Se aplicável, sugira UM tipo de ativo/setor que está em falta e que fortaleceria a carteira].
+
+                **4. Conclusão:**
+                   - [Uma frase final de encorajamento e um resumo da principal ação a ser tomada].
+
+                Seja técnico, mas com uma linguagem clara e direta.
             `;
             
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
@@ -826,15 +841,26 @@
             }));
 
             const prompt = `
-                Atue como um analista de investimentos focado no mercado brasileiro. A carteira de um investidor, que busca altos dividendos mensais, é a seguinte:
+                Atue como um analista de investimentos (CFA) focado no mercado brasileiro de FIIs e Fiagros. A carteira de um investidor, que busca altos dividendos mensais, é a seguinte:
                 ${JSON.stringify(portfolioData, null, 2)}
 
-                Sugira UM ÚNICO novo ativo (FII ou Fiagro) que complementaria bem esta carteira, focando em diversificação e potencial de dividendos. Não sugira nenhum dos seguintes ativos que já estão na carteira: ${existingAssets}.
+                **Sua Tarefa:**
+                1.  Identifique o setor (Tijolo, Papel ou Fiagro) que está mais sub-alocado ou que oferece a melhor oportunidade de diversificação para esta carteira.
+                2.  Sugira UM ÚNICO ativo (FII ou Fiagro) dentro desse setor que seja uma excelente adição. Não sugira nenhum dos seguintes ativos que já estão na carteira: ${existingAssets}.
+                3.  Compare o ativo sugerido com um outro ativo popular do mesmo setor, explicando por que a sua sugestão é mais adequada para este investidor.
 
-                Forneça sua resposta em formato de texto simples, com a seguinte estrutura:
-                Ativo: [TICKER DO ATIVO]
-                Segmento: [SEGMENTO DO ATIVO]
-                Justificativa: [Uma breve justificativa (2-3 frases) explicando por que este ativo é uma boa adição para esta carteira específica.]
+                **Forneça sua resposta estritamente no seguinte formato:**
+
+                **Setor Prioritário:** [Nome do Setor]
+
+                **Ativo Sugerido:** [TICKER]
+                - **P/VP:** [Valor]
+                - **DY (12M):** [Valor]
+                - **Liquidez Diária:** [Valor]
+                - **Justificativa:** [Justificativa concisa (2-3 frases) explicando por que este ativo é uma boa escolha para ESTA carteira específica].
+
+                **Comparativo:**
+                - **[TICKER SUGERIDO] vs. [TICKER CONCORRENTE]:** [Explique brevemente por que o ativo sugerido é superior ao concorrente neste contexto].
             `;
 
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
@@ -849,10 +875,20 @@
             }));
 
             const prompt = `
-                Atue como um consultor financeiro. Um investidor possui a seguinte carteira de renda variável focada em dividendos:
+                Atue como um consultor financeiro para um investidor brasileiro com a seguinte carteira de renda variável focada em dividendos:
                 ${JSON.stringify(portfolioData, null, 2)}
 
-                Sugira DUAS opções de investimentos em RENDA FIXA que seriam adequadas para este investidor. Considere objetivos como estabilidade, reserva de oportunidade ou complemento de renda. Para cada sugestão, explique brevemente (1-2 frases) o porquê da recomendação.
+                O investidor precisa de sugestões de Renda Fixa para complementar sua estratégia. Forneça DUAS sugestões, cada uma com um objetivo diferente, e explique de forma clara e direta.
+
+                **Sua resposta deve seguir estritamente o seguinte formato:**
+
+                **Opção 1: Reserva de Oportunidade (Alta Liquidez)**
+                - **Produto Sugerido:** [Ex: Tesouro Selic, CDB 110% CDI com liquidez diária]
+                - **Justificativa:** [Explique em 1-2 frases por que este produto é ideal para ter dinheiro disponível para aproveitar quedas no mercado de renda variável].
+
+                **Opção 2: Estabilidade e Proteção (Longo Prazo)**
+                - **Produto Sugerido:** [Ex: Tesouro IPCA+ com juros semestrais, LCI/LCA de longo prazo]
+                - **Justificativa:** [Explique em 1-2 frases como este produto protege o poder de compra contra a inflação e pode gerar uma renda complementar estável].
             `;
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
         }
@@ -866,10 +902,20 @@
             }));
 
             const prompt = `
-                Atue como um consultor financeiro. Um investidor possui a seguinte carteira de renda variável focada em dividendos:
+                Atue como um consultor financeiro para um investidor brasileiro com a seguinte carteira de renda variável focada em dividendos:
                 ${JSON.stringify(portfolioData, null, 2)}
 
-                Sugira DUAS opções de investimentos em OUTRAS CLASSES DE ATIVOS (como Ações de crescimento, ETFs, BDRs ou Criptomoedas) para diversificar e complementar esta carteira. Para cada sugestão, explique brevemente (1-2 frases) o porquê da recomendação, focando em diversificação ou potencial de crescimento.
+                O investidor deseja diversificar para além de FIIs/Fiagros. Forneça DUAS sugestões de OUTRAS CLASSES DE ATIVOS, cada uma com um objetivo estratégico diferente.
+
+                **Sua resposta deve seguir estritamente o seguinte formato:**
+
+                **Opção 1: Potencial de Crescimento do Capital**
+                - **Classe/Ativo Sugerido:** [Ex: Ações de uma empresa específica, ETF BOVA11]
+                - **Papel na Carteira:** [Explique em 1-2 frases como este ativo pode adicionar um componente de valorização de capital para equilibrar a estratégia de renda].
+
+                **Opção 2: Dolarização e Diversificação Global**
+                - **Classe/Ativo Sugerido:** [Ex: BDR de uma empresa estrangeira, ETF IVVB11]
+                - **Papel na Carteira:** [Explique em 1-2 frases como este ativo pode proteger parte do patrimônio contra a desvalorização do Real e dar exposição a mercados internacionais].
             `;
             copyPromptToClipboardAndOpenGemini(prompt, document.getElementById('aiModalTitle'), document.getElementById('aiResult'));
         }
