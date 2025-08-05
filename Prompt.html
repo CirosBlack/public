@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Prompts com IA (Profissional)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #111827; }
+        .step-card { background-color: #1F2937; border-radius: 0.75rem; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border: 1px solid #374151; }
+        .option-btn { background-color: #374151; transition: all 0.2s ease-in-out; border: 2px solid #4B5563; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem; }
+        .option-btn:hover { border-color: #60A5FA; transform: translateY(-2px); }
+        .option-btn.selected { border-color: #3B82F6; background-color: #2563EB; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .option-btn .description { font-size: 0.75rem; line-height: 1rem; color: #D1D5DB; margin-top: 0.25rem; font-weight: 400; }
+        .nav-btn { transition: all 0.2s ease-in-out; }
+        .input-field, .textarea-field { background-color: #374151; border: 2px solid #4B5563; color: white; border-radius: 0.5rem; padding: 0.75rem 1rem; width: 100%; }
+        .input-field:focus, .textarea-field:focus { outline: none; border-color: #60A5FA; }
+        .color-swatch { width: 2.5rem; height: 2.5rem; border-radius: 9999px; cursor: pointer; border: 2px solid #4B5563; transition: transform 0.2s; }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.selected { border-color: #fff; box-shadow: 0 0 10px #fff; }
+        .progress-bar-fill { background-color: #3B82F6; transition: width 0.5s ease-in-out; }
+        #finalPrompt::-webkit-scrollbar { width: 8px; }
+        #finalPrompt::-webkit-scrollbar-track { background: #1F2937; }
+        #finalPrompt::-webkit-scrollbar-thumb { background-color: #4B5563; border-radius: 10px; border: 2px solid #1F2937; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
+        .animate-shake { animation: shake 0.5s ease-in-out; }
+    </style>
+</head>
+<body class="text-white">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Criador de Prompts Profissional</h1>
+            <p class="text-gray-400 mt-2">Controle cada detalhe da sua criação com um fluxo inteligente.</p>
+        </header>
+
+        <div class="w-full mb-8">
+            <div id="progress-container" class="bg-gray-700 rounded-full h-2.5">
+                <div id="progress-bar" class="progress-bar-fill h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <p id="progress-text" class="text-center text-sm text-gray-400 mt-2"></p>
+        </div>
+
+        <main id="wizard"></main>
+
+        <div id="resultSection" class="step-card text-center hidden">
+            <h2 class="text-2xl font-bold mb-4 text-green-400">Seu Prompt Profissional está Pronto!</h2>
+            <div id="loading" class="flex justify-center items-center my-8">
+                <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p class="ml-4 text-lg">Aguarde, a IA está construindo seu prompt...</p>
+            </div>
+            <div id="promptResult" class="hidden">
+                <textarea id="finalPrompt" readonly class="w-full h-64 p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"></textarea>
+                <div class="flex flex-col sm:flex-row gap-4 mt-6 justify-center">
+                    <button id="copyButton" class="w-full sm:w-auto nav-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center">Copiar Prompt</button>
+                    <button id="restartButton" class="w-full sm:w-auto nav-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">Começar de Novo</button>
+                </div>
+                 <p id="copyMessage" class="text-green-400 mt-4 h-6"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- STATE & CONFIG ---
+        let stepHistory = [0];
+        let selections = {};
+        const getStepById = (id) => steps.findIndex(step => step.id === id);
+
+        // --- DATA ---
+        const sizeOptions = [ { text: 'Extra Pequeno (XS)', value: 'extra small (XS)' }, { text: 'Pequeno (S)', value: 'small (S)' }, { text: 'Médio (M)', value: 'medium (M)' }, { text: 'Largo (L)', value: 'large (L)' }, { text: 'Extra Largo (XL)', value: 'extra large (XL)' }, { text: 'Nenhum', value: '' } ];
+        const steps = [
+            { id: 'identity', type: 'input', title: 'Identidade da Personagem' },
+            { id: 'bodyType', title: 'Biotipo Físico', options: [ { text: 'Ectomorfo', description: 'Estrutura longa e fina, naturalmente magra.', value: "an 'Ectomorph' somatotype, with a long and slender bone structure, naturally lean" }, { text: 'Mesomorfo', description: 'Corpo atlético, facilidade para ganhar músculos.', value: "a 'Mesomorph' somatotype, with an athletic build and a natural ease in gaining muscle" }, { text: 'Endomorfo', description: 'Estrutura larga, formas mais arredondadas.', value: "an 'Endomorph' somatotype, with a wider bone structure and a softer, more rounded physique" }, { text: 'Triângulo (Pera)', description: 'Quadris mais largos que os ombros.', value: "a 'Triangle' or 'Pear' body shape, where the hips are wider than the shoulders" }, { text: 'Triângulo Invertido', description: 'Ombros mais largos que os quadris.', value: "an 'Inverted Triangle' body shape, where the shoulders are noticeably wider than the hips" }, { text: 'Retângulo', description: 'Ombros, cintura e quadris com medidas próximas.', value: "a 'Rectangle' body shape, with similar measurements for shoulders, waist, and hips, creating a straight silhouette" }, { text: 'Ampulheta', description: 'Ombros e quadris semelhantes, cintura fina.', value: "an 'Hourglass' body shape, with similarly proportioned shoulders and hips and a well-defined, narrow waist" }, { text: 'Oval (Maçã)', description: 'Cintura mais larga que ombros e quadris.', value: "an 'Oval' or 'Apple' body shape, with a wider waist and abdomen compared to the shoulders and hips" }, { text: 'Nenhum', value: '' } ] },
+            { id: 'skinTone', title: 'Cor da Pele', options: [ { text: 'Pele Clara', value: 'fair skin' }, { text: 'Pele Pálida', value: 'pale skin' }, { text: 'Pele Bronzeada', value: 'tanned skin' }, { text: 'Pele Oliva', value: 'olive skin' }, { text: 'Pele Escura', value: 'dark skin' }, { text: 'Pele com Sardas', value: 'freckled skin' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'hairLength', title: 'Comprimento do Cabelo', options: [ { text: 'Longo', value: 'long' }, { text: 'Médio (ombros)', value: 'shoulder-length' }, { text: 'Curto', value: 'short' }, { text: 'Raspado (Buzzcut)', value: 'buzzcut' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'hairTexture', title: 'Textura/Penteado do Cabelo', options: [ { text: 'Liso e Reto', value: 'straight, sleek hair' }, { text: 'Ondulado', value: 'wavy hair' }, { text: 'Cacheado Volumoso', value: 'voluminous curly hair' }, { text: 'Tranças', value: 'braided hair' }, { text: 'Coque Alto', value: 'a high bun' }, { text: 'Rabo de Cavalo', value: 'a ponytail' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'hairColor', title: 'Cor do Cabelo', options: [ { text: 'Preto', value: 'black' }, { text: 'Loiro', value: 'blonde' }, { text: 'Castanho', value: 'brown' }, { text: 'Ruivo', value: 'red' }, { text: 'Branco/Platinado', value: 'white/platinum' }, { text: 'Rosa', value: 'pink' }, { text: 'Azul', value: 'blue' }, { text: 'Verde', value: 'green' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'eyeColor', title: 'Cor dos Olhos', options: [ { text: 'Azuis', value: 'blue eyes' }, { text: 'Verdes', value: 'green eyes' }, { text: 'Castanhos', value: 'brown eyes' }, { text: 'Cor de Mel', value: 'hazel eyes' }, { text: 'Cinzas', value: 'gray eyes' }, { text: 'Pretos', value: 'black eyes' }, { text: 'Heterocromia', value: 'heterochromia eyes' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'breastSize', title: 'Tamanho dos Seios', options: [ { text: 'Reto (Flat)', value: 'a flat chest' }, { text: 'Pequenos', value: 'small breasts' }, { text: 'Médios', value: 'medium-sized breasts' }, { text: 'Grandes', value: 'large breasts' }, { text: 'Volumosos', value: 'voluminous breasts' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'composition', title: 'Composição da Cena', options: [ { text: 'Corpo Inteiro', value: 'Full body shot' }, { text: 'Plano Médio', value: 'Medium shot' }, { text: 'Close-up no Rosto', value: 'Close-up portrait' }, { text: 'Plano Detalhe', value: 'Extreme close-up' }, { text: 'Vista Traseira', value: 'Rear view shot' }, { text: 'Ângulo Baixo', value: 'Low-angle shot' }, { text: 'Ângulo Alto', value: 'High-angle shot' }, { text: 'Ângulo Holandês', value: 'Dutch angle shot' }, { text: 'Ponto de Vista (POV)', value: 'Point-of-view (POV) shot' }, { text: 'Sobre o Ombro', value: 'Over-the-shoulder shot' }, { text: 'Plano Americano', value: 'American shot (cowboy shot)' }, { text: 'Grande Angular', value: 'Wide-angle lens shot' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'subjectStyle', title: 'Estilo da Personagem', options: [ { text: 'Fantasia: Elfa', value: 'an elven fantasy style' }, { text: 'Fantasia: Guerreira', value: 'a warrior fantasy style' }, { text: 'Sci-Fi: Cyberpunk', value: 'a cyberpunk sci-fi style' }, { text: 'Sci-Fi: Androide', value: 'an android sci-fi style' }, { text: 'Moderno: Gótica', value: 'a modern gothic style' }, { text: 'Moderno: E-girl', value: 'a modern e-girl style' }, { text: 'Moderno: Fitness', value: 'a modern fitness style' }, { text: 'Moderno: Casual', value: 'a modern casual style' }, { text: 'Histórico: Vitoriano', value: 'a Victorian historical style' }, { text: 'Histórico: Medieval', value: 'a medieval historical style' }, { text: 'Steampunk', value: 'a steampunk style' }, { text: 'Pós-apocalíptico', value: 'a post-apocalyptic style' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'makeup', title: 'Maquiagem', options: [ { text: 'Natural', value: 'a natural makeup look' }, { text: 'Olho Esfumado', value: 'a smokey eye makeup look' }, { text: 'Glamour', value: 'a glamorous makeup look' }, { text: 'Gótica', value: 'a gothic makeup look' }, { text: 'Cores Neon', value: 'a neon-colored makeup look' }, { text: 'Artística', value: 'an artistic/editorial makeup look' }, { text: 'Nenhuma', value: 'no makeup' } ] },
+            { id: 'accessories', title: 'Acessórios', options: [ { text: 'Óculos', value: 'wearing glasses' }, { text: 'Colar', value: 'wearing a necklace' }, { text: 'Brincos', value: 'wearing earrings' }, { text: 'Piercings', value: 'with facial piercings' }, { text: 'Tatuagens', value: 'with visible tattoos' }, { text: 'Chapéu', value: 'wearing a hat' }, { text: 'Fones de Ouvido', value: 'wearing headphones' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'expression', title: 'Expressão Facial', options: [ { text: 'Sedutora', value: 'a seductive expression' }, { text: 'Confiante', value: 'a confident expression' }, { text: 'Triste', value: 'a sad expression' }, { text: 'Irritada', value: 'an angry expression' }, { text: 'Feliz/Sorrindo', value: 'a happy, smiling expression' }, { text: 'Pensativa', value: 'a thoughtful expression' }, { text: 'Assustada', value: 'a scared expression' }, { text: 'Entediada', value: 'a bored expression' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'pose', title: 'Pose Corporal', type: 'custom_input', custom_id: 'customPose', placeholder: 'Ex: sentada em um trono, com uma perna cruzada...', options: [ { text: 'Em pé', value: 'standing' }, { text: 'Sentada', value: 'sitting' }, { text: 'Deitada', value: 'lying down' }, { text: 'Andando', value: 'walking' }, { text: 'Correndo', value: 'running' }, { text: 'Dançando', value: 'dancing' }, { text: 'Pose de Luta', value: 'in a fighting stance' }, { text: 'Pose de Ação', value: 'in a dynamic action pose' }, { text: 'Encostada', value: 'leaning against a wall' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'clothingType', title: 'Tipo de Vestimenta', options: [ { text: 'Totalmente Nua', value: 'nude' }, { text: 'Apenas Roupa Íntima', value: 'lingerie' }, { text: 'Vestida', value: 'clothed' } ] },
+            { id: 'panties', title: 'Calcinha', type: 'custom_input', custom_id: 'customPanties', placeholder: 'Ex: calcinha de biquíni...', next_step: 'pantiesSize', options: [ { text: 'Tanga', value: 'thong-style panties' }, { text: 'Fio Dental', value: 'a G-string' }, { text: 'Biquíni', value: 'bikini-cut panties' }, { text: 'Caleçon', value: 'lace caleçon shorts' }, { text: 'Hot Pants', value: 'high-waisted hot pants' }, { text: 'Boyshort', value: 'boyshorts' }, { text: 'Sem Costura', value: 'seamless panties' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'pantiesSize', title: 'Tamanho da Calcinha', for: 'panties', next_step: 'pantiesColor', options: sizeOptions },
+            { id: 'pantiesColor', type: 'color_details', title: 'Cor e Detalhes da Calcinha', for: 'panties' },
+            { id: 'bra', title: 'Sutiã', type: 'custom_input', custom_id: 'customBra', placeholder: 'Ex: sutiã esportivo...', next_step: 'braSize', options: [ { text: 'Meia-Taça', value: 'a demi-cup bra' }, { text: 'Push-Up', value: 'a push-up bra' }, { text: 'Tomara que Caia', value: 'a strapless bandeau bra' }, { text: 'Triângulo', value: 'a triangle bralette' }, { text: 'Nadador', value: 'a racerback bra' }, { text: 'Top', value: 'a top-style bra' }, { text: 'Balconet', value: 'a balconette bra' }, { text: 'Nenhum (Topless)', value: 'is topless' } ] },
+            { id: 'braSize', title: 'Tamanho do Sutiã', for: 'bra', next_step: 'braColor', options: sizeOptions },
+            { id: 'braColor', type: 'color_details', title: 'Cor e Detalhes do Sutiã', for: 'bra' },
+            { id: 'topWear', title: 'Peça Superior', type: 'custom_input', custom_id: 'customTopWear', placeholder: 'Ex: jaqueta de couro...', next_step: 'topWearSize', options: [ { text: 'Camisa Social', value: 'a classic button-down shirt' }, { text: 'Ciganinha', value: 'an off-the-shoulder "ciganinha" blouse' }, { text: 'Body Justo', value: 'a sleek, form-fitting body' }, { text: 'Bata Boho', value: 'a loose, boho-style "bata" blouse' }, { text: 'Blusa com Laço', value: 'an elegant blouse with a bow tie neck' }, { text: 'Manga Bufante', value: 'a blouse with puff sleeves' }, { text: 'T-shirt Básica', value: 'a basic t-shirt' }, { text: 'Regata', value: 'a tank top' }, { text: 'Cropped', value: 'a cropped top' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'topWearSize', title: 'Tamanho da Peça Superior', for: 'topWear', next_step: 'topWearColor', options: sizeOptions },
+            { id: 'topWearColor', type: 'color_details', title: 'Cor e Detalhes da Peça Superior', for: 'topWear' },
+            { id: 'bottomWear', title: 'Peça Inferior', type: 'custom_input', custom_id: 'customBottomWear', placeholder: 'Ex: saia plissada...', next_step: 'bottomWearSize', options: [ { text: 'Calça Skinny', value: 'skinny fit pants' }, { text: 'Calça Reta', value: 'straight-leg pants' }, { text: 'Calça Flare', value: 'flare pants' }, { text: 'Calça Pantalona', value: 'pantalona pants' }, { text: 'Calça Mom', value: 'mom jeans' }, { text: 'Calça Wide Leg', value: 'wide-leg pants' }, { text: 'Calça Jogger', value: 'jogger pants' }, { text: 'Calça de Alfaiataria', value: 'tailored trousers' }, { text: 'Calça Cargo', value: 'cargo pants' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'bottomWearSize', title: 'Tamanho da Peça Inferior', for: 'bottomWear', next_step: 'bottomWearColor', options: sizeOptions },
+            { id: 'bottomWearColor', type: 'color_details', title: 'Cor e Detalhes da Peça Inferior', for: 'bottomWear' },
+            { id: 'shoes', title: 'Sapatos', type: 'custom_input', custom_id: 'customShoes', placeholder: 'Ex: botas de combate...', next_step: 'shoesSize', options: [ { text: 'Scarpin', value: 'scarpin pumps' }, { text: 'Sapatilha', value: 'ballet flats' }, { text: 'Tênis Casual', value: 'casual sneakers' }, { text: 'Salto Bloco', value: 'block-heel sandals' }, { text: 'Rasteirinha', value: 'flat sandals' }, { text: 'Bota Cano Curto', value: 'ankle boots' }, { text: 'Mule', value: 'mule shoes' }, { text: 'Mocassim', value: 'loafers' }, { text: 'Plataforma', value: 'platform shoes' }, { text: 'Descalça', value: 'is barefoot' } ] },
+            { id: 'shoesSize', title: 'Tamanho dos Sapatos', for: 'shoes', next_step: 'shoesColor', options: sizeOptions },
+            { id: 'shoesColor', type: 'color_details', title: 'Cor e Detalhes dos Sapatos', for: 'shoes' },
+            { id: 'lighting', title: 'Iluminação', options: [ { text: 'Luz Suave (Softbox)', value: 'soft studio lighting' }, { text: 'Luz Dura (Dramática)', value: 'dramatic hard lighting' }, { text: 'Luz de Rembrandt', value: 'Rembrandt lighting' }, { text: 'Contraluz (Backlight)', value: 'backlit with a strong rim light' }, { text: 'Golden Hour', value: 'warm, golden hour lighting' }, { text: 'Luz de Velas', value: 'candlelight' }, { text: 'Neon', value: 'neon lighting' }, { text: 'Subaquática', value: 'underwater lighting with caustic reflections' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'location', title: 'Fundo / Local', type: 'custom_input', custom_id: 'customLocation', placeholder: 'Ex: em um beco chuvoso de neon...', options: [ { text: 'Estúdio (Fundo Liso)', value: "against a plain studio background." }, { text: 'Floresta Mística', value: "in a mystical forest." }, { text: 'Cidade Cyberpunk', value: "on a futuristic city street." }, { text: 'Quarto Aconchegante', value: "in a cozy bedroom." }, { text: 'Praia Ensolarada', value: "on a sunny beach." }, { text: 'Biblioteca Antiga', value: "in an ancient library." }, { text: 'Ruínas Desertas', value: "amidst desert ruins." }, { text: 'Salão de Baile Gótico', value: "in a gothic ballroom." }, { text: 'Interior de Nave Espacial', value: "inside a sleek spaceship interior." }, { text: 'Nenhum', value: '' } ] },
+            { id: 'action', title: 'Ação da Personagem', type: 'custom_input', custom_id: 'customAction', placeholder: 'Ex: lendo um livro antigo...', options: [ { text: 'Olhando para a câmera', value: 'looking at the camera' }, { text: 'Ajustando a roupa', value: 'adjusting her clothing' }, { text: 'Interagindo com o cenário', value: 'interacting with the environment' }, { text: 'Em movimento', value: 'in motion' }, { text: 'Pensativa', value: 'lost in thought' }, { text: 'Tocando um instrumento', value: 'playing a musical instrument' }, { text: 'Pintando em uma tela', value: 'painting on a canvas' }, { text: 'Bebendo café', value: 'sipping coffee' }, { text: 'Olhando para o horizonte', value: 'gazing at the horizon' }, { text: 'Nenhum', value: '' } ] },
+            { id: 'style', title: 'Estilo Final e Qualidade', options: [ { text: 'Fotografia Realista', value: "Ultra-realistic photograph, 8K, sharp focus" }, { text: 'Pintura Digital', value: "Epic digital painting, detailed brushstrokes" }, { text: 'Arte Conceitual', value: "Concept art, cinematic lighting" }, { text: 'Estilo Anime/Mangá', value: "Anime art style, vibrant colors" }, { text: 'Preto e Branco', value: "Black and white photography, film grain" }, { text: 'Arte Barroca', value: 'Baroque art style, dramatic chiaroscuro lighting' }, { text: 'Aquarela', value: 'Watercolor style, soft and bleeding colors' }, { text: 'Vaporwave', value: 'Vaporwave aesthetic, neon grids, pastel colors' }, { text: 'Lente 50mm', value: 'shot on a 50mm lens, creating a natural field of view' }, { text: 'Lente Teleobjetiva', value: 'shot on a telephoto lens, compressing the background' }, { text: 'Estilo Cinematográfico', value: 'cinematic still from a movie, film grain, anamorphic lens flare' }, { text: 'Arte de Videogame (AAA)', value: 'AAA video game art, hyper-detailed textures, Unreal Engine 5 render' }, { text: 'Nenhum', value: '' } ] }
+        ];
+        
+        // --- CORE FUNCTIONS ---
+
+        function renderCurrentStep() {
+            const currentStepIndex = stepHistory[stepHistory.length - 1];
+            const stepData = steps[currentStepIndex];
+            
+            const wizard = document.getElementById('wizard');
+            wizard.innerHTML = '';
+            if (!stepData) {
+                showResults();
+                return;
+            }
+
+            const stepCard = createStepCard(stepData, currentStepIndex);
+            wizard.appendChild(stepCard);
+
+            if (selections[stepData.id]) {
+                const selectedBtn = wizard.querySelector(`[data-value="${CSS.escape(selections[stepData.id])}"]`);
+                if (selectedBtn) selectedBtn.classList.add('selected');
+            }
+            addEventListeners();
+            updateProgress();
+        }
+
+        function createStepCard(stepData, currentStepIndex) {
+            const stepCard = document.createElement('div');
+            stepCard.className = 'step-card';
+            stepCard.id = `step-${currentStepIndex}`;
+
+            let contentHtml = '';
+            if (stepData.type === 'input') {
+                contentHtml = createInputContent(stepData);
+            } else if (stepData.type === 'color_details') {
+                contentHtml = createColorDetailsContent(stepData);
+            } else if (stepData.type === 'custom_input') {
+                contentHtml = createCustomInputContent(stepData);
+            } else {
+                contentHtml = createOptionContent(stepData);
+            }
+            
+            const navButtonsHtml = (stepData.type === 'input' || stepData.type === 'color_details' || stepData.type === 'custom_input') ?
+                `<button onclick="navigate(1)" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Próximo</button>` :
+                '';
+
+            stepCard.innerHTML = `
+                <h2 class="text-2xl font-bold mb-6 text-center">${stepData.title}</h2>
+                ${contentHtml}
+                <div class="flex justify-between mt-8">
+                    <button ${stepHistory.length === 1 ? 'disabled' : ''} onclick="navigate(-1)" class="nav-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
+                    ${navButtonsHtml}
+                </div>
+            `;
+            return stepCard;
+        }
+
+        function createInputContent() {
+            return `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <label for="characterName" class="block mb-2 text-sm font-medium text-gray-300">Nome da Personagem</label>
+                        <input type="text" id="characterName" class="input-field w-full" placeholder="Ex: Alice" value="${selections.name || ''}">
+                    </div>
+                    <div>
+                        <label for="characterAge" class="block mb-2 text-sm font-medium text-gray-300">Idade</label>
+                        <input type="number" id="characterAge" class="input-field w-full" placeholder="Ex: 18" value="${selections.age || ''}">
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createCustomInputContent(stepData) {
+            let optionsHtml = stepData.options.map(option => `
+                <button class="option-btn text-center rounded-lg" data-category="${stepData.id}" data-value="${option.value}">
+                    <span class="text-sm md:text-base font-medium">${option.text}</span>
+                </button>
+            `).join('');
+            
+            return `
+                ${optionsHtml ? `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">${optionsHtml}</div>` : ''}
+                <div class="mt-4">
+                    <label for="${stepData.custom_id}" class="block mb-2 text-sm font-medium text-gray-300">Ou escreva os detalhes aqui:</label>
+                    <textarea id="${stepData.custom_id}" class="textarea-field" rows="3" placeholder="${stepData.placeholder || ''}">${selections[stepData.id]?.custom || ''}</textarea>
+                </div>
+            `;
+        }
+        
+        function createColorDetailsContent(stepData) {
+            const colors = ['#ffffff', '#000000', '#ff0000', '#0000ff', '#008000', '#ffff00', '#800080', '#ffc0cb'];
+            const colorSwatches = colors.map(color => 
+                `<div class="color-swatch" style="background-color:${color};" onclick="selectColor('${stepData.for}', '${color}')"></div>`
+            ).join('');
+
+            return `
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-300">Escolha uma cor:</label>
+                    <div class="flex gap-4 flex-wrap">${colorSwatches}</div>
+                </div>
+                <div>
+                    <label for="${stepData.for}Details" class="block mb-2 text-sm font-medium text-gray-300">Ou escreva a cor e detalhes (Ex: azul claro com renda):</label>
+                    <input type="text" id="${stepData.for}Details" class="input-field w-full" value="${selections[stepData.for]?.details || ''}">
+                </div>
+            `;
+        }
+
+        function createOptionContent(stepData) {
+            let optionsHtml = stepData.options.map(option => `
+                <button class="option-btn text-center rounded-lg" data-category="${stepData.id}" data-value="${option.value}">
+                    <span class="text-sm md:text-base font-medium">${option.text}</span>
+                    ${option.description ? `<span class="description">${option.description}</span>` : ''}
+                </button>
+            `).join('');
+            return `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">${optionsHtml}</div>`;
+        }
+        
+        function selectColor(itemKey, color) {
+            if (!selections[itemKey]) selections[itemKey] = {};
+            selections[itemKey].color = color;
+            
+            document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            setTimeout(() => navigate(1), 250);
+        }
+
+        function addEventListeners() {
+            document.querySelectorAll('.option-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const category = button.dataset.category;
+                    const value = button.dataset.value;
+                    
+                    if (steps.find(s => s.id === category)?.type === 'custom_input') {
+                        selections[category] = { item: value };
+                    } else {
+                         selections[category] = value;
+                    }
+                    
+                    document.querySelectorAll(`.option-btn[data-category="${category}"]`).forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    
+                    setTimeout(() => navigate(1), 250);
+                });
+            });
+
+            copyButton.addEventListener('click', () => {
+                finalPromptTextarea.select();
+                try { document.execCommand('copy'); copyMessage.textContent = 'Copiado!'; setTimeout(() => copyMessage.textContent = '', 3000); }
+                catch (err) { copyMessage.textContent = 'Falha ao copiar.'; }
+            });
+
+            restartButton.addEventListener('click', () => {
+                stepHistory = [0];
+                selections = {};
+                document.getElementById('resultSection').classList.add('hidden');
+                document.getElementById('wizard').classList.remove('hidden');
+                renderCurrentStep();
+            });
+        }
+
+        function navigate(direction) {
+            const currentStepIndex = stepHistory[stepHistory.length - 1];
+            const currentStepData = steps[currentStepIndex];
+
+            if (direction === -1) {
+                if (stepHistory.length > 1) { stepHistory.pop(); renderCurrentStep(); }
+                return;
+            }
+
+            // --- SAVE DATA FROM CURRENT STEP ---
+            if (currentStepData.type === 'input') {
+                selections.name = document.getElementById('characterName').value;
+                selections.age = document.getElementById('characterAge').value;
+            } else if (currentStepData.type === 'custom_input') {
+                const customValue = document.getElementById(currentStepData.custom_id).value;
+                if (customValue) {
+                    selections[currentStepData.id] = { custom: customValue };
+                }
+            } else if (currentStepData.type === 'color_details') {
+                const detailsValue = document.getElementById(`${currentStepData.for}Details`).value;
+                if (!selections[currentStepData.for]) selections[currentStepData.for] = {};
+                if (detailsValue) {
+                    selections[currentStepData.for].details = detailsValue;
+                    delete selections[currentStepData.for].color;
+                }
+            }
+            
+            // --- DETERMINE NEXT STEP ---
+            let nextStepIndex;
+            if (currentStepData.next_step) {
+                const itemSelection = selections[currentStepData.id]?.item || selections[currentStepData.id];
+                if (itemSelection && itemSelection !== 'is topless' && itemSelection !== 'is barefoot') {
+                    if(typeof selections[currentStepData.id] !== 'object') {
+                        selections[currentStepData.id] = { item: itemSelection };
+                    }
+                    nextStepIndex = getStepById(currentStepData.next_step);
+                } else {
+                    nextStepIndex = getNextMajorStepIndex(currentStepIndex);
+                }
+            } else if (currentStepData.id === 'clothingType') {
+                const choice = selections.clothingType;
+                if (choice === 'nude') nextStepIndex = getStepById('lighting');
+                else if (choice === 'lingerie') nextStepIndex = getStepById('panties');
+                else if (choice === 'clothed') nextStepIndex = getStepById('topWear');
+            } else {
+                 nextStepIndex = getNextMajorStepIndex(currentStepIndex);
+            }
+            
+            if (nextStepIndex < steps.length) {
+                stepHistory.push(nextStepIndex);
+                renderCurrentStep();
+            } else {
+                showResults();
+            }
+        }
+        
+        function getNextMajorStepIndex(currentStepIndex) {
+             const currentId = steps[currentStepIndex].id;
+             if (currentId === 'braColor' || currentId === 'braSize') return getStepById('lighting');
+             if (currentId === 'shoesColor' || currentId === 'shoesSize') return getStepById('lighting');
+             if (currentId.endsWith('Color') || currentId.endsWith('Size')) {
+                 if (currentId.startsWith('panties')) return getStepById('bra');
+                 if (currentId.startsWith('topWear')) return getStepById('bottomWear');
+                 if (currentId.startsWith('bottomWear')) return getStepById('shoes');
+             }
+             return currentStepIndex + 1;
+        }
+
+        function updateProgress() {
+            const progressPercentage = (stepHistory.length / 22) * 100; // 22 is an average path length now
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${Math.min(progressPercentage, 100)}%`;
+            const progressText = document.getElementById('progress-text');
+            const currentStepData = steps[stepHistory[stepHistory.length - 1]];
+            if (currentStepData) {
+                progressText.textContent = `${currentStepData.title}`;
+            }
+        }
+
+        async function showResults() {
+            const wizard = document.getElementById('wizard');
+            const resultSection = document.getElementById('resultSection');
+            const loading = document.getElementById('loading');
+            const promptResult = document.getElementById('promptResult');
+            
+            wizard.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            loading.classList.remove('hidden');
+            promptResult.classList.add('hidden');
+            document.getElementById('progress-text').textContent = 'Concluído!';
+            document.getElementById('progress-bar').style.width = '100%';
+
+            const finalPrompt = buildFinalPrompt();
+            const generationPrompt = `Your task is to transform a set of user-selected keywords into a single, masterfully crafted, ultra-detailed paragraph for a photorealistic AI image generator. The final prompt must be in English. Do not just combine the keywords; expand upon them dramatically. Add evocative, sensory details: the texture of fabric (e.g., "soft cotton," "worn leather"), the quality of light (e.g., "soft morning light filtering through a dusty window," "harsh neon glow reflecting on wet pavement"), subtle aspects of the character's expression (e.g., "a melancholic gaze," "a smirk playing on her lips"), and intricate background elements. The goal is to create a prompt that an AI can use to generate a breathtaking, emotionally resonant, and hyper-realistic image. The final output must be ONLY the prompt text itself, without any introductory phrases or explanations. Here are the user's keywords: "${finalPrompt}"`;
+
+            try {
+                const detailedPrompt = await callGeminiApi(generationPrompt);
+                document.getElementById('finalPrompt').value = detailedPrompt.replace(/\s+/g, ' ').trim();
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                document.getElementById('finalPrompt').value = "Desculpe, ocorreu um erro ao gerar o prompt. Tente novamente.\n\n" + finalPrompt;
+            } finally {
+                loading.classList.add('hidden');
+                promptResult.classList.remove('hidden');
+            }
+        }
+
+        function buildClothingString(key) {
+            const itemData = selections[key];
+            if (!itemData) return '';
+            if (itemData.custom) return itemData.custom;
+            if (!itemData.item) return '';
+            
+            let parts = [];
+            if (itemData.size) parts.push(itemData.size);
+            if (itemData.details) {
+                parts.push(itemData.details);
+            } else if (itemData.color) {
+                const colorMap = {'#ffffff': 'white', '#000000': 'black', '#ff0000': 'red', '#0000ff': 'blue', '#008000': 'green', '#ffff00': 'yellow', '#800080': 'purple', '#ffc0cb': 'pink'};
+                parts.push(colorMap[itemData.color] || itemData.color);
+            }
+            parts.push(itemData.item);
+            return parts.join(' ');
+        }
+
+        function buildFinalPrompt() {
+            const { name = 'a woman', age = '25' } = selections;
+            const hair = [selections.hairColor, selections.hairLength, selections.hairTexture].filter(Boolean).join(' ');
+            
+            let clothing = '';
+            if (selections.clothingType === 'nude') {
+                clothing = 'She is completely nude.';
+            } else if (selections.clothingType === 'lingerie') {
+                const braDesc = selections.bra?.item === 'is topless' ? 'is topless' : `wears ${buildClothingString('bra') || 'a bra'}`;
+                const pantiesDesc = buildClothingString('panties') || 'panties';
+                if (selections.bra?.item && selections.panties?.item) {
+                     clothing = `She ${braDesc} and ${pantiesDesc}.`;
+                } else if (selections.bra?.item) {
+                    clothing = `She ${braDesc}.`;
+                } else if (selections.panties?.item) {
+                    clothing = `She wears ${pantiesDesc}.`;
+                }
+            } else if (selections.clothingType === 'clothed') {
+                const topDesc = buildClothingString('topWear');
+                const bottomDesc = buildClothingString('bottomWear');
+                const shoesDesc = selections.shoes?.item === 'is barefoot' ? 'is barefoot' : `wears ${buildClothingString('shoes') || 'shoes'}`;
+                
+                let parts = [];
+                if(topDesc) parts.push(topDesc);
+                if(bottomDesc) parts.push(bottomDesc);
+                if (parts.length > 0) {
+                    clothing = `She wears ${parts.join(', ')}. ${shoesDesc.startsWith('wears') ? 'She also ' + shoesDesc : 'She ' + shoesDesc}.`;
+                } else {
+                    clothing = `She ${shoesDesc}.`;
+                }
+            }
+
+            const pose = selections.pose?.custom || selections.pose?.item || '';
+            const location = selections.location?.custom || selections.location?.item || 'in a neutral environment';
+            const action = selections.action?.custom || selections.action?.item || '';
+            const lighting = selections.lighting || 'neutral lighting';
+
+            const fragments = [
+                `${selections.composition || ''} ${selections.style || ''}.`,
+                `The subject is ${name}, a ${age}-year-old with ${selections.subjectStyle || ''}, ${selections.skinTone || ''} and ${selections.bodyType || ''}.`,
+                `She has ${selections.eyeColor || ''}, ${hair.trim()}, and ${selections.breastSize || ''}.`,
+                `Her expression is ${selections.expression || ''} as she is ${pose}.`,
+                action ? `She is in the middle of ${action}.` : '',
+                `She has ${selections.makeup || ''} ${selections.accessories ? 'and ' + selections.accessories : ''}.`,
+                clothing,
+                `The scene is set ${location} and is lit by ${lighting}.`
+            ];
+
+            return fragments.filter(f => f && f.trim() && f.trim() !== '.').join(' ');
+        }
+
+        async function callGeminiApi(prompt) {
+            const apiKey = ""; // Leave empty
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, topK: 1, topP: 1, maxOutputTokens: 800 }
+            };
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+            const result = await response.json();
+            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+                 if (result.promptFeedback?.blockReason) {
+                     return `Não foi possível gerar o prompt. Motivo: ${result.promptFeedback.blockReason}. Tente fazer seleções diferentes.`;
+                }
+                throw new Error("Invalid response structure from API.");
+            }
+        }
+        
+        // --- INITIALIZATION ---
+        renderCurrentStep();
+        addEventListeners();
+
+    </script>
+</body>
+</html>
