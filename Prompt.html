@@ -366,7 +366,7 @@
                 document.getElementById('finalPrompt').value = detailedPrompt.replace(/\s+/g, ' ').trim();
             } catch (error) {
                 console.error("Error calling Gemini API:", error);
-                document.getElementById('finalPrompt').value = "Desculpe, ocorreu um erro ao gerar o prompt. Tente novamente.\n\n" + finalPrompt;
+                document.getElementById('finalPrompt').value = finalPrompt;
             } finally {
                 loading.classList.add('hidden');
                 promptResult.classList.remove('hidden');
