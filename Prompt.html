@@ -252,9 +252,16 @@
             });
 
             copyButton.addEventListener('click', () => {
+                const finalPromptTextarea = document.getElementById('finalPrompt');
+                const copyMessage = document.getElementById('copyMessage');
                 finalPromptTextarea.select();
-                try { document.execCommand('copy'); copyMessage.textContent = 'Copiado!'; setTimeout(() => copyMessage.textContent = '', 3000); }
-                catch (err) { copyMessage.textContent = 'Falha ao copiar.'; }
+                try { 
+                    document.execCommand('copy'); 
+                    copyMessage.textContent = 'Prompt copiado com sucesso!'; 
+                    setTimeout(() => { copyMessage.textContent = ''; }, 3000);
+                } catch (err) { 
+                    copyMessage.textContent = 'Falha ao copiar.'; 
+                }
             });
 
             restartButton.addEventListener('click', () => {
