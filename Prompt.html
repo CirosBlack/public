@@ -254,26 +254,59 @@
                 });
             });
 
-            copyButton.addEventListener('click', () => {
-                const finalPromptTextarea = document.getElementById('finalPrompt');
-                const copyMessage = document.getElementById('copyMessage');
-                finalPromptTextarea.select();
-                try { 
-                    document.execCommand('copy'); 
-                    copyMessage.textContent = 'Prompt copiado com sucesso!'; 
-                    setTimeout(() => { copyMessage.textContent = ''; }, 3000);
-                } catch (err) { 
-                    copyMessage.textContent = 'Falha ao copiar.'; 
-                }
-            });
+            const copyButton = document.getElementById('copyButton');
+            if(copyButton) {
+                copyButton.addEventListener('click', () => {
+                    const finalPromptTextarea = document.getElementById('finalPrompt');
+                    const copyMessage = document.getElementById('copyMessage');
+                    finalPromptTextarea.select();
+                    try { 
+                        document.execCommand('copy'); 
+                        copyMessage.textContent = 'Prompt copiado com sucesso!'; 
+                        setTimeout(() => { copyMessage.textContent = ''; }, 3000);
+                    } catch (err) { 
+                        copyMessage.textContent = 'Falha ao copiar.'; 
+                    }
+                });
+            }
 
-            restartButton.addEventListener('click', () => {
-                stepHistory = [0];
-                selections = {};
-                document.getElementById('resultSection').classList.add('hidden');
-                document.getElementById('wizard').classList.remove('hidden');
-                renderCurrentStep();
-            });
+            const translateButton = document.getElementById('translateButton');
+            if(translateButton) {
+                translateButton.addEventListener('click', async () => {
+                    const finalPromptTextarea = document.getElementById('finalPrompt');
+                    const copyMessage = document.getElementById('copyMessage');
+                    const originalText = finalPromptTextarea.value;
+                    
+                    if(!originalText) return;
+
+                    copyMessage.textContent = 'Traduzindo...';
+                    translateButton.disabled = true;
+
+                    try {
+                        const translationPrompt = `Translate the following text to English. Output only the translated text, without any introductory phrases: "${originalText}"`;
+                        const translatedText = await callGeminiApi(translationPrompt);
+                        finalPromptTextarea.value = translatedText.trim();
+                        copyMessage.textContent = 'Tradução concluída!';
+                    } catch (error) {
+                        console.error("Translation failed:", error);
+                        copyMessage.textContent = 'Falha na tradução.';
+                    } finally {
+                        translateButton.disabled = false;
+                        setTimeout(() => { copyMessage.textContent = ''; }, 3000);
+                    }
+                });
+            }
+
+            const restartButton = document.getElementById('restartButton');
+            if(restartButton) {
+                restartButton.addEventListener('click', () => {
+                    stepHistory = [0];
+                    selections = {};
+                    document.getElementById('resultSection').classList.add('hidden');
+                    document.getElementById('wizard').classList.remove('hidden');
+                    renderCurrentStep();
+                });
+            }
         }
 
         function navigate(direction) {
@@ -403,7 +436,7 @@
 
         function buildFinalPrompt() {
             const { name = 'a woman', age } = selections;
-            const hair = [selections.hairColor, selections.hairLength, selections.hairStyle].filter(Boolean).join(' ');
+            const hair = [selections.hairColor, selections.hairStyle, selections.hairLength].filter(Boolean).join(' ');
             
             let clothing = '';
             if (selections.clothingType === 'nude') {
