@@ -73,6 +73,7 @@
         const sizeOptions = [ { text: 'Extra Pequeno (XS)', value: 'extra small (XS)' }, { text: 'Pequeno (S)', value: 'small (S)' }, { text: 'Médio (M)', value: 'medium (M)' }, { text: 'Largo (L)', value: 'large (L)' }, { text: 'Extra Largo (XL)', value: 'extra large (XL)' }, { text: 'Nenhum', value: '' } ];
         const steps = [
             { id: 'identity', type: 'input', title: 'Identidade da Personagem' },
+            { id: 'ageGroup', title: 'Faixa Etária', options: [ { text: 'Menina', description: 'Aproximadamente 8-12 anos.', value: 'a young girl' }, { text: 'Menina Adolescente', description: 'Aproximadamente 13-17 anos.', value: 'a teenage girl' }, { text: 'Garota', description: 'Aproximadamente 18-22 anos.', value: 'a girl' }, { text: 'Jovem Mulher', description: 'Aproximadamente 23-30 anos.', value: 'a young woman' }, { text: 'Mulher', description: 'Aproximadamente 31-45 anos.', value: 'an adult woman' }, { text: 'Mulher Madura', description: 'Aproximadamente 46+ anos.', value: 'a mature woman' } ] },
             { id: 'ethnicity', title: 'Etnia', options: [ { text: 'Caucasiana', description: 'Traços europeus.', value: 'Caucasian' }, { text: 'Asiática (Leste)', description: 'China, Japão, Coreia.', value: 'East Asian' }, { text: 'Afrodescendente', description: 'Traços africanos.', value: 'of African descent' }, { text: 'Hispânica/Latina', description: 'Traços da América Latina.', value: 'Hispanic/Latina' }, { text: 'Brasileira', description: 'Traços diversos do Brasil.', value: 'Brazilian' }, { text: 'Indígena', description: 'Traços de povos nativos.', value: 'indigenous' }, { text: 'Oriente Médio', description: 'Traços do Oriente Médio.', value: 'Middle Eastern' }, { text: 'Sul Asiático', description: 'Subcontinente indiano.', value: 'South Asian' }, { text: 'Multirracial', description: 'Mistura de etnias.', value: 'multiracial' }, { text: 'Polinésia', description: 'Ilhas do Pacífico.', value: 'Polynesian' }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
             { id: 'bodyType', title: 'Biotipo Físico', options: [ { text: 'Ectomorfo', description: 'Estrutura longa e fina, naturalmente magra.', value: "an 'Ectomorph' somatotype, with a long and slender bone structure, naturally lean" }, { text: 'Mesomorfo', description: 'Corpo atlético, facilidade para ganhar músculos.', value: "a 'Mesomorph' somatotype, with an athletic build and a natural ease in gaining muscle" }, { text: 'Endomorfo', description: 'Estrutura larga, formas mais arredondadas.', value: "an 'Endomorph' somatotype, with a wider bone structure and a softer, more rounded physique" }, { text: 'Triângulo (Pera)', description: 'Quadris mais largos que os ombros.', value: "a 'Triangle' or 'Pear' body shape, where the hips are wider than the shoulders" }, { text: 'Triângulo Invertido', description: 'Ombros mais largos que os quadris.', value: "an 'Inverted Triangle' body shape, where the shoulders are noticeably wider than the hips" }, { text: 'Retângulo', description: 'Ombros, cintura e quadris com medidas próximas.', value: "a 'Rectangle' body shape, with similar measurements for shoulders, waist, and hips, creating a straight silhouette" }, { text: 'Ampulheta', description: 'Ombros e quadris semelhantes, cintura fina.', value: "an 'Hourglass' body shape, with similarly proportioned shoulders and hips and a well-defined, narrow waist" }, { text: 'Oval (Maçã)', description: 'Cintura mais larga que ombros e quadris.', value: "an 'Oval' or 'Apple' body shape, with a wider waist and abdomen compared to the shoulders and hips" }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
             { id: 'skinTone', title: 'Cor da Pele', options: [ { text: 'Pele Clara', description: 'Tom de pele claro, rosado.', value: 'fair skin' }, { text: 'Pele Pálida', description: 'Muito claro, quase branco.', value: 'pale skin' }, { text: 'Pele Bronzeada', description: 'Tom dourado, queimado de sol.', value: 'tanned skin' }, { text: 'Pele Oliva', description: 'Tom de pele amarelado/esverdeado.', value: 'olive skin' }, { text: 'Pele Escura', description: 'Tom de pele marrom escuro.', value: 'dark skin' }, { text: 'Pele com Sardas', description: 'Pele com pequenas manchas de melanina.', value: 'freckled skin' }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
@@ -172,8 +173,8 @@
                         <input type="text" id="characterName" class="input-field w-full" placeholder="Ex: Alice, Sofia, Kenji, Luna, David..." value="${selections.name || ''}">
                     </div>
                     <div>
-                        <label for="characterAge" class="block mb-2 text-sm font-medium text-gray-300">Idade</label>
-                        <input type="number" id="characterAge" class="input-field w-full" placeholder="Ex: 18" value="${selections.age || ''}">
+                        <label for="characterAge" class="block mb-2 text-sm font-medium text-gray-300">Idade (opcional)</label>
+                        <input type="number" id="characterAge" class="input-field w-full" placeholder="Ex: 25" value="${selections.age || ''}">
                     </div>
                 </div>
             `;
@@ -400,7 +401,7 @@
         }
 
         function buildFinalPrompt() {
-            const { name = 'a woman', age = '25' } = selections;
+            const { name = 'a woman', age } = selections;
             const hair = [selections.hairColor, selections.hairLength, selections.hairStyle].filter(Boolean).join(' ');
             
             let clothing = '';
@@ -436,9 +437,11 @@
             const action = selections.action?.custom || selections.action?.item || '';
             const lighting = selections.lighting || 'neutral lighting';
 
+            const ageString = age ? `${age}-year-old` : (selections.ageGroup || 'an adult woman');
+
             const fragments = [
                 `${selections.composition || ''} ${selections.style || ''}.`,
-                `The subject is ${name}, a ${age}-year-old ${selections.ethnicity || ''} woman with ${selections.subjectStyle || ''}, ${selections.skinTone || ''} and ${selections.bodyType || ''}.`,
+                `The subject is ${name}, a ${ageString} ${selections.ethnicity || ''} woman with ${selections.subjectStyle || ''}, ${selections.skinTone || ''} and ${selections.bodyType || ''}.`,
                 `She has ${selections.eyeColor || ''}, ${hair.trim()}, and ${selections.breastSize || ''}.`,
                 `Her expression is ${selections.expression || ''} as she is ${pose}.`,
                 action ? `She is in the middle of ${action}.` : '',
