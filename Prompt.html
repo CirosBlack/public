@@ -50,7 +50,7 @@
             <h2 class="text-2xl font-bold mb-4 text-green-400">Seu Prompt Profissional está Pronto!</h2>
             <div id="loading" class="flex justify-center items-center my-8">
                 <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                <p class="ml-4 text-lg">Aguarde, a IA está construindo seu prompt...</p>
+                <p id="loading-text" class="ml-4 text-lg">Aguarde, a IA está construindo seu prompt...</p>
             </div>
             <div id="promptResult" class="hidden">
                 <textarea id="finalPrompt" readonly class="w-full h-64 p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"></textarea>
@@ -269,33 +269,6 @@
                 });
             }
 
-            const translateButton = document.getElementById('translateButton');
-            if(translateButton) {
-                translateButton.addEventListener('click', async () => {
-                    const finalPromptTextarea = document.getElementById('finalPrompt');
-                    const copyMessage = document.getElementById('copyMessage');
-                    const originalText = finalPromptTextarea.value;
-                    
-                    if(!originalText) return;
-
-                    copyMessage.textContent = 'Traduzindo...';
-                    translateButton.disabled = true;
-
-                    try {
-                        const translationPrompt = `Translate the following text to English. Output only the translated text, without any introductory phrases: "${originalText}"`;
-                        const translatedText = await callGeminiApi(translationPrompt);
-                        finalPromptTextarea.value = translatedText.trim();
-                        copyMessage.textContent = 'Tradução concluída!';
-                    } catch (error) {
-                        console.error("Translation failed:", error);
-                        copyMessage.textContent = 'Falha na tradução.';
-                    } finally {
-                        translateButton.disabled = false;
-                        setTimeout(() => { copyMessage.textContent = ''; }, 3000);
-                    }
-                });
-            }
-
             const restartButton = document.getElementById('restartButton');
             if(restartButton) {
                 restartButton.addEventListener('click', () => {
@@ -392,6 +365,7 @@
             const resultSection = document.getElementById('resultSection');
             const loading = document.getElementById('loading');
             const promptResult = document.getElementById('promptResult');
+            const loadingText = document.getElementById('loading-text');
             
             wizard.classList.add('hidden');
             resultSection.classList.remove('hidden');
@@ -400,7 +374,11 @@
             document.getElementById('progress-text').textContent = 'Concluído!';
             document.getElementById('progress-bar').style.width = '100%';
 
-            const finalPrompt = buildFinalPrompt();
+            loadingText.textContent = 'Traduzindo textos personalizados...';
+            const translatedSelections = await translateCustomInputs(selections);
+
+            loadingText.textContent = 'Construindo o prompt detalhado...';
+            const finalPrompt = buildFinalPrompt(translatedSelections);
             const generationPrompt = `Your task is to transform a set of user-selected keywords into a single, masterfully crafted, ultra-detailed paragraph for a photorealistic AI image generator. The final prompt must be in English. Do not just combine the keywords; expand upon them dramatically. Add evocative, sensory details: the texture of fabric (e.g., "soft cotton," "worn leather"), the quality of light (e.g., "soft morning light filtering through a dusty window," "harsh neon glow reflecting on wet pavement"), subtle aspects of the character's expression (e.g., "a melancholic gaze," "a smirk playing on her lips"), and intricate background elements. The goal is to create a prompt that an AI can use to generate a breathtaking, emotionally resonant, and hyper-realistic image. The final output must be ONLY the prompt text itself, without any introductory phrases or explanations. Here are the user's keywords: "${finalPrompt}"`;
 
             try {
@@ -415,8 +393,8 @@
             }
         }
 
-        function buildClothingString(key) {
-            const itemData = selections[key];
+        function buildClothingString(key, currentSelections) {
+            const itemData = currentSelections[key];
             if (!itemData) return '';
             if (itemData.custom) return itemData.custom;
             if (!itemData.item) return '';
@@ -433,27 +411,27 @@
             return parts.join(' ');
         }
 
-        function buildFinalPrompt() {
-            const { name = 'a woman', age } = selections;
-            const hair = [selections.hairColor, selections.hairStyle, selections.hairLength].filter(Boolean).join(' ');
+        function buildFinalPrompt(currentSelections) {
+            const { name = 'a woman', age } = currentSelections;
+            const hair = [currentSelections.hairColor, currentSelections.hairStyle, currentSelections.hairLength].filter(Boolean).join(' ');
             
             let clothing = '';
-            if (selections.clothingType === 'nude') {
+            if (currentSelections.clothingType === 'nude') {
                 clothing = 'She is completely nude.';
-            } else if (selections.clothingType === 'lingerie') {
-                const braDesc = selections.bra?.item === 'is topless' ? 'is topless' : `wears ${buildClothingString('bra') || 'a bra'}`;
-                const pantiesDesc = buildClothingString('panties') || 'panties';
-                if (selections.bra?.item && selections.panties?.item) {
+            } else if (currentSelections.clothingType === 'lingerie') {
+                const braDesc = currentSelections.bra?.item === 'is topless' ? 'is topless' : `wears ${buildClothingString('bra', currentSelections) || 'a bra'}`;
+                const pantiesDesc = buildClothingString('panties', currentSelections) || 'panties';
+                if (currentSelections.bra?.item && currentSelections.panties?.item) {
                      clothing = `She ${braDesc} and ${pantiesDesc}.`;
-                } else if (selections.bra?.item) {
+                } else if (currentSelections.bra?.item) {
                     clothing = `She ${braDesc}.`;
-                } else if (selections.panties?.item) {
+                } else if (currentSelections.panties?.item) {
                     clothing = `She wears ${pantiesDesc}.`;
                 }
-            } else if (selections.clothingType === 'clothed') {
-                const topDesc = buildClothingString('topWear');
-                const bottomDesc = buildClothingString('bottomWear');
-                const shoesDesc = selections.shoes?.item === 'is barefoot' ? 'is barefoot' : `wears ${buildClothingString('shoes') || 'shoes'}`;
+            } else if (currentSelections.clothingType === 'clothed') {
+                const topDesc = buildClothingString('topWear', currentSelections);
+                const bottomDesc = buildClothingString('bottomWear', currentSelections);
+                const shoesDesc = currentSelections.shoes?.item === 'is barefoot' ? 'is barefoot' : `wears ${buildClothingString('shoes', currentSelections) || 'shoes'}`;
                 
                 let parts = [];
                 if(topDesc) parts.push(topDesc);
@@ -465,26 +443,63 @@
                 }
             }
 
-            const pose = selections.pose?.custom || selections.pose?.item || '';
-            const location = selections.location?.custom || selections.location?.item || 'in a neutral environment';
-            const action = selections.action?.custom || selections.action?.item || '';
-            const lighting = selections.lighting || 'neutral lighting';
+            const pose = currentSelections.pose?.custom || currentSelections.pose?.item || '';
+            const location = currentSelections.location?.custom || currentSelections.location?.item || 'in a neutral environment';
+            const action = currentSelections.action?.custom || currentSelections.action?.item || '';
+            const lighting = currentSelections.lighting || 'neutral lighting';
 
-            const ageString = age ? `${age}-year-old` : (selections.ageGroup || 'an adult woman');
+            const ageString = age ? `${age}-year-old` : (currentSelections.ageGroup || 'an adult woman');
 
             const fragments = [
-                `${selections.composition || ''} ${selections.style || ''}.`,
-                `The subject is ${name}, a ${ageString} ${selections.ethnicity || ''} woman with ${selections.subjectStyle || ''}, ${selections.skinTone || ''} and ${selections.bodyType || ''}.`,
-                `She has ${selections.eyeColor || ''}, ${hair.trim()}, and ${selections.breastSize || ''}.`,
-                `Her expression is ${selections.expression || ''} as she is ${pose}.`,
+                `${currentSelections.composition || ''} ${currentSelections.style || ''}.`,
+                `The subject is ${name}, a ${ageString} ${currentSelections.ethnicity || ''} woman with ${currentSelections.subjectStyle || ''}, ${currentSelections.skinTone || ''} and ${currentSelections.bodyType || ''}.`,
+                `She has ${currentSelections.eyeColor || ''}, ${hair.trim()}, and ${currentSelections.breastSize || ''}.`,
+                `Her expression is ${currentSelections.expression || ''} as she is ${pose}.`,
                 action ? `She is in the middle of ${action}.` : '',
-                `She has ${selections.makeup || ''} ${selections.accessories ? 'and ' + selections.accessories : ''}.`,
+                `She has ${currentSelections.makeup || ''} ${currentSelections.accessories ? 'and ' + selections.accessories : ''}.`,
                 clothing,
                 `The scene is set ${location} and is lit by ${lighting}.`
             ];
 
             return fragments.filter(f => f && f.trim() && f.trim() !== '.').join(' ');
         }
+        
+        async function translateCustomInputs(currentSelections) {
+            const textsToTranslate = {};
+            const keysToTranslate = [];
+
+            for (const key in currentSelections) {
+                if (currentSelections[key] && typeof currentSelections[key] === 'object' && currentSelections[key].custom) {
+                    textsToTranslate[key] = currentSelections[key].custom;
+                    keysToTranslate.push(key);
+                }
+            }
+
+            if (keysToTranslate.length === 0) {
+                return currentSelections;
+            }
+
+            const translationPrompt = `Translate the string values in the following JSON object to English. Respond ONLY with the translated JSON object, maintaining the same structure and keys. Do not add any other text or explanations. JSON to translate: ${JSON.stringify(textsToTranslate)}`;
+
+            try {
+                const translatedJsonString = await callGeminiApi(translationPrompt);
+                const cleanedJsonString = translatedJsonString.replace(/```json|```/g, '').trim();
+                const translatedTexts = JSON.parse(cleanedJsonString);
+
+                const newSelections = JSON.parse(JSON.stringify(currentSelections));
+
+                for (const key of keysToTranslate) {
+                    if (translatedTexts[key]) {
+                        newSelections[key].custom = translatedTexts[key];
+                    }
+                }
+                return newSelections;
+            } catch (error) {
+                console.error("Translation API call failed:", error);
+                return currentSelections;
+            }
+        }
+
 
         async function callGeminiApi(prompt) {
             const apiKey = ""; // Leave empty
