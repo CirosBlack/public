@@ -667,7 +667,7 @@
         async function translateFullPrompt(promptInPortuguese, retries = 3, delay = 1000) {
             const systemPrompt = `Your task is to translate a text fragment used for image generation. This text is a mix of English and Portuguese. You MUST translate ALL Portuguese words and phrases into natural, descriptive English. Combine all information into a single, cohesive English paragraph. DO NOT leave any Portuguese words in the output. Respond ONLY with the final, fully translated English paragraph. Here is the text: "${promptInPortuguese}"`;
             const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
-            const apiKey = ""; // Canvas provides this
+            const apiKey = "AIzaSyCSmhUh1sgXvXRmILgrR-RtaH7zwiRwb9o";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             for (let i = 0; i < retries; i++) {
