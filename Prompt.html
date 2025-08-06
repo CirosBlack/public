@@ -22,6 +22,9 @@
             background-color: #1F2937;
             border: 2px solid #374151;
             transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .option-card:hover {
             border-color: #4f46e580;
@@ -306,51 +309,40 @@
                 <h2 class="text-2xl font-semibold mb-6">Corte de Cabelo e Penteado</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <!-- Cabelo LONGO -->
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Corte em Camadas Longas', 'long layers')"><h3 class="font-bold">Corte em Camadas Longas</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Corte Reto Longo', 'long blunt cut')"><h3 class="font-bold">Corte Reto</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Shaggy Hair Longo', 'long shaggy hair')"><h3 class="font-bold">Shaggy Hair Longo</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Franja Cortininha', 'curtain bangs')"><h3 class="font-bold">Franja Cortininha</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Rabo de Cavalo Alto e Polido', 'high polished ponytail')"><h3 class="font-bold">Rabo de Cavalo Alto</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Ondas Sereia', 'mermaid waves')"><h3 class="font-bold">Ondas "Sereia"</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Meio Preso', 'half-up hairstyle')"><h3 class="font-bold">Meio Preso</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Trança Boxeadora Dupla', 'double boxer braids')"><h3 class="font-bold">Trança Boxeadora Dupla</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Franja Reta e Cheia', 'long hair with full straight bangs')"><h3 class="font-bold">Franja Reta e Cheia</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Efeito Molhado', 'wet look hairstyle')"><h3 class="font-bold">Efeito Molhado</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Corte em Camadas Longas', 'long layers')"><h3 class="font-bold">Corte em Camadas</h3><p class="text-sm text-gray-400 mt-1">Cria movimento e volume em cabelos longos.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Corte Reto Longo', 'long blunt cut')"><h3 class="font-bold">Corte Reto</h3><p class="text-sm text-gray-400 mt-1">Linhas retas e limpas, ideal para um visual polido.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Shaggy Hair Longo', 'long shaggy hair')"><h3 class="font-bold">Shaggy Hair</h3><p class="text-sm text-gray-400 mt-1">Visual despojado com camadas repicadas e textura.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Franja Cortininha', 'curtain bangs')"><h3 class="font-bold">Franja Cortininha</h3><p class="text-sm text-gray-400 mt-1">Franja dividida ao meio, emoldura o rosto suavemente.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Rabo de Cavalo Alto e Polido', 'high polished ponytail')"><h3 class="font-bold">Rabo de Cavalo Alto</h3><p class="text-sm text-gray-400 mt-1">Penteado elegante e justo, posicionado no topo da cabeça.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Ondas Sereia', 'mermaid waves')"><h3 class="font-bold">Ondas "Sereia"</h3><p class="text-sm text-gray-400 mt-1">Ondas largas e uniformes, criando um visual romântico.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Meio Preso', 'half-up hairstyle')"><h3 class="font-bold">Meio Preso</h3><p class="text-sm text-gray-400 mt-1">Parte superior do cabelo presa, deixando o resto solto.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Trança Boxeadora Dupla', 'double boxer braids')"><h3 class="font-bold">Trança Boxeadora</h3><p class="text-sm text-gray-400 mt-1">Duas tranças embutidas firmes, da raiz às pontas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Franja Reta e Cheia', 'long hair with full straight bangs')"><h3 class="font-bold">Franja Reta e Cheia</h3><p class="text-sm text-gray-400 mt-1">Franja densa que cobre a testa, um clássico.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Efeito Molhado', 'wet look hairstyle')"><h3 class="font-bold">Efeito Molhado</h3><p class="text-sm text-gray-400 mt-1">Cabelo com aparência úmida, penteado para trás.</p></div>
                     <!-- Cabelo MÉDIO -->
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Long Bob (Lob)', 'long bob (lob)')"><h3 class="font-bold">Long Bob (Lob)</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Chanel de Bico', 'A-line bob')"><h3 class="font-bold">Chanel de Bico</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Blunt Cut Médio', 'medium blunt cut')"><h3 class="font-bold">Blunt Cut Médio</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Shaggy Médio', 'medium shaggy hair')"><h3 class="font-bold">Shaggy Médio</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Clavicut', 'clavicut')"><h3 class="font-bold">Clavicut</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Ondas Suaves', 'soft beach waves')"><h3 class="font-bold">Ondas Suaves</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Liso Escorrido com Divisão Central', 'sleek straight hair with a center part')"><h3 class="font-bold">Liso com Divisão Central</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Preso com Presilhas Laterais', 'side-pinned with barrettes')"><h3 class="font-bold">Preso com Presilhas</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Camadas Invisíveis', 'invisible layers')"><h3 class="font-bold">Camadas Invisíveis</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Glass Hair', 'glass hair look')"><h3 class="font-bold">Glass Hair</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Long Bob (Lob)', 'long bob (lob)')"><h3 class="font-bold">Long Bob (Lob)</h3><p class="text-sm text-gray-400 mt-1">Versão mais longa do Chanel, na altura dos ombros.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Chanel de Bico', 'A-line bob')"><h3 class="font-bold">Chanel de Bico</h3><p class="text-sm text-gray-400 mt-1">Mais curto atrás e com pontas longas na frente.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Blunt Cut Médio', 'medium blunt cut')"><h3 class="font-bold">Blunt Cut</h3><p class="text-sm text-gray-400 mt-1">Corte reto e sem camadas, para um look moderno.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Shaggy Médio', 'medium shaggy hair')"><h3 class="font-bold">Shaggy</h3><p class="text-sm text-gray-400 mt-1">Camadas repicadas para um visual rock'n'roll.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Clavicut', 'clavicut')"><h3 class="font-bold">Clavicut</h3><p class="text-sm text-gray-400 mt-1">Corte médio reto que toca a clavícula.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Ondas Suaves', 'soft beach waves')"><h3 class="font-bold">Ondas Suaves</h3><p class="text-sm text-gray-400 mt-1">Ondas leves e naturais, como as de praia.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Liso Escorrido com Divisão Central', 'sleek straight hair with a center part')"><h3 class="font-bold">Liso com Divisão Central</h3><p class="text-sm text-gray-400 mt-1">Visual minimalista com cabelo liso e partido ao meio.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium" onclick="handleSelection(this, 'hairStyle', 'Glass Hair', 'glass hair look')"><h3 class="font-bold">Glass Hair</h3><p class="text-sm text-gray-400 mt-1">Cabelo extremamente liso e com brilho espelhado.</p></div>
                     <!-- Cabelo CURTO -->
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Pixie Cut Clássico', 'classic pixie cut')"><h3 class="font-bold">Pixie Cut Clássico</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Short Bob (Chanel Curto)', 'short bob')"><h3 class="font-bold">Short Bob (Chanel)</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Tapered Cut', 'tapered cut')"><h3 class="font-bold">Tapered Cut</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Bixie Cut', 'bixie cut')"><h3 class="font-bold">Bixie Cut</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Bowl Cut Moderno', 'modern bowl cut')"><h3 class="font-bold">Bowl Cut Moderno</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Topete (Pompadour)', 'pompadour hairstyle')"><h3 class="font-bold">Topete (Pompadour)</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Slicked Back Curto', 'slicked back short hair')"><h3 class="font-bold">Slicked Back</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Franja Curta (Baby Bangs)', 'short hair with baby bangs')"><h3 class="font-bold">Franja Curta</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Undercut Feminino', 'female undercut')"><h3 class="font-bold">Undercut Feminino</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Curto com Acessórios', 'short hair with accessories')"><h3 class="font-bold">Curto com Acessórios</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Pixie Cut Clássico', 'classic pixie cut')"><h3 class="font-bold">Pixie Cut</h3><p class="text-sm text-gray-400 mt-1">Curto na nuca e lados, com mais volume no topo.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Short Bob (Chanel Curto)', 'short bob')"><h3 class="font-bold">Short Bob (Chanel)</h3><p class="text-sm text-gray-400 mt-1">Corte clássico e elegante na altura do queixo.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Bixie Cut', 'bixie cut')"><h3 class="font-bold">Bixie Cut</h3><p class="text-sm text-gray-400 mt-1">Mistura entre o Bob e o Pixie, mais longo que o Pixie.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Topete (Pompadour)', 'pompadour hairstyle')"><h3 class="font-bold">Topete (Pompadour)</h3><p class="text-sm text-gray-400 mt-1">Cabelo penteado para cima e para trás, com volume.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Slicked Back Curto', 'slicked back short hair')"><h3 class="font-bold">Slicked Back</h3><p class="text-sm text-gray-400 mt-1">Cabelo curto penteado para trás com gel ou pomada.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Franja Curta (Baby Bangs)', 'short hair with baby bangs')"><h3 class="font-bold">Franja Curta</h3><p class="text-sm text-gray-400 mt-1">Franja bem acima das sobrancelhas, um look ousado.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Undercut Feminino', 'female undercut')"><h3 class="font-bold">Undercut</h3><p class="text-sm text-gray-400 mt-1">Laterais e/ou nuca raspadas, com topo mais longo.</p></div>
                      <!-- Cabelo RASPADO -->
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Buzz Cut Uniforme', 'uniform buzz cut')"><h3 class="font-bold">Buzz Cut Uniforme</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Buzz Cut com Degradê', 'buzz cut with a fade')"><h3 class="font-bold">Buzz Cut com Degradê</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Induction Cut', 'induction cut (zero blade)')"><h3 class="font-bold">Induction Cut</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Careca', 'completely bald, razor shaved')"><h3 class="font-bold">Careca</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Descoloração Global', 'bleached buzz cut (e.g., platinum, pink)')"><h3 class="font-bold">Descoloração Global</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Hair Tattoo', 'hair tattoo, razor designs')"><h3 class="font-bold">Hair Tattoo</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Buzz Cut com Mancha de Cor', 'buzz cut with a patch of color')"><h3 class="font-bold">Buzz Cut com Mancha de Cor</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Aplicação de Glitter', 'glitter or hair jewels on a shaved head')"><h3 class="font-bold">Aplicação de Glitter</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Desenho com Tinta Temporária', 'temporary stencil patterns on a buzz cut')"><h3 class="font-bold">Desenho com Tinta</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Sidecut com Topo Raspado', 'sidecut with a shaved top')"><h3 class="font-bold">Sidecut com Topo Raspado</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Buzz Cut Uniforme', 'uniform buzz cut')"><h3 class="font-bold">Buzz Cut Uniforme</h3><p class="text-sm text-gray-400 mt-1">Raspado com a mesma altura em toda a cabeça.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Buzz Cut com Degradê', 'buzz cut with a fade')"><h3 class="font-bold">Buzz Cut com Degradê</h3><p class="text-sm text-gray-400 mt-1">Raspado com um efeito degradê nas laterais (fade).</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Careca', 'completely bald, razor shaved')"><h3 class="font-bold">Careca</h3><p class="text-sm text-gray-400 mt-1">Cabeça totalmente raspada com navalha, sem cabelo.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Hair Tattoo', 'hair tattoo, razor designs')"><h3 class="font-bold">Hair Tattoo</h3><p class="text-sm text-gray-400 mt-1">Desenhos feitos com navalha no cabelo raspado.</p></div>
                     <!-- Nenhum -->
-                    <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-3" data-lengths="long,medium,short,shaved" onclick="handleSelection(this, 'hairStyle', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-3" data-lengths="long,medium,short,shaved" onclick="handleSelection(this, 'hairStyle', 'Nenhum', '')"><h3 class="font-bold">Nenhum / Não especificar</h3></div>
                 </div>
                 <div class="mt-8 flex justify-between w-full">
                     <button onclick="goToStep(6)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
@@ -382,11 +374,15 @@
             <div id="step-9" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Cor dos Olhos</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Azuis', 'blue eyes')"><h3 class="font-bold">Azuis</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Verdes', 'green eyes')"><h3 class="font-bold">Verdes</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Castanhos', 'brown eyes')"><h3 class="font-bold">Castanhos</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Azuis Claros', 'light blue eyes')"><h3 class="font-bold">Azuis Claros</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Azuis Escuros', 'dark blue eyes')"><h3 class="font-bold">Azuis Escuros</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Verdes Claros', 'light green eyes')"><h3 class="font-bold">Verdes Claros</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Verdes Escuros', 'dark green eyes')"><h3 class="font-bold">Verdes Escuros</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Castanhos Claros', 'light brown eyes')"><h3 class="font-bold">Castanhos Claros</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Castanhos Escuros', 'dark brown eyes')"><h3 class="font-bold">Castanhos Escuros</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Cor de Mel', 'honey-colored eyes')"><h3 class="font-bold">Cor de Mel</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Cinzas', 'gray eyes')"><h3 class="font-bold">Cinzas</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Cinza Claro', 'light gray eyes')"><h3 class="font-bold">Cinza Claro</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Cinza Escuro', 'dark gray eyes')"><h3 class="font-bold">Cinza Escuro</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Pretos', 'black eyes')"><h3 class="font-bold">Pretos</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Heterocromia', 'heterochromia eyes')"><h3 class="font-bold">Heterocromia</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
@@ -417,27 +413,42 @@
             <!-- Step 11: Composição da Cena -->
             <div id="step-11" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Composição da Cena</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Corpo Inteiro', 'full body shot, long shot')"><h3 class="font-bold text-sm">Corpo Inteiro</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Médio', 'medium shot')"><h3 class="font-bold text-sm">Plano Médio</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Close-up no Rosto', 'close-up shot on face')"><h3 class="font-bold text-sm">Close-up no Rosto</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Detalhe', 'extreme close-up on a detail')"><h3 class="font-bold text-sm">Plano Detalhe</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Vista Traseira', 'from behind view, over the shoulder shot')"><h3 class="font-bold text-sm">Vista Traseira</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ângulo Baixo', 'low angle shot')"><h3 class="font-bold text-sm">Ângulo Baixo</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ângulo Alto', 'high angle shot')"><h3 class="font-bold text-sm">Ângulo Alto</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ângulo Holandês', 'dutch angle')"><h3 class="font-bold text-sm">Ângulo Holandês</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ponto de Vista (POV)', 'point of view (POV)')"><h3 class="font-bold text-sm">Ponto de Vista (POV)</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Sobre o Ombro', 'over the shoulder shot')"><h3 class="font-bold text-sm">Sobre o Ombro</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Americano', 'american shot, medium long shot')"><h3 class="font-bold text-sm">Plano Americano</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Geral Amplo', 'establishing shot, wide shot')"><h3 class="font-bold text-sm">Plano Geral Amplo</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Conjunto', 'two-shot or group shot')"><h3 class="font-bold text-sm">Plano Conjunto</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Regra dos Terços', 'rule of thirds composition')"><h3 class="font-bold text-sm">Regra dos Terços</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Linhas Guia', 'leading lines composition')"><h3 class="font-bold text-sm">Linhas Guia</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Enquadramento Natural', 'frame within a frame composition')"><h3 class="font-bold text-sm">Enquadramento Natural</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Simetria e Ponto Central', 'symmetrical composition, centered subject')"><h3 class="font-bold text-sm">Simetria e Ponto Central</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Espaço Negativo', 'negative space composition')"><h3 class="font-bold text-sm">Espaço Negativo</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Profundidade de Campo', 'shallow depth of field or deep depth of field')"><h3 class="font-bold text-sm">Profundidade de Campo</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Nenhum', '')"><h3 class="font-bold text-sm">Nenhum</h3></div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Orientação da Personagem</h3>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleViewSelection(this, 'characterView', 'Frente', 'facing the camera')"><h3 class="font-bold">De Frente</h3></div>
+                        <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleViewSelection(this, 'characterView', 'Lado', 'side view')"><h3 class="font-bold">De Lado</h3></div>
+                        <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleViewSelection(this, 'characterView', 'Costas', 'from behind')"><h3 class="font-bold">De Costas</h3></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Enquadramento e Composição (Múltipla Escolha)</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'full body shot, long shot')"><h3 class="font-bold text-sm">Corpo Inteiro</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'medium shot')"><h3 class="font-bold text-sm">Plano Médio</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'close-up shot on face')"><h3 class="font-bold text-sm">Close-up no Rosto</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'extreme close-up on a detail')"><h3 class="font-bold text-sm">Plano Detalhe</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'low angle shot')"><h3 class="font-bold text-sm">Ângulo Baixo</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'high angle shot')"><h3 class="font-bold text-sm">Ângulo Alto</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'dutch angle')"><h3 class="font-bold text-sm">Ângulo Holandês</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'point of view (POV)')"><h3 class="font-bold text-sm">Ponto de Vista (POV)</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'over the shoulder shot')"><h3 class="font-bold text-sm">Sobre o Ombro</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'american shot, medium long shot')"><h3 class="font-bold text-sm">Plano Americano</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'establishing shot, wide shot')"><h3 class="font-bold text-sm">Plano Geral Amplo</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'two-shot or group shot')"><h3 class="font-bold text-sm">Plano Conjunto</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'rule of thirds composition')"><h3 class="font-bold text-sm">Regra dos Terços</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'leading lines composition')"><h3 class="font-bold text-sm">Linhas Guia</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'frame within a frame composition')"><h3 class="font-bold text-sm">Enquadramento Natural</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'symmetrical composition, centered subject')"><h3 class="font-bold text-sm">Simetria e Ponto Central</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'negative space composition')"><h3 class="font-bold text-sm">Espaço Negativo</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'shallow depth of field or deep depth of field')"><h3 class="font-bold text-sm">Profundidade de Campo</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'macro view')"><h3 class="font-bold text-sm">Visão Macro</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'focused framing')"><h3 class="font-bold text-sm">Enquadramento com Foco</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'centered framing')"><h3 class="font-bold text-sm">Enquadramento Centralizado</h3></div>
+                        <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'shot from a low angle, looking up')"><h3 class="font-bold text-sm">Visão Inferior</h3></div>
+                    </div>
                 </div>
                 <div class="mt-8 flex justify-between w-full">
                     <button onclick="goToStep(10)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
@@ -490,34 +501,144 @@
             <!-- Step 14: Acessórios -->
             <div id="step-14" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Acessórios (múltipla escolha)</h2>
-                <div id="accessories-options" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing glasses')"><h3 class="font-bold">Óculos</h3></div>
-                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing a necklace')"><h3 class="font-bold">Colar</h3></div>
-                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing earrings')"><h3 class="font-bold">Brincos</h3></div>
-                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'with piercings')"><h3 class="font-bold">Piercings</h3></div>
-                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'with tattoos')"><h3 class="font-bold">Tatuagens</h3></div>
-                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing a hat')"><h3 class="font-bold">Chapéu</h3></div>
-                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing headphones')"><h3 class="font-bold">Fones de Ouvido</h3></div>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Estilos</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="toggleAccessoryStyle(this, 'gothic-accessories')"><h3 class="font-bold text-sm">Gótica</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="toggleAccessoryStyle(this, 'rocker-accessories')"><h3 class="font-bold text-sm">Rockeira</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="toggleAccessoryStyle(this, 'bdsm-accessories')"><h3 class="font-bold text-sm">Sadomasoquista</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="toggleAccessoryStyle(this, 'preppy-accessories')"><h3 class="font-bold text-sm">Patricinha</h3></div>
+                        </div>
+                    </div>
+                    <!-- GOTHIC ACCESSORIES (HIDDEN) -->
+                    <div id="gothic-accessories" class="hidden space-y-4">
+                        <h4 class="text-lg font-medium text-gray-300">Acessórios Góticos</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                           <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'velvet choker')"><h3 class="font-bold text-sm">Choker de Veludo</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather harness')"><h3 class="font-bold text-sm">Harness de Couro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'belt with ornate buckle')"><h3 class="font-bold text-sm">Cinto com Fivela Elaborada</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'pants chains')"><h3 class="font-bold text-sm">Correntes para Calças</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'lace or fishnet gloves')"><h3 class="font-bold text-sm">Luvas de Renda/Arrastão</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'crucifix or ankh necklaces')"><h3 class="font-bold text-sm">Colares de Crucifixo/Ankh</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'rings with dark stones')"><h3 class="font-bold text-sm">Anéis com Pedras Escuras</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'hoop earrings with cross pendants')"><h3 class="font-bold text-sm">Brincos de Argola com Cruz</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'fishnet or victorian pattern tights')"><h3 class="font-bold text-sm">Meia-calça Arrastão/Vitoriana</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'coffin-shaped bag')"><h3 class="font-bold text-sm">Bolsa de Caixão</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'cameo or insect brooches')"><h3 class="font-bold text-sm">Broches de Camafeu/Insetos</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wide-brimmed hat or top hat')"><h3 class="font-bold text-sm">Chapéu de Aba Larga/Cartola</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'round vintage sunglasses')"><h3 class="font-bold text-sm">Óculos de Sol Vintage</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather bracelet with spikes')"><h3 class="font-bold text-sm">Pulseira de Couro com Spikes</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'hair accessories with black feathers')"><h3 class="font-bold text-sm">Acessórios de Cabelo com Penas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'spiked garter')"><h3 class="font-bold text-sm">Gargantilha com Spikes</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leg harness')"><h3 class="font-bold text-sm">Leg-harness</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'septum or lip piercing')"><h3 class="font-bold text-sm">Piercings (Septo, Lábio)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'platform ankle boots')"><h3 class="font-bold text-sm">Ankle Boots com Plataforma</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'short or long veils')"><h3 class="font-bold text-sm">Véus</h3></div>
+                        </div>
+                    </div>
+                     <!-- ROCKER ACCESSORIES (HIDDEN) -->
+                    <div id="rocker-accessories" class="hidden space-y-4">
+                        <h4 class="text-lg font-medium text-gray-300">Acessórios Rockeira</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'perfecto leather jacket')"><h3 class="font-bold text-sm">Jaqueta de Couro Perfecto</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'bandana')"><h3 class="font-bold text-sm">Bandanas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'studded leather belt')"><h3 class="font-bold text-sm">Cinto de Couro com Tachas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather wristbands with rivets')"><h3 class="font-bold text-sm">Pulseiras de Couro com Rebites</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'band logo wristbands')"><h3 class="font-bold text-sm">Munhequeiras</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'guitar pick necklace')"><h3 class="font-bold text-sm">Colar com Palheta</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'silver skull rings')"><h3 class="font-bold text-sm">Anéis de Caveira</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'thick chains')"><h3 class="font-bold text-sm">Correntes Grossas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'aviator sunglasses')"><h3 class="font-bold text-sm">Óculos de Sol Aviador</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'combat boots')"><h3 class="font-bold text-sm">Botas de Combate</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'band patches on jacket')"><h3 class="font-bold text-sm">Patches de Bandas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'trucker hat')"><h3 class="font-bold text-sm">Boné Trucker</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'fishnet stockings')"><h3 class="font-bold text-sm">Meias Arrastão</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'large hoop earrings')"><h3 class="font-bold text-sm">Brincos de Argola Grandes</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'skull or plaid scarf')"><h3 class="font-bold text-sm">Lenços de Caveira/Xadrez</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'fingerless leather gloves')"><h3 class="font-bold text-sm">Luvas sem Dedos</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wallet with chain')"><h3 class="font-bold text-sm">Carteira com Corrente</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'canvas belt with metal buckle')"><h3 class="font-bold text-sm">Cinto de Lona</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'chain anklets')"><h3 class="font-bold text-sm">Tornozeleiras de Corrente</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'band pins')"><h3 class="font-bold text-sm">Pins de Bandas</h3></div>
+                        </div>
+                    </div>
+                    <!-- BDSM ACCESSORIES (HIDDEN) -->
+                    <div id="bdsm-accessories" class="hidden space-y-4">
+                        <h4 class="text-lg font-medium text-gray-300">Acessórios Sadomasoquista</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                           <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'full body harness')"><h3 class="font-bold text-sm">Harness de Corpo Inteiro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather collar with O-ring')"><h3 class="font-bold text-sm">Coleira de Couro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather or metal cuffs')"><h3 class="font-bold text-sm">Algemas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'ball gag or tape gag')"><h3 class="font-bold text-sm">Mordaças</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'whip or riding crop')"><h3 class="font-bold text-sm">Chicotes</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather or latex mask')"><h3 class="font-bold text-sm">Máscaras</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'aesthetic chastity belt')"><h3 class="font-bold text-sm">Cinto de Castidade</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'ring gag')"><h3 class="font-bold text-sm">Gag de Anel</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'heavy metal body chains')"><h3 class="font-bold text-sm">Body Chains</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'elbow-length latex gloves')"><h3 class="font-bold text-sm">Luvas de Látex</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'vinyl thigh-high stockings with garter belt')"><h3 class="font-bold text-sm">Meias 7/8 de Vinil</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'nipple pasties')"><h3 class="font-bold text-sm">Pasties</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wide leather cuffs')"><h3 class="font-bold text-sm">Cuffs de Couro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leash chains')"><h3 class="font-bold text-sm">Correntes de Coleira</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'nipple or genital piercings')"><h3 class="font-bold text-sm">Piercings Estratégicos</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'thigh-high stiletto boots')"><h3 class="font-bold text-sm">Botas de Cano Altíssimo</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather or vinyl corset')"><h3 class="font-bold text-sm">Espartilho de Couro/Vinil</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'leather eyepatch')"><h3 class="font-bold text-sm">Tapa-olho de Couro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'aesthetic tail plug')"><h3 class="font-bold text-sm">Plugue de Cauda</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'body jewelry with chains')"><h3 class="font-bold text-sm">Joias para o Corpo</h3></div>
+                        </div>
+                    </div>
+                     <!-- PREPPY ACCESSORIES (HIDDEN) -->
+                    <div id="preppy-accessories" class="hidden space-y-4">
+                        <h4 class="text-lg font-medium text-gray-300">Acessórios Patricinha</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                           <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'designer handbag')"><h3 class="font-bold text-sm">Bolsa de Grife</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'padded or pearl headband')"><h3 class="font-bold text-sm">Tiara Acolchoada/Pérolas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'ribbon bows in hair')"><h3 class="font-bold text-sm">Laços de Fita</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'large designer sunglasses')"><h3 class="font-bold text-sm">Óculos de Sol Grandes</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'initial pendant necklace')"><h3 class="font-bold text-sm">Colar de Inicial</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'charm bracelet')"><h3 class="font-bold text-sm">Pulseira de Berloques</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'pearl or diamond stud earrings')"><h3 class="font-bold text-sm">Brincos de Pérola/Brilhantes</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'gold-plated watch')"><h3 class="font-bold text-sm">Relógio de Marca</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'designer silk scarf')"><h3 class="font-bold text-sm">Lenço de Seda</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'thin leather belt')"><h3 class="font-bold text-sm">Cinto Fino de Couro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'ballet flats')"><h3 class="font-bold text-sm">Sapatilhas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'high-heeled pumps')"><h3 class="font-bold text-sm">Scarpins</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'rhinestone hair clips')"><h3 class="font-bold text-sm">Presilhas com Strass</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'delicate stackable rings')"><h3 class="font-bold text-sm">Anéis Delicados</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'designer phone case with chain')"><h3 class="font-bold text-sm">Porta-celular de Grife</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'designer makeup bag')"><h3 class="font-bold text-sm">Necessaire de Marca</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'plush keychain')"><h3 class="font-bold text-sm">Chaveiro de Pelúcia</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'fabric headbands')"><h3 class="font-bold text-sm">Faixas de Cabelo</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'sheer neutral-colored tights')"><h3 class="font-bold text-sm">Meias-calças Finas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'short leather gloves in pastel colors')"><h3 class="font-bold text-sm">Luvas de Couro Curtas</h3></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-8 flex justify-between w-full">
                     <button onclick="goToStep(13)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(15)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                    <button onclick="handleManualInput(this, 'tattooDescription', 'tattooDescription', 15)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
                 </div>
             </div>
 
             <!-- Step 15: Expressão Facial -->
             <div id="step-15" class="step">
-                <h2 class="text-2xl font-semibold mb-6">Expressão Facial</h2>
+                <h2 class="text-2xl font-semibold mb-6">Expressão Facial (Múltipla Escolha)</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Sedutora', 'seductive expression')"><h3 class="font-bold">Sedutora</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Confiante', 'confident expression')"><h3 class="font-bold">Confiante</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Triste', 'sad expression')"><h3 class="font-bold">Triste</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Irritada', 'angry expression')"><h3 class="font-bold">Irritada</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Feliz/Sorrindo', 'happy/smiling expression')"><h3 class="font-bold">Feliz/Sorrindo</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Pensativa', 'thoughtful expression')"><h3 class="font-bold">Pensativa</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Assustada', 'scared expression')"><h3 class="font-bold">Assustada</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Entediada', 'bored expression')"><h3 class="font-bold">Entediada</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'seductive expression')"><h3 class="font-bold">Sedutora</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'confident expression')"><h3 class="font-bold">Confiante</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'sad expression')"><h3 class="font-bold">Triste</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'angry expression')"><h3 class="font-bold">Irritada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'happy, smiling expression')"><h3 class="font-bold">Feliz/Sorrindo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'thoughtful expression')"><h3 class="font-bold">Pensativa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'scared expression')"><h3 class="font-bold">Assustada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'bored expression')"><h3 class="font-bold">Entediada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'sweet, gentle expression')"><h3 class="font-bold">Meiga</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'cute expression')"><h3 class="font-bold">Fofinha</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'shouting, screaming expression')"><h3 class="font-bold">Gritando</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'crying expression')"><h3 class="font-bold">Chorando</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'with tears in eyes')"><h3 class="font-bold">Lágrimas</h3></div>
                 </div>
                 <div class="mt-8 flex justify-between w-full">
                     <button onclick="goToStep(14)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
@@ -527,57 +648,64 @@
 
             <!-- Step 16: Pose Corporal -->
             <div id="step-16" class="step">
-                <h2 class="text-2xl font-semibold mb-6">Pose Corporal</h2>
+                <h2 class="text-2xl font-semibold mb-6">Pose Corporal (Múltipla Escolha)</h2>
                 <div class="space-y-6">
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Poses Básicas e Cotidianas</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Em pé', 'standing pose')"><h3 class="font-bold text-sm">Em pé</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Sentada(o)', 'sitting pose')"><h3 class="font-bold text-sm">Sentada(o)</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Deitada(o)', 'lying down pose')"><h3 class="font-bold text-sm">Deitada(o)</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Andando', 'walking pose')"><h3 class="font-bold text-sm">Andando</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Correndo', 'running pose')"><h3 class="font-bold text-sm">Correndo</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Dançando', 'dancing pose')"><h3 class="font-bold text-sm">Dançando</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Encostada(o)', 'leaning pose')"><h3 class="font-bold text-sm">Encostada(o)</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Agachada(o)', 'squatting pose')"><h3 class="font-bold text-sm">Agachada(o)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'standing pose')"><h3 class="font-bold text-sm">Em pé</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'sitting pose')"><h3 class="font-bold text-sm">Sentada(o)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'lying down pose')"><h3 class="font-bold text-sm">Deitada(o)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'walking pose')"><h3 class="font-bold text-sm">Andando</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'running pose')"><h3 class="font-bold text-sm">Correndo</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'dancing pose')"><h3 class="font-bold text-sm">Dançando</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'leaning pose')"><h3 class="font-bold text-sm">Encostada(o)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'squatting pose')"><h3 class="font-bold text-sm">Agachada(o)</h3></div>
                         </div>
                     </div>
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Poses de Ação e Movimento</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pose de Luta', 'fighting stance')"><h3 class="font-bold text-sm">Pose de Luta</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pose de Ação', 'action pose (jumping, climbing)')"><h3 class="font-bold text-sm">Pose de Ação</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pose de Super-herói', 'superhero pose')"><h3 class="font-bold text-sm">Pose de Super-herói</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Ajoelhada(o)', 'kneeling pose')"><h3 class="font-bold text-sm">Ajoelhada(o)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'fighting stance')"><h3 class="font-bold text-sm">Pose de Luta</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'action pose (jumping, climbing)')"><h3 class="font-bold text-sm">Pose de Ação</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'superhero pose')"><h3 class="font-bold text-sm">Pose de Super-herói</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'kneeling pose')"><h3 class="font-bold text-sm">Ajoelhada(o)</h3></div>
                         </div>
                     </div>
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Poses Sensuais e Provocantes</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'De Quatro', 'on all fours')"><h3 class="font-bold text-sm">De Quatro</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pernas Abertas', 'legs spread pose')"><h3 class="font-bold text-sm">Pernas Abertas</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Empinada(o)', 'arched back, presenting buttocks')"><h3 class="font-bold text-sm">Empinada(o)</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Arqueada(o)', 'arched back pose')"><h3 class="font-bold text-sm">Arqueada(o)</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Frango Assado', 'prone with legs bent and spread')"><h3 class="font-bold text-sm">"Frango Assado"</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Mão na Boca ou nos Lábios', 'hand on mouth or lips')"><h3 class="font-bold text-sm">Mão na Boca</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Olhar por Cima do Ombro', 'looking over the shoulder')"><h3 class="font-bold text-sm">Olhar por Cima do Ombro</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Puxando a Roupa', 'pulling on clothing')"><h3 class="font-bold text-sm">Puxando a Roupa</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'on all fours')"><h3 class="font-bold text-sm">De Quatro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'legs spread')"><h3 class="font-bold text-sm">Pernas Abertas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'arched back')"><h3 class="font-bold text-sm">Arqueada(o)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'butt pushed back')"><h3 class="font-bold text-sm">Bunda Empinada para Trás</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'focus on the ass')"><h3 class="font-bold text-sm">Foco da Bunda</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'focus on pussy')"><h3 class="font-bold text-sm">Foco na Buceta</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'spread pussy')"><h3 class="font-bold text-sm">Buceta Aberta</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'closed pussy')"><h3 class="font-bold text-sm">Buceta Fechada</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'crossed legs')"><h3 class="font-bold text-sm">Pernas Cruzadas</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'kneeling')"><h3 class="font-bold text-sm">Ajoelhada (sensual)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'masturbating')"><h3 class="font-bold text-sm">Masturbação</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'fingers in pussy')"><h3 class="font-bold text-sm">Dedos na Buceta</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'fingers in anus')"><h3 class="font-bold text-sm">Dedos no Ânus</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'looking over the shoulder')"><h3 class="font-bold text-sm">Olhar por Cima do Ombro</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'pulling on clothing')"><h3 class="font-bold text-sm">Puxando a Roupa</h3></div>
                         </div>
                     </div>
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Poses Expressivas e Artísticas</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pose de Yoga', 'yoga pose (e.g., lotus, warrior)')"><h3 class="font-bold text-sm">Pose de Yoga</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Contorcionismo', 'contortionist pose')"><h3 class="font-bold text-sm">Contorcionismo</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pose Fetal', 'fetal position')"><h3 class="font-bold text-sm">Pose Fetal</h3></div>
-                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Abraçando a si mesma(o)', 'hugging self')"><h3 class="font-bold text-sm">Abraçando a si mesma(o)</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'yoga pose (e.g., lotus, warrior)')"><h3 class="font-bold text-sm">Pose de Yoga</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'contortionist pose')"><h3 class="font-bold text-sm">Contorcionismo</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'fetal position')"><h3 class="font-bold text-sm">Pose Fetal</h3></div>
+                            <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'bodyPose', 'hugging self')"><h3 class="font-bold text-sm">Abraçando a si mesma(o)</h3></div>
                         </div>
                     </div>
                 </div>
-                 <textarea id="bodyPoseManual" placeholder="Ou descreva a pose aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                 <textarea id="bodyPoseManual" placeholder="Ou escreva a pose aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
                  <div class="mt-8 flex justify-between w-full">
                     <button onclick="goToStep(15)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'bodyPoseManual', 'bodyPose', 17)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                    <button onclick="handleManualInput(this, 'bodyPoseManual', 'manualPose', 17)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
                 </div>
             </div>
 
@@ -599,26 +727,17 @@
             <div id="step-18" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tipo de Calcinha</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Clássica', 'classic cut panties')"><h3 class="font-bold text-sm">Clássica</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Biquíni', 'bikini cut panties')"><h3 class="font-bold text-sm">Biquíni</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Caleçon', 'boyshort panties')"><h3 class="font-bold text-sm">Caleçon</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Cintura Alta', 'high-waist panties')"><h3 class="font-bold text-sm">Cintura Alta</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Fio Dental', 'thong')"><h3 class="font-bold text-sm">Fio Dental</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Fio Duplo', 'double string thong')"><h3 class="font-bold text-sm">Fio Duplo</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Tanga', 'tanga panties')"><h3 class="font-bold text-sm">Tanga</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Strappy', 'strappy panties')"><h3 class="font-bold text-sm">Strappy</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Modeladora', 'shapewear panties')"><h3 class="font-bold text-sm">Modeladora</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Asa Delta', 'high-leg or V-cut panties')"><h3 class="font-bold text-sm">Asa Delta</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Sem Costura', 'seamless panties')"><h3 class="font-bold text-sm">Sem Costura</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Hipster', 'hipster panties')"><h3 class="font-bold text-sm">Hipster</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Biquíni de Laço', 'tie-side bikini panties')"><h3 class="font-bold text-sm">Biquíni de Laço</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Calcinha de Renda', 'lace panties')"><h3 class="font-bold text-sm">De Renda</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Com Enchimento', 'padded panties')"><h3 class="font-bold text-sm">Com Enchimento</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Aberta', 'crotchless panties')"><h3 class="font-bold text-sm">Aberta</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Com Sainha', 'skirted panties')"><h3 class="font-bold text-sm">Com Sainha</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Maternidade', 'maternity panties')"><h3 class="font-bold text-sm">Maternidade</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Calcinha Absorvente', 'period panties')"><h3 class="font-bold text-sm">Absorvente</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Borboleta', 'butterfly panties')"><h3 class="font-bold text-sm">Borboleta</h3></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Clássica', 'classic cut panties')"><h3 class="font-bold text-sm">Clássica</h3><p class="text-xs text-gray-400 mt-1">Cobertura moderada, confortável.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Biquíni', 'bikini cut panties')"><h3 class="font-bold text-sm">Biquíni</h3><p class="text-xs text-gray-400 mt-1">Corte mais baixo e cavado que a clássica.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Caleçon', 'boyshort panties')"><h3 class="font-bold text-sm">Caleçon</h3><p class="text-xs text-gray-400 mt-1">Formato de shortinho, cobre o bumbum.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Cintura Alta', 'high-waist panties')"><h3 class="font-bold text-sm">Cintura Alta</h3><p class="text-xs text-gray-400 mt-1">Cobre o umbigo, modela a silhueta.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Fio Dental', 'thong')"><h3 class="font-bold text-sm">Fio Dental</h3><p class="text-xs text-gray-400 mt-1">Mínima cobertura atrás, não marca.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Tanga', 'tanga panties')"><h3 class="font-bold text-sm">Tanga</h3><p class="text-xs text-gray-400 mt-1">Maior que o fio dental, pouca cobertura.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Strappy', 'strappy panties')"><h3 class="font-bold text-sm">Strappy</h3><p class="text-xs text-gray-400 mt-1">Com tiras decorativas no quadril.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Asa Delta', 'high-leg or V-cut panties')"><h3 class="font-bold text-sm">Asa Delta</h3><p class="text-xs text-gray-400 mt-1">Laterais super cavadas, alongam as pernas.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Sem Costura', 'seamless panties')"><h3 class="font-bold text-sm">Sem Costura</h3><p class="text-xs text-gray-400 mt-1">Corte a laser, invisível sob a roupa.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Calcinha de Renda', 'lace panties')"><h3 class="font-bold text-sm">De Renda</h3><p class="text-xs text-gray-400 mt-1">Feita parcial ou totalmente em renda.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Aberta', 'crotchless panties')"><h3 class="font-bold text-sm">Aberta</h3><p class="text-xs text-gray-400 mt-1">Abertura na região íntima, design erótico.</p></div>
                 </div>
                  <textarea id="pantiesManual" placeholder="Ou escreva os detalhes aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
                  <div class="mt-8 flex justify-between w-full">
@@ -660,26 +779,19 @@
             <div id="step-21" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tipo de Sutiã</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Meia-taça', 'demi-cup bra')"><h3 class="font-bold text-sm">Meia-taça</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Push-up', 'push-up bra')"><h3 class="font-bold text-sm">Push-up</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Balconet', 'balconette bra')"><h3 class="font-bold text-sm">Balconet</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Alta Sustentação', 'high support bra')"><h3 class="font-bold text-sm">Alta Sustentação</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Tomara que Caia', 'strapless bra')"><h3 class="font-bold text-sm">Tomara que Caia</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Nadador', 'racerback bra')"><h3 class="font-bold text-sm">Nadador</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Triângulo', 'triangle bra')"><h3 class="font-bold text-sm">Triângulo</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Bralette', 'bralette')"><h3 class="font-bold text-sm">Bralette</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Esportivo', 'sports bra')"><h3 class="font-bold text-sm">Esportivo</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Decote Profundo', 'plunge bra')"><h3 class="font-bold text-sm">Decote Profundo</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Cropped', 'cropped bra')"><h3 class="font-bold text-sm">Cropped</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Cobertura Total', 'full cup bra')"><h3 class="font-bold text-sm">Cobertura Total</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Adesivo', 'adhesive bra')"><h3 class="font-bold text-sm">Adesivo</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Strappy', 'strappy bra')"><h3 class="font-bold text-sm">Strappy</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Com Aro', 'underwire bra')"><h3 class="font-bold text-sm">Com Aro</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Sem Bojo', 'unpadded bra')"><h3 class="font-bold text-sm">Sem Bojo</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Amamentação', 'nursing bra')"><h3 class="font-bold text-sm">Amamentação</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Pós-cirúrgico', 'post-surgical bra')"><h3 class="font-bold text-sm">Pós-cirúrgico</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Corretor Postural', 'posture corrector bra')"><h3 class="font-bold text-sm">Corretor Postural</h3></div>
-                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Nenhum (Topless)', 'topless')"><h3 class="font-bold text-sm">Nenhum (Topless)</h3></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Meia-taça', 'demi-cup bra')"><h3 class="font-bold text-sm">Meia-taça</h3><p class="text-xs text-gray-400 mt-1">Cobre metade dos seios, ideal para decotes.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Push-up', 'push-up bra')"><h3 class="font-bold text-sm">Push-up</h3><p class="text-xs text-gray-400 mt-1">Com bojo, aproxima e levanta os seios.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Balconet', 'balconette bra')"><h3 class="font-bold text-sm">Balconet</h3><p class="text-xs text-gray-400 mt-1">Decote reto, levanta os seios.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Alta Sustentação', 'high support bra')"><h3 class="font-bold text-sm">Alta Sustentação</h3><p class="text-xs text-gray-400 mt-1">Estruturado para seios volumosos.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Tomara que Caia', 'strapless bra')"><h3 class="font-bold text-sm">Tomara que Caia</h3><p class="text-xs text-gray-400 mt-1">Sem alças.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Nadador', 'racerback bra')"><h3 class="font-bold text-sm">Nadador</h3><p class="text-xs text-gray-400 mt-1">Alças se unem nas costas.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Triângulo', 'triangle bra')"><h3 class="font-bold text-sm">Triângulo</h3><p class="text-xs text-gray-400 mt-1">Sem aro, leve e natural.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Bralette', 'bralette')"><h3 class="font-bold text-sm">Bralette</h3><p class="text-xs text-gray-400 mt-1">Top de renda sem aro ou bojo.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Esportivo', 'sports bra')"><h3 class="font-bold text-sm">Esportivo</h3><p class="text-xs text-gray-400 mt-1">Alta compressão para atividades físicas.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Decote Profundo', 'plunge bra')"><h3 class="font-bold text-sm">Decote Profundo</h3><p class="text-xs text-gray-400 mt-1">Design em 'V' para decotes acentuados.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Cropped', 'cropped bra')"><h3 class="font-bold text-sm">Cropped</h3><p class="text-xs text-gray-400 mt-1">Longo como um top.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Strappy', 'strappy bra')"><h3 class="font-bold text-sm">Strappy</h3><p class="text-xs text-gray-400 mt-1">Com tiras decorativas no decote.</p></div>
+                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Nenhum (Topless)', 'topless')"><h3 class="font-bold text-sm">Nenhum (Topless)</h3><p class="text-xs text-gray-400 mt-1">Sem sutiã, seios à mostra.</p></div>
                 </div>
                 <textarea id="braManual" placeholder="Ou escreva os detalhes aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
                 <div class="mt-8 flex justify-between w-full">
@@ -721,26 +833,18 @@
             <div id="step-24" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Iluminação</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Iluminação Cinematográfica', 'cinematic lighting')"><h3 class="font-bold text-sm">Cinematográfica</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Suave', 'soft light')"><h3 class="font-bold text-sm">Luz Suave</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Dura', 'hard light')"><h3 class="font-bold text-sm">Luz Dura</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Rembrandt', 'Rembrandt lighting')"><h3 class="font-bold text-sm">Luz de Rembrandt</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Contraluz', 'backlight')"><h3 class="font-bold text-sm">Contraluz</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Golden Hour', 'golden hour lighting')"><h3 class="font-bold text-sm">Golden Hour</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Velas', 'candlelight')"><h3 class="font-bold text-sm">Luz de Velas</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Neon', 'neon lighting')"><h3 class="font-bold text-sm">Neon</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Subaquática', 'underwater lighting')"><h3 class="font-bold text-sm">Luz Subaquática</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Principal', 'key light')"><h3 class="font-bold text-sm">Luz Principal</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Preenchimento', 'fill light')"><h3 class="font-bold text-sm">Luz de Preenchimento</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Frontal', 'front light')"><h3 class="font-bold text-sm">Luz Frontal</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Lateral', 'side light')"><h3 class="font-bold text-sm">Luz Lateral</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Silhueta', 'silhouette')"><h3 class="font-bold text-sm">Silhueta</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Blue Hour', 'blue hour lighting')"><h3 class="font-bold text-sm">Blue Hour</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Natural', 'natural light')"><h3 class="font-bold text-sm">Luz Natural</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Artificial', 'artificial light')"><h3 class="font-bold text-sm">Luz Artificial</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Recorte', 'rim light, kicker')"><h3 class="font-bold text-sm">Luz de Recorte</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Rebatida', 'bounce light')"><h3 class="font-bold text-sm">Luz Rebatida</h3></div>
-                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Nenhum', '')"><h3 class="font-bold text-sm">Nenhum (Escuridão)</h3></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Iluminação Cinematográfica', 'cinematic lighting')"><h3 class="font-bold text-sm">Cinematográfica</h3><p class="text-xs text-gray-400 mt-1">Luz dramática com alto contraste, como em filmes.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Suave', 'soft light')"><h3 class="font-bold text-sm">Luz Suave</h3><p class="text-xs text-gray-400 mt-1">Difusa e sem sombras duras, ideal para retratos.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Dura', 'hard light')"><h3 class="font-bold text-sm">Luz Dura</h3><p class="text-xs text-gray-400 mt-1">Cria sombras nítidas e definidas, intenso.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Rembrandt', 'Rembrandt lighting')"><h3 class="font-bold text-sm">Luz de Rembrandt</h3><p class="text-xs text-gray-400 mt-1">Triângulo de luz na bochecha sombreada.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Contraluz', 'backlight')"><h3 class="font-bold text-sm">Contraluz</h3><p class="text-xs text-gray-400 mt-1">Luz atrás do objeto, criando um contorno.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Golden Hour', 'golden hour lighting')"><h3 class="font-bold text-sm">Golden Hour</h3><p class="text-xs text-gray-400 mt-1">Luz quente e dourada do amanhecer/entardecer.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Velas', 'candlelight')"><h3 class="font-bold text-sm">Luz de Velas</h3><p class="text-xs text-gray-400 mt-1">Iluminação quente, suave e bruxuleante.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Neon', 'neon lighting')"><h3 class="font-bold text-sm">Neon</h3><p class="text-xs text-gray-400 mt-1">Luzes vibrantes e coloridas de ambientes urbanos.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Subaquática', 'underwater lighting')"><h3 class="font-bold text-sm">Luz Subaquática</h3><p class="text-xs text-gray-400 mt-1">Luz difusa e azulada, com raios visíveis na água.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Recorte', 'rim light, kicker')"><h3 class="font-bold text-sm">Luz de Recorte</h3><p class="text-xs text-gray-400 mt-1">Luz de trás para separar o objeto do fundo.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Silhueta', 'silhouette')"><h3 class="font-bold text-sm">Silhueta</h3><p class="text-xs text-gray-400 mt-1">Objeto escuro contra um fundo claro.</p></div>
+                    <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Nenhum', '')"><h3 class="font-bold text-sm">Nenhum (Escuridão)</h3><p class="text-xs text-gray-400 mt-1">Cena escura, com pouca ou nenhuma luz.</p></div>
                 </div>
                 <div class="mt-8 flex justify-between w-full">
                     <button onclick="handleLightingPrevious()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
@@ -752,15 +856,15 @@
             <div id="step-25" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Fundo / Local</h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Estúdio (Fundo Liso)', 'in a studio with a plain background')"><h3 class="font-bold">Estúdio</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Floresta Mística', 'in a mystical forest')"><h3 class="font-bold">Floresta Mística</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Cidade Cyberpunk', 'in a cyberpunk city')"><h3 class="font-bold">Cidade Cyberpunk</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Quarto Aconchegante', 'in a cozy room')"><h3 class="font-bold">Quarto Aconchegante</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Praia Ensolarada', 'on a sunny beach')"><h3 class="font-bold">Praia Ensolarada</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Biblioteca Antiga', 'in an old library')"><h3 class="font-bold">Biblioteca Antiga</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Ruínas Desertas', 'in deserted ruins')"><h3 class="font-bold">Ruínas Desertas</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Salão de Baile Gótico', 'in a gothic ballroom')"><h3 class="font-bold">Salão de Baile Gótico</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Interior de Nave Espacial', 'inside a spaceship')"><h3 class="font-bold">Interior de Nave Espacial</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Estúdio (Fundo Liso)', 'in a studio with a plain gray background')"><h3 class="font-bold">Estúdio</h3><p class="text-sm text-gray-400 mt-1">Ambiente controlado com fundo neutro.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Floresta Mística', 'in a mystical forest')"><h3 class="font-bold">Floresta Mística</h3><p class="text-sm text-gray-400 mt-1">Bosque denso com névoa e elementos mágicos.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Cidade Cyberpunk', 'in a cyberpunk city')"><h3 class="font-bold">Cidade Cyberpunk</h3><p class="text-sm text-gray-400 mt-1">Metrópole futurista com neon e chuva.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Quarto Aconchegante', 'in a cozy room')"><h3 class="font-bold">Quarto Aconchegante</h3><p class="text-sm text-gray-400 mt-1">Espaço íntimo com cama e iluminação suave.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Praia Ensolarada', 'on a sunny beach')"><h3 class="font-bold">Praia Ensolarada</h3><p class="text-sm text-gray-400 mt-1">Areia branca, mar azul-turquesa e céu limpo.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Biblioteca Antiga', 'in an old library')"><h3 class="font-bold">Biblioteca Antiga</h3><p class="text-sm text-gray-400 mt-1">Prateleiras de madeira com livros antigos.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Ruínas Desertas', 'in deserted ruins')"><h3 class="font-bold">Ruínas Desertas</h3><p class="text-sm text-gray-400 mt-1">Estruturas antigas tomadas pela natureza.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Salão de Baile Gótico', 'in a gothic ballroom')"><h3 class="font-bold">Salão de Baile Gótico</h3><p class="text-sm text-gray-400 mt-1">Arquitetura ornamentada e candelabros.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Interior de Nave Espacial', 'inside a spaceship')"><h3 class="font-bold">Nave Espacial</h3><p class="text-sm text-gray-400 mt-1">Corredores metálicos e painéis de controle.</p></div>
                 </div>
                  <textarea id="backgroundManual" placeholder="Ou escreva os detalhes aqui (Ex: em um beco chuvoso de neon...)" class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
                  <div class="mt-8 flex justify-between w-full">
@@ -824,14 +928,30 @@
                 </div>
 
                 <h2 class="text-2xl font-semibold mb-2">Seu Prompt Profissional está Pronto!</h2>
-                <p class="text-gray-400 mb-6">Copie o prompt abaixo e use-o em sua ferramenta de geração de imagem favorita.</p>
-                <textarea id="finalPrompt" rows="10" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300" readonly></textarea>
-                <div class="mt-6 flex flex-col md:flex-row gap-4">
-                    <button id="copyButton" onclick="copyPrompt()" class="w-full md:w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
-                        <span id="copyButtonText">Copiar Prompt</span>
-                    </button>
-                    <button id="restartButton" onclick="restart()" class="w-full md:w-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+                <p class="text-gray-400 mb-6">Copie o prompt e use-o no Fooocus. Para máxima consistência, use o mesmo "Código de Consistência" em todas as imagens.</p>
+                
+                <textarea id="finalPrompt" rows="8" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300" readonly></textarea>
+                <button id="copyButton" onclick="copyToClipboard('finalPrompt', 'copyButtonText', 'Copiar Prompt')" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                    <span id="copyButtonText">Copiar Prompt</span>
+                </button>
+
+                <h3 class="text-xl font-semibold mb-2 mt-6">Prompt Negativo</h3>
+                <textarea id="negativePrompt" rows="4" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300" readonly></textarea>
+                 <button id="copyNegativeButton" onclick="copyToClipboard('negativePrompt', 'copyNegativeButtonText', 'Copiar Negativo')" class="w-full mt-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                    <span id="copyNegativeButtonText">Copiar Negativo</span>
+                </button>
+
+                <h3 class="text-xl font-semibold mb-2 mt-6">Código de Consistência (Seed)</h3>
+                <div id="consistencySeed" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 font-mono"></div>
+                 <button id="copySeedButton" onclick="copyToClipboard('consistencySeed', 'copySeedButtonText', 'Copiar Código')" class="w-full mt-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                    <span id="copySeedButtonText">Copiar Código</span>
+                </button>
+
+                <div class="mt-8">
+                    <button id="restartButton" onclick="restart()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
                         Começar de Novo
                     </button>
@@ -844,7 +964,10 @@
     <script>
         // --- State Management ---
         let promptData = {
-            accessories: []
+            accessories: [],
+            sceneComposition: [],
+            facialExpression: [],
+            bodyPose: []
         };
         let currentStep = 1;
         const totalSteps = 27;
@@ -868,7 +991,7 @@
         async function translateFullPrompt(promptInPortuguese, retries = 3, delay = 1000) {
             const systemPrompt = `Your task is to translate a text fragment. This text is a mix of English and Portuguese. You MUST translate ALL Portuguese words and phrases into natural, descriptive English. Combine all information into a single, cohesive English paragraph. DO NOT leave any Portuguese words in the output. Respond ONLY with the final, fully translated English paragraph. Here is the text: "${promptInPortuguese}"`;
             const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
-            const apiKey = "AIzaSyCSmhUh1sgXvXRmILgrR-RtaH7zwiRwb9o";
+            const apiKey = ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             let lastError = null;
 
@@ -900,7 +1023,7 @@
                     }
                 }
             }
-            return `// Translation failed: ${lastError.message}. Please check your API key, billing status, and browser console for CORS errors. Original prompt: ${promptInPortuguese}`;
+            return `// A tradução falhou: ${lastError.message}. Verifique a sua chave de API, estado de faturação e a consola do navegador para erros de CORS. Prompt original: ${promptInPortuguese}`;
         }
 
         // --- Navigation ---
@@ -925,7 +1048,7 @@
                 
                 document.querySelectorAll('#step-7 .option-card').forEach(card => {
                     const compatibleLengths = card.dataset.lengths;
-                    card.style.display = (!compatibleLengths || compatibleLengths.includes(lengthKey)) ? 'block' : 'none';
+                    card.style.display = (!compatibleLengths || compatibleLengths.includes(lengthKey)) ? 'flex' : 'none';
                 });
             }
             showStep(stepNumber);
@@ -955,6 +1078,24 @@
                 else goToStep(currentStep + 1);
             }, 250);
         }
+        
+        function handleViewSelection(element, key, value, textToStore) {
+            const parentGroup = element.closest('.grid');
+            parentGroup.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+
+            if (value !== 'Nenhum') {
+                promptData[key] = { text: textToStore };
+            } else {
+                delete promptData[key];
+            }
+        }
+
+        function toggleAccessoryStyle(button, styleId) {
+            button.classList.toggle('selected');
+            const accessoryGrid = document.getElementById(styleId);
+            accessoryGrid.classList.toggle('hidden');
+        }
 
         function handleMultiSelection(element, key, textToStore) {
             element.classList.toggle('selected');
@@ -971,7 +1112,7 @@
             if (age >= 23 && age <= 30) return `a young woman, approximately ${age} years old`;
             if (age >= 31 && age <= 45) return `a woman, approximately ${age} years old`;
             if (age >= 46) return `a mature woman, approximately ${age} years old`;
-            return `${age} years old`; // Fallback for ages outside the main ranges
+            return `${age} years old`;
         }
 
         function handleNameAndAge() {
@@ -991,9 +1132,12 @@
         }
         
         function handleManualInput(button, inputId, dataKey, nextStep) {
-            const manualInput = document.getElementById(inputId).value;
-            if (manualInput) {
-                promptData[dataKey] = { text: manualInput };
+            const manualInputEl = document.getElementById(inputId);
+            if (manualInputEl) {
+                const manualInput = manualInputEl.value;
+                if (manualInput) {
+                    promptData[dataKey] = { text: manualInput };
+                }
             }
             goToStep(nextStep);
         }
@@ -1029,10 +1173,45 @@
         }
 
         // --- Prompt Generation & Translation ---
+        function generateNegativePrompt(data) {
+            const baseNegative = "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), watermark, watermarked, oversaturated, censored, distorted hands, amputation, missing hands, obese, doubled face, doubled hands, text, signature";
+            
+            const dynamicNegatives = new Set();
+
+            const negativeMappings = {
+                hairLength: {
+                    'long hair': 'short hair, medium hair',
+                    'medium hair': 'long hair, short hair',
+                    'short hair': 'long hair, medium hair',
+                    'shaved hair': 'long hair, medium hair, short hair, wig'
+                },
+                finalStyle: {
+                    'realistic photography, photorealistic, 8k, ultra-detailed': 'painting, drawing, illustration, anime, cartoon, 3d render, sketch',
+                    'digital painting, concept art': 'photo, photograph, photorealistic, 3d render, realism',
+                    'anime style, manga art': 'photo, photograph, photorealistic, realism, 3d render',
+                    'black and white photography': 'color, colorful'
+                },
+                bodyType: {
+                    'thin body, low body fat': 'fat, chubby, overweight, muscular, plus-size',
+                    'extremely thin body': 'fat, chubby, overweight, muscular, athletic, plus-size',
+                    'chubby, soft body with some body fat': 'thin, skinny, slender, muscular, toned, athletic',
+                    'fat, plump body with plenty of body fat': 'thin, skinny, slender, muscular, toned, athletic',
+                    'muscular body with large muscle volume': 'skinny, thin, slender, chubby, fat, out of shape'
+                }
+            };
+
+            for (const key in data) {
+                const value = data[key]?.text;
+                if (value && negativeMappings[key] && negativeMappings[key][value]) {
+                    negativeMappings[key][value].split(',').forEach(term => dynamicNegatives.add(term.trim()));
+                }
+            }
+
+            return [baseNegative, ...dynamicNegatives].join(', ');
+        }
+
         function buildInitialPrompt() {
             const segments = [];
-            if (promptData.sceneComposition) segments.push(promptData.sceneComposition.text);
-            if (promptData.finalStyle) segments.push(promptData.finalStyle.text);
             
             let characterDesc = `A portrait of`;
             const characterParts = [
@@ -1043,7 +1222,7 @@
             segments.push(`${characterDesc}.`);
 
             const physicalFeatures = [
-                promptData.bodyType ? `a ${promptData.bodyType.text}` : null, promptData.skinColor?.text,
+                promptData.bodyType?.text, promptData.skinColor?.text,
                 promptData.breasts?.text, promptData.hairLength?.text, promptData.hairStyle?.text,
                 promptData.hairColor?.text, promptData.eyeColor?.text
             ].filter(Boolean);
@@ -1076,8 +1255,10 @@
             if (extraDetails.length > 0) segments.push(`She is ${extraDetails.join(' and ')}.`);
 
             const poseAndExpression = [
-                promptData.bodyPose ? `in a ${promptData.bodyPose.text}` : null,
-                promptData.facialExpression ? `with a ${promptData.facialExpression.text}` : null
+                promptData.characterView?.text,
+                promptData.bodyPose.length > 0 ? `in a ${promptData.bodyPose.map(p => p.text).join(', ')} pose` : null,
+                promptData.manualPose?.text,
+                promptData.facialExpression.length > 0 ? `with a ${promptData.facialExpression.map(e => e.text).join(', ')} expression` : null
             ].filter(Boolean);
             if (poseAndExpression.length > 0) segments.push(`Posed ${poseAndExpression.join(' ')}.`);
 
@@ -1086,71 +1267,128 @@
                 promptData.action ? `while ${promptData.action.text}` : null
             ].filter(Boolean);
             if (environment.length > 0) segments.push(`The scene is ${environment.join(' ')}.`);
-            if (promptData.lighting) segments.push(`${promptData.lighting.text}.`);
+            
+            const finalDetails = [
+                promptData.lighting?.text,
+                ...(promptData.sceneComposition?.map(item => item.text) || []),
+                promptData.finalStyle?.text
+            ].filter(Boolean);
+
+            if(finalDetails.length > 0) {
+                 segments.push(finalDetails.join(', ') + '.');
+            }
+            
+            const consistencyParts = [
+                promptData.name?.text,
+                promptData.age?.text,
+                promptData.ethnicity?.text,
+                promptData.hairColor?.text,
+                promptData.hairStyle?.text || promptData.hairLength?.text,
+                promptData.eyeColor?.text,
+                promptData.bodyType?.text,
+            ].filter(Boolean).map(s => s.split(',')[0]); 
+
+            if (consistencyParts.length > 2) {
+                segments.push(`(character sheet for consistency: ${consistencyParts.join(', ')})`);
+            }
 
             return segments.join(' ').replace(/\s+/g, ' ').replace(/ \./g, '.').replace(/ ,/g, ',').trim();
         }
 
         async function generateAndTranslatePrompt() {
             handleManualInput(null, 'actionManual', 'action', 'final');
-            
             showStep('final');
+
             const promptTextarea = document.getElementById('finalPrompt');
+            const negativePromptTextarea = document.getElementById('negativePrompt');
+            const seedDiv = document.getElementById('consistencySeed');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            const copyButton = document.getElementById('copyButton');
+            const allCopyButtons = document.querySelectorAll('#step-final button[onclick*="copyToClipboard"]');
             const restartButton = document.getElementById('restartButton');
 
-            const initialPrompt = buildInitialPrompt();
-            promptTextarea.value = initialPrompt;
-
+            promptTextarea.value = '';
+            negativePromptTextarea.value = '';
+            seedDiv.textContent = '';
             loadingOverlay.classList.remove('hidden');
-            copyButton.disabled = true;
+            allCopyButtons.forEach(btn => btn.disabled = true);
             restartButton.disabled = true;
 
-            const translatedPrompt = await translateFullPrompt(initialPrompt);
+            const initialPrompt = buildInitialPrompt();
+            promptTextarea.value = "A traduzir...";
 
+            const translatedPrompt = await translateFullPrompt(initialPrompt);
             promptTextarea.value = translatedPrompt;
+
+            const negativePrompt = generateNegativePrompt(promptData);
+            negativePromptTextarea.value = negativePrompt;
+
+            const seed = Math.floor(Math.random() * 999999999999999);
+            seedDiv.textContent = seed;
+
             loadingOverlay.classList.add('hidden');
-            copyButton.disabled = false;
+            allCopyButtons.forEach(btn => btn.disabled = false);
             restartButton.disabled = false;
         }
 
         // --- Final Actions ---
-        function copyPrompt() {
-            const promptText = document.getElementById('finalPrompt');
-            const copyButtonText = document.getElementById('copyButtonText');
-            
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(promptText.value).then(() => {
-                    copyButtonText.textContent = 'Copiado!';
-                    setTimeout(() => { copyButtonText.textContent = 'Copiar Prompt'; }, 2000);
-                }).catch(err => {
-                    fallbackCopyTextToClipboard(promptText, copyButtonText);
-                });
-            } else {
-                fallbackCopyTextToClipboard(promptText, copyButtonText);
+        function copyToClipboard(elementId, buttonTextId, originalText) {
+            const element = document.getElementById(elementId);
+            const buttonTextElement = document.getElementById(buttonTextId);
+            const textToCopy = element.tagName === 'TEXTAREA' ? element.value : element.innerText;
+
+            if (!navigator.clipboard) {
+                fallbackCopy(element, buttonTextElement, originalText);
+                return;
             }
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                buttonTextElement.textContent = 'Copiado!';
+                setTimeout(() => {
+                    buttonTextElement.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Async: Could not copy text: ', err);
+                fallbackCopy(element, buttonTextElement, originalText);
+            });
         }
 
-        function fallbackCopyTextToClipboard(textArea, buttonTextElement) {
-            textArea.select();
-            textArea.setSelectionRange(0, 99999);
-            try {
-                document.execCommand('copy');
-                buttonTextElement.textContent = 'Copiado!';
-                setTimeout(() => { buttonTextElement.textContent = 'Copiar Prompt'; }, 2000);
-            } catch (err) {
-                console.error('Fallback copy failed:', err);
-                buttonTextElement.textContent = 'Falhou!';
-                 setTimeout(() => { buttonTextElement.textContent = 'Copiar Prompt'; }, 2000);
+        function fallbackCopy(element, buttonTextElement, originalText) {
+            let textArea;
+            if (element.tagName !== 'TEXTAREA') {
+                textArea = document.createElement('textarea');
+                textArea.value = element.innerText;
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                document.body.appendChild(textArea);
+            } else {
+                textArea = element;
             }
+            
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                buttonTextElement.textContent = successful ? 'Copiado!' : 'Falhou!';
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                buttonTextElement.textContent = 'Falhou!';
+            }
+
+            if (element.tagName !== 'TEXTAREA') {
+                document.body.removeChild(textArea);
+            }
+            
+            setTimeout(() => {
+                buttonTextElement.textContent = originalText;
+            }, 2000);
         }
         
         function restart() {
-            promptData = { accessories: [] };
+            promptData = { accessories: [], sceneComposition: [], facialExpression: [], bodyPose: [] };
             document.querySelectorAll('textarea, input[type="text"], input[type="number"]').forEach(el => el.value = '');
             document.querySelectorAll('.option-card.selected').forEach(c => c.classList.remove('selected'));
             document.querySelectorAll('.color-swatch.selected').forEach(s => s.classList.remove('selected'));
+            document.querySelectorAll('[id$="-accessories"]').forEach(el => el.classList.add('hidden'));
             showStep(1);
         }
         
@@ -1168,7 +1406,7 @@
                     promptData.pantiesColor = { text: color.en };
                     document.querySelectorAll('#pantiesColorGrid .color-swatch').forEach(s => s.classList.remove('selected'));
                     swatchPanties.classList.add('selected');
-                    handleManualInput(null, 'pantiesDetails', 'pantiesDetails', 21);
+                    setTimeout(() => handleManualInput(null, 'pantiesDetails', 'pantiesDetails', 21), 250);
                 };
                 pantiesColorGrid.appendChild(swatchPanties);
 
@@ -1180,7 +1418,7 @@
                     promptData.braColor = { text: color.en };
                     document.querySelectorAll('#braColorGrid .color-swatch').forEach(s => s.classList.remove('selected'));
                     swatchBra.classList.add('selected');
-                    handleManualInput(null, 'braDetails', 'braDetails', 24);
+                    setTimeout(() => handleManualInput(null, 'braDetails', 'braDetails', 24), 250);
                 };
                 braColorGrid.appendChild(swatchBra);
             });
