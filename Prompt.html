@@ -3,528 +3,981 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criador de Prompts com IA (Profissional)</title>
+    <title>Criador de Prompts Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #111827; }
-        .step-card { background-color: #1F2937; border-radius: 0.75rem; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border: 1px solid #374151; }
-        .option-btn { background-color: #374151; transition: all 0.2s ease-in-out; border: 2px solid #4B5563; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem; }
-        .option-btn:hover { border-color: #60A5FA; transform: translateY(-2px); }
-        .option-btn.selected { border-color: #3B82F6; background-color: #2563EB; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        .option-btn .description { font-size: 0.75rem; line-height: 1rem; color: #D1D5DB; margin-top: 0.25rem; font-weight: 400; }
-        .nav-btn { transition: all 0.2s ease-in-out; }
-        .input-field, .textarea-field { background-color: #374151; border: 2px solid #4B5563; color: white; border-radius: 0.5rem; padding: 0.75rem 1rem; width: 100%; }
-        .input-field:focus, .textarea-field:focus { outline: none; border-color: #60A5FA; }
-        .color-swatch { width: 2.5rem; height: 2.5rem; border-radius: 9999px; cursor: pointer; border: 2px solid #4B5563; transition: transform 0.2s; }
-        .color-swatch:hover { transform: scale(1.1); }
-        .color-swatch.selected { border-color: #fff; box-shadow: 0 0 10px #fff; }
-        .progress-bar-fill { background-color: #3B82F6; transition: width 0.5s ease-in-out; }
-        #finalPrompt::-webkit-scrollbar { width: 8px; }
-        #finalPrompt::-webkit-scrollbar-track { background: #1F2937; }
-        #finalPrompt::-webkit-scrollbar-thumb { background-color: #4B5563; border-radius: 10px; border: 2px solid #1F2937; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
-        .animate-shake { animation: shake 0.5s ease-in-out; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #F9FAFB;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .option-card {
+            background-color: #1F2937;
+            border: 2px solid #374151;
+            transition: all 0.2s ease-in-out;
+        }
+        .option-card:hover {
+            border-color: #4f46e580;
+            transform: translateY(-2px);
+        }
+        .option-card.selected {
+            border-color: #4F46E5;
+            background-color: #3730a3;
+        }
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+        .color-swatch:hover, .color-swatch.selected {
+            border-color: #F9FAFB;
+            transform: scale(1.1);
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4F46E5;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338CA;
+        }
     </style>
 </head>
-<body class="text-white">
+<body class="antialiased">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Criador de Prompts Profissional</h1>
-            <p class="text-gray-400 mt-2">Controle cada detalhe da sua criação com um fluxo inteligente.</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Criador de Prompts Profissional</h1>
+            <p class="text-lg text-gray-400">Controle cada detalhe da sua criação com um fluxo inteligente.</p>
         </header>
 
-        <div class="w-full mb-8">
-            <div id="progress-container" class="bg-gray-700 rounded-full h-2.5">
-                <div id="progress-bar" class="progress-bar-fill h-2.5 rounded-full" style="width: 0%"></div>
-            </div>
-            <p id="progress-text" class="text-center text-sm text-gray-400 mt-2"></p>
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-700 rounded-full h-2.5 mb-8">
+            <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
         </div>
 
-        <main id="wizard"></main>
+        <main id="prompt-builder" class="bg-gray-900 p-6 md:p-8 rounded-2xl shadow-2xl">
 
-        <div id="resultSection" class="step-card text-center hidden">
-            <h2 class="text-2xl font-bold mb-4 text-green-400">Seu Prompt Profissional está Pronto!</h2>
-            <div id="loading" class="flex justify-center items-center my-8">
-                <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                <p id="loading-text" class="ml-4 text-lg">Aguarde, a IA está construindo seu prompt...</p>
-            </div>
-            <div id="promptResult" class="hidden">
-                <textarea id="finalPrompt" readonly class="w-full h-64 p-4 bg-gray-900 border border-gray-700 rounded-lg text-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"></textarea>
-                <div class="flex flex-col sm:flex-row gap-4 mt-6 justify-center">
-                    <button id="copyButton" class="w-full sm:w-auto nav-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center">Copiar Prompt</button>
-                    <button id="restartButton" class="w-full sm:w-auto nav-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">Começar de Novo</button>
+            <!-- Step 1: Nome da Personagem -->
+            <div id="step-1" class="step active">
+                <h2 class="text-2xl font-semibold mb-2">Nome e Idade da Personagem</h2>
+                <p class="text-gray-400 mb-6">Comece dando um nome e uma idade para sua personagem. A idade é opcional.</p>
+                <div class="space-y-4">
+                    <input type="text" id="characterName" placeholder="Digite o nome da personagem" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                    <input type="number" id="characterAge" placeholder="Digite a idade (opcional)" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
                 </div>
-                 <p id="copyMessage" class="text-green-400 mt-4 h-6"></p>
+                 <div class="mt-8 flex justify-end w-full">
+                    <button onclick="handleNameAndAge()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
             </div>
-        </div>
+
+            <!-- Step 2: Faixa Etária -->
+            <div id="step-2" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Faixa Etária</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'age', 'Menina (8-12 anos)', 'a young girl, approximately 8-12 years old')">
+                        <h3 class="font-bold text-lg">Menina</h3><p class="text-sm text-gray-400">Aprox. 8-12 anos.</p>
+                    </div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'age', 'Menina Adolescente (13-17 anos)', 'a teenage girl, approximately 13-17 years old')">
+                        <h3 class="font-bold text-lg">Adolescente</h3><p class="text-sm text-gray-400">Aprox. 13-17 anos.</p>
+                    </div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'age', 'Garota (18-22 anos)', 'a girl, approximately 18-22 years old')">
+                        <h3 class="font-bold text-lg">Garota</h3><p class="text-sm text-gray-400">Aprox. 18-22 anos.</p>
+                    </div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'age', 'Jovem Mulher (23-30 anos)', 'a young woman, approximately 23-30 years old')">
+                        <h3 class="font-bold text-lg">Jovem Mulher</h3><p class="text-sm text-gray-400">Aprox. 23-30 anos.</p>
+                    </div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'age', 'Mulher (31-45 anos)', 'a woman, approximately 31-45 years old')">
+                        <h3 class="font-bold text-lg">Mulher</h3><p class="text-sm text-gray-400">Aprox. 31-45 anos.</p>
+                    </div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'age', 'Mulher Madura (46+ anos)', 'a mature woman, approximately 46+ years old')">
+                        <h3 class="font-bold text-lg">Mulher Madura</h3><p class="text-sm text-gray-400">Aprox. 46+ anos.</p>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(1)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(3)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Etnia -->
+            <div id="step-3" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Etnia</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Caucasiana', 'Caucasian')"><h3 class="font-bold">Caucasiana</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Asiática (Leste)', 'East Asian')"><h3 class="font-bold">Asiática (Leste)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Afrodescendente', 'Afro-descendant')"><h3 class="font-bold">Afrodescendente</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Hispânica/Latina', 'Hispanic/Latina')"><h3 class="font-bold">Hispânica/Latina</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Brasileira', 'Brazilian with diverse features')"><h3 class="font-bold">Brasileira</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Indígena', 'Indigenous')"><h3 class="font-bold">Indígena</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Oriente Médio', 'Middle Eastern')"><h3 class="font-bold">Oriente Médio</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Sul Asiático', 'South Asian')"><h3 class="font-bold">Sul Asiático</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Multirracial', 'Multiracial')"><h3 class="font-bold">Multirracial</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Polinésia', 'Polynesian')"><h3 class="font-bold">Polinésia</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-1" onclick="handleSelection(this, 'ethnicity', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(promptData.ageIsNumeric ? 1 : 2)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(4)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Biotipo Físico -->
+            <div id="step-4" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Biotipo Físico</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Ectomorfo', 'ectomorph body type, long and thin frame, naturally lean')"><h3 class="font-bold">Ectomorfo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Mesomorfo', 'mesomorph body type, athletic body, easily gains muscle')"><h3 class="font-bold">Mesomorfo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Endomorfo', 'endomorph body type, wide frame, more rounded shapes')"><h3 class="font-bold">Endomorfo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Triângulo (Pera)', 'pear-shaped body, wider hips than shoulders')"><h3 class="font-bold">Triângulo (Pera)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Triângulo Invertido', 'inverted triangle body, wider shoulders than hips')"><h3 class="font-bold">Triângulo Invertido</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Retângulo', 'rectangle body, similar shoulder, waist, and hip measurements')"><h3 class="font-bold">Retângulo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Ampulheta', 'hourglass body, similar shoulders and hips, thin waist')"><h3 class="font-bold">Ampulheta</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyType', 'Oval (Maçã)', 'apple-shaped body, wider waist than shoulders and hips')"><h3 class="font-bold">Oval (Maçã)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-1" onclick="handleSelection(this, 'bodyType', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(3)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(5)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Cor da Pele -->
+            <div id="step-5" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Cor da Pele</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele Clara', 'light, rosy skin tone')"><h3 class="font-bold">Pele Clara</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele Pálida', 'pale, very light skin')"><h3 class="font-bold">Pele Pálida</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele Bronzeada', 'tanned, golden skin tone')"><h3 class="font-bold">Pele Bronzeada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele Oliva', 'olive, yellowish/greenish skin tone')"><h3 class="font-bold">Pele Oliva</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele Escura', 'dark brown skin tone')"><h3 class="font-bold">Pele Escura</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele com Sardas', 'skin with freckles')"><h3 class="font-bold">Pele com Sardas</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(4)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(6)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Comprimento do Cabelo -->
+            <div id="step-6" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Comprimento do Cabelo</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Longo', 'long hair')"><h3 class="font-bold">Longo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Médio', 'medium hair')"><h3 class="font-bold">Médio</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Curto', 'short hair')"><h3 class="font-bold">Curto</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Raspado', 'shaved hair')"><h3 class="font-bold">Raspado</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(5)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(7)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 7: Corte de Cabelo e Penteado -->
+            <div id="step-7" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Corte de Cabelo e Penteado</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium,short" onclick="handleSelection(this, 'hairStyle', 'Chanel (Bob Cut)', 'bob cut hairstyle')"><h3 class="font-bold">Chanel (Bob Cut)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Long Bob (Lob)', 'long bob (lob) hairstyle')"><h3 class="font-bold">Long Bob (Lob)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Pixie Cut', 'pixie cut hairstyle')"><h3 class="font-bold">Pixie Cut</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium,short" onclick="handleSelection(this, 'hairStyle', 'Shaggy Hair', 'shaggy hair')"><h3 class="font-bold">Shaggy Hair</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Corte em Camadas', 'layered hair')"><h3 class="font-bold">Corte em Camadas</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short" onclick="handleSelection(this, 'hairStyle', 'Blunt Cut', 'blunt cut')"><h3 class="font-bold">Blunt Cut</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="short,shaved" onclick="handleSelection(this, 'hairStyle', 'Undercut', 'undercut hairstyle')"><h3 class="font-bold">Undercut</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="shaved" onclick="handleSelection(this, 'hairStyle', 'Buzz Cut (Raspado)', 'buzz cut')"><h3 class="font-bold">Buzz Cut</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="medium,short" onclick="handleSelection(this, 'hairStyle', 'Mullet', 'mullet hairstyle')"><h3 class="font-bold">Mullet</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium,short" onclick="handleSelection(this, 'hairStyle', 'Wolf Cut', 'wolf cut hairstyle')"><h3 class="font-bold">Wolf Cut</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Rabo de Cavalo', 'ponytail')"><h3 class="font-bold">Rabo de Cavalo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Coque Alto', 'high bun')"><h3 class="font-bold">Coque Alto</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Trança Boxeadora', 'boxer braids')"><h3 class="font-bold">Trança Boxeadora</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Trança Embutida', 'french braid')"><h3 class="font-bold">Trança Embutida</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Meio Preso', 'half-up hairstyle')"><h3 class="font-bold">Meio Preso</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Ondas de Sereia', 'mermaid waves')"><h3 class="font-bold">Ondas de Sereia</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium,short" onclick="handleSelection(this, 'hairStyle', 'Efeito Molhado', 'wet hair look')"><h3 class="font-bold">Efeito Molhado</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium" onclick="handleSelection(this, 'hairStyle', 'Coque Baixo', 'low bun')"><h3 class="font-bold">Coque Baixo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long,medium,short" onclick="handleSelection(this, 'hairStyle', 'Slicked Back', 'slicked back hair')"><h3 class="font-bold">Slicked Back</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-3" data-lengths="long,medium,short,shaved" onclick="handleSelection(this, 'hairStyle', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(6)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(8)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 8: Cor do Cabelo -->
+            <div id="step-8" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Cor do Cabelo</h2>
+                <div class="grid grid-cols-3 md:grid-cols-4 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Preto', 'black hair')"><h3 class="font-bold">Preto</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Loiro', 'blonde hair')"><h3 class="font-bold">Loiro</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Castanho', 'brown hair')"><h3 class="font-bold">Castanho</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Ruivo', 'red hair')"><h3 class="font-bold">Ruivo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Branco/Platinado', 'white/platinum hair')"><h3 class="font-bold">Branco/Platinado</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Rosa', 'pink hair')"><h3 class="font-bold">Rosa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Azul', 'blue hair')"><h3 class="font-bold">Azul</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Verde', 'green hair')"><h3 class="font-bold">Verde</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(7)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(9)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 9: Cor dos Olhos -->
+            <div id="step-9" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Cor dos Olhos</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Azuis', 'blue eyes')"><h3 class="font-bold">Azuis</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Verdes', 'green eyes')"><h3 class="font-bold">Verdes</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Castanhos', 'brown eyes')"><h3 class="font-bold">Castanhos</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Cor de Mel', 'honey-colored eyes')"><h3 class="font-bold">Cor de Mel</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Cinzas', 'gray eyes')"><h3 class="font-bold">Cinzas</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Pretos', 'black eyes')"><h3 class="font-bold">Pretos</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Heterocromia', 'heterochromia eyes')"><h3 class="font-bold">Heterocromia</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                 <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(8)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(10)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 10: Tamanho dos Seios -->
+            <div id="step-10" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Tamanho dos Seios</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Reto (Flat)', 'flat chest')"><h3 class="font-bold">Reto (Flat)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Pequenos', 'small breasts')"><h3 class="font-bold">Pequenos</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Médios', 'medium breasts')"><h3 class="font-bold">Médios</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Grandes', 'large breasts')"><h3 class="font-bold">Grandes</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Volumosos', 'voluminous breasts')"><h3 class="font-bold">Volumosos</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(9)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(11)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 11: Composição da Cena -->
+            <div id="step-11" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Composição da Cena</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Corpo Inteiro', 'full body shot')"><h3 class="font-bold">Corpo Inteiro</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Médio', 'medium shot')"><h3 class="font-bold">Plano Médio</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Close-up no Rosto', 'face close-up')"><h3 class="font-bold">Close-up no Rosto</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Detalhe', 'detail shot')"><h3 class="font-bold">Plano Detalhe</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Vista Traseira', 'from behind view')"><h3 class="font-bold">Vista Traseira</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ângulo Baixo', 'low angle shot')"><h3 class="font-bold">Ângulo Baixo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ângulo Alto', 'high angle shot')"><h3 class="font-bold">Ângulo Alto</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ângulo Holandês', 'dutch angle shot')"><h3 class="font-bold">Ângulo Holandês</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Ponto de Vista (POV)', 'point of view (POV)')"><h3 class="font-bold">Ponto de Vista (POV)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Sobre o Ombro', 'over the shoulder shot')"><h3 class="font-bold">Sobre o Ombro</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Plano Americano', 'american shot')"><h3 class="font-bold">Plano Americano</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'sceneComposition', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(10)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(12)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 12: Estilo da Personagem -->
+            <div id="step-12" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Estilo da Personagem</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Fantasia: Elfa', 'fantasy elf style')"><h3 class="font-bold">Fantasia: Elfa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Fantasia: Guerreira', 'fantasy warrior style')"><h3 class="font-bold">Fantasia: Guerreira</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Sci-Fi: Cyberpunk', 'sci-fi cyberpunk style')"><h3 class="font-bold">Sci-Fi: Cyberpunk</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Sci-Fi: Androide', 'sci-fi android style')"><h3 class="font-bold">Sci-Fi: Androide</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Moderno: Gótica', 'modern gothic style')"><h3 class="font-bold">Moderno: Gótica</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Moderno: E-girl', 'modern e-girl style')"><h3 class="font-bold">Moderno: E-girl</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Moderno: Fitness', 'modern fitness style')"><h3 class="font-bold">Moderno: Fitness</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Moderno: Casual', 'modern casual style')"><h3 class="font-bold">Moderno: Casual</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Histórico: Vitoriano', 'historical victorian style')"><h3 class="font-bold">Histórico: Vitoriano</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Histórico: Medieval', 'historical medieval style')"><h3 class="font-bold">Histórico: Medieval</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Steampunk', 'steampunk style')"><h3 class="font-bold">Steampunk</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Pós-apocalíptico', 'post-apocalyptic style')"><h3 class="font-bold">Pós-apocalíptico</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-1" onclick="handleSelection(this, 'characterStyle', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(11)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(13)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 13: Maquiagem -->
+            <div id="step-13" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Maquiagem</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Natural', 'natural makeup')"><h3 class="font-bold">Natural</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Olho Esfumado', 'smokey eyes makeup')"><h3 class="font-bold">Olho Esfumado</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Glamour', 'glamour makeup')"><h3 class="font-bold">Glamour</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Gótica', 'gothic makeup')"><h3 class="font-bold">Gótica</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Cores Neon', 'neon colors makeup')"><h3 class="font-bold">Cores Neon</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Artística', 'artistic makeup')"><h3 class="font-bold">Artística</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Nenhuma', 'no makeup')"><h3 class="font-bold">Nenhuma</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(12)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(14)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 14: Acessórios -->
+            <div id="step-14" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Acessórios (múltipla escolha)</h2>
+                <div id="accessories-options" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing glasses')"><h3 class="font-bold">Óculos</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing a necklace')"><h3 class="font-bold">Colar</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing earrings')"><h3 class="font-bold">Brincos</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'with piercings')"><h3 class="font-bold">Piercings</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'with tattoos')"><h3 class="font-bold">Tatuagens</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing a hat')"><h3 class="font-bold">Chapéu</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'accessories', 'wearing headphones')"><h3 class="font-bold">Fones de Ouvido</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(13)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(15)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 15: Expressão Facial -->
+            <div id="step-15" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Expressão Facial</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Sedutora', 'seductive expression')"><h3 class="font-bold">Sedutora</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Confiante', 'confident expression')"><h3 class="font-bold">Confiante</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Triste', 'sad expression')"><h3 class="font-bold">Triste</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Irritada', 'angry expression')"><h3 class="font-bold">Irritada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Feliz/Sorrindo', 'happy/smiling expression')"><h3 class="font-bold">Feliz/Sorrindo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Pensativa', 'thoughtful expression')"><h3 class="font-bold">Pensativa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Assustada', 'scared expression')"><h3 class="font-bold">Assustada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Entediada', 'bored expression')"><h3 class="font-bold">Entediada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'facialExpression', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(14)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(16)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 16: Pose Corporal -->
+            <div id="step-16" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Pose Corporal</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Em pé', 'standing pose')"><h3 class="font-bold">Em pé</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Sentada', 'sitting pose')"><h3 class="font-bold">Sentada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Deitada', 'lying down pose')"><h3 class="font-bold">Deitada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Andando', 'walking pose')"><h3 class="font-bold">Andando</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Correndo', 'running pose')"><h3 class="font-bold">Correndo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Dançando', 'dancing pose')"><h3 class="font-bold">Dançando</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pose de Luta', 'fighting pose')"><h3 class="font-bold">Pose de Luta</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Pose de Ação', 'action pose')"><h3 class="font-bold">Pose de Ação</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'bodyPose', 'Encostada', 'leaning pose')"><h3 class="font-bold">Encostada</h3></div>
+                </div>
+                 <textarea id="bodyPoseManual" placeholder="Ou descreva a pose aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                 <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(15)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'bodyPoseManual', 'bodyPose', 17)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 17: Tipo de Vestimenta -->
+            <div id="step-17" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Tipo de Vestimenta</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'clothing', 'nude', 'nude')"><h3 class="font-bold">Totalmente Nua</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'clothing', 'underwear', 'underwear')"><h3 class="font-bold">Apenas Roupa Íntima</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'clothing', 'clothed', 'clothed')"><h3 class="font-bold">Vestida</h3></div>
+                </div>
+                 <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(16)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleClothingChoice()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 18: Calcinha -->
+            <div id="step-18" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Tipo de Calcinha</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Clássica', 'classic panties')"><h3 class="font-bold">Clássica</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Biquíni', 'bikini-style panties')"><h3 class="font-bold">Biquíni</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Caleçon', 'boyshorts')"><h3 class="font-bold">Caleçon</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Cintura Alta', 'high-waisted panties')"><h3 class="font-bold">Cintura Alta</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Fio Dental', 'thong')"><h3 class="font-bold">Fio Dental</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Fio Duplo', 'g-string')"><h3 class="font-bold">Fio Duplo</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Tanga', 'tanga panties')"><h3 class="font-bold">Tanga</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'String', 'string panties')"><h3 class="font-bold">String</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Strappy', 'strappy panties')"><h3 class="font-bold">Strappy</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Modeladora', 'shaping panties')"><h3 class="font-bold">Modeladora</h3></div>
+                </div>
+                 <textarea id="pantiesManual" placeholder="Ou escreva os detalhes aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                 <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(17)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'pantiesManual', 'pantiesType', 19)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+            
+            <!-- Step 19: Tamanho da Calcinha -->
+            <div id="step-19" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Tamanho da Calcinha</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'XS', 'XS size')"><h3 class="font-bold">Extra Pequeno (XS)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'S', 'S size')"><h3 class="font-bold">Pequeno (S)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'M', 'M size')"><h3 class="font-bold">Médio (M)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'L', 'L size')"><h3 class="font-bold">Largo (L)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'XL', 'XL size')"><h3 class="font-bold">Extra Largo (XL)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(18)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(20)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 20: Cor e Detalhes da Calcinha -->
+            <div id="step-20" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Cor da Calcinha</h2>
+                <div id="pantiesColorGrid" class="grid grid-cols-6 md:grid-cols-9 gap-3 mb-4"></div>
+                <h3 class="text-xl font-semibold mb-4 mt-6">Detalhes da Calcinha</h3>
+                <textarea id="pantiesDetails" placeholder="Ex: azul claro com renda, transparente..." class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(19)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'pantiesDetails', 'pantiesDetails', 21)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 21: Sutiã -->
+            <div id="step-21" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Tipo de Sutiã</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Meia-taça', 'demi-cup bra')"><h3 class="font-bold">Meia-taça</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Push-up', 'push-up bra')"><h3 class="font-bold">Push-up</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Balconet', 'balconette bra')"><h3 class="font-bold">Balconet</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Alta Sustentação', 'high support bra')"><h3 class="font-bold">Alta Sustentação</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Tomara que Caia', 'strapless bra')"><h3 class="font-bold">Tomara que Caia</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Nadador', 'racerback bra')"><h3 class="font-bold">Nadador</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Triângulo', 'triangle bra')"><h3 class="font-bold">Triângulo</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Bralette', 'bralette')"><h3 class="font-bold">Bralette</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Esportivo', 'sports bra')"><h3 class="font-bold">Esportivo</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Decote Profundo', 'plunge bra')"><h3 class="font-bold">Decote Profundo</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Cropped', 'cropped bra')"><h3 class="font-bold">Cropped</h3></div>
+                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Nenhum (Topless)', 'topless')"><h3 class="font-bold">Nenhum (Topless)</h3></div>
+                </div>
+                <textarea id="braManual" placeholder="Ou escreva os detalhes aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(20)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleBra(this)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 22: Tamanho do Sutiã -->
+            <div id="step-22" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Tamanho do Sutiã</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'XS', 'XS size')"><h3 class="font-bold">Extra Pequeno (XS)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'S', 'S size')"><h3 class="font-bold">Pequeno (S)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'M', 'M size')"><h3 class="font-bold">Médio (M)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'L', 'L size')"><h3 class="font-bold">Largo (L)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'XL', 'XL size')"><h3 class="font-bold">Extra Largo (XL)</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(21)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(23)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 23: Cor e Detalhes do Sutiã -->
+            <div id="step-23" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Cor do Sutiã</h2>
+                <div id="braColorGrid" class="grid grid-cols-6 md:grid-cols-9 gap-3 mb-4"></div>
+                <h3 class="text-xl font-semibold mb-4 mt-6">Detalhes do Sutiã</h3>
+                <textarea id="braDetails" placeholder="Ex: azul claro com renda, transparente..." class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(22)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'braDetails', 'braDetails', 24)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 24: Iluminação -->
+            <div id="step-24" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Iluminação</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Suave (Softbox)', 'softbox lighting')"><h3 class="font-bold">Luz Suave</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Dura (Dramática)', 'dramatic hard lighting')"><h3 class="font-bold">Luz Dura</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Rembrandt', 'Rembrandt lighting')"><h3 class="font-bold">Luz de Rembrandt</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Contraluz (Backlight)', 'backlight')"><h3 class="font-bold">Contraluz</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Golden Hour', 'golden hour lighting')"><h3 class="font-bold">Golden Hour</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz de Velas', 'candlelight')"><h3 class="font-bold">Luz de Velas</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Neon', 'neon lighting')"><h3 class="font-bold">Neon</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Subaquática', 'underwater lighting')"><h3 class="font-bold">Subaquática</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="handleLightingPrevious()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(25)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 25: Fundo / Local -->
+            <div id="step-25" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Fundo / Local</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Estúdio (Fundo Liso)', 'in a studio with a plain background')"><h3 class="font-bold">Estúdio</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Floresta Mística', 'in a mystical forest')"><h3 class="font-bold">Floresta Mística</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Cidade Cyberpunk', 'in a cyberpunk city')"><h3 class="font-bold">Cidade Cyberpunk</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Quarto Aconchegante', 'in a cozy room')"><h3 class="font-bold">Quarto Aconchegante</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Praia Ensolarada', 'on a sunny beach')"><h3 class="font-bold">Praia Ensolarada</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Biblioteca Antiga', 'in an old library')"><h3 class="font-bold">Biblioteca Antiga</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Ruínas Desertas', 'in deserted ruins')"><h3 class="font-bold">Ruínas Desertas</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Salão de Baile Gótico', 'in a gothic ballroom')"><h3 class="font-bold">Salão de Baile Gótico</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Interior de Nave Espacial', 'inside a spaceship')"><h3 class="font-bold">Interior de Nave Espacial</h3></div>
+                </div>
+                 <textarea id="backgroundManual" placeholder="Ou escreva os detalhes aqui (Ex: em um beco chuvoso de neon...)" class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                 <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(24)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'backgroundManual', 'background', 26)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 26: Ação da Personagem -->
+            <div id="step-26" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Ação da Personagem</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Olhando para a câmera', 'looking at the camera')"><h3 class="font-bold">Olhando para a câmera</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Ajustando a roupa', 'adjusting clothes')"><h3 class="font-bold">Ajustando a roupa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Interagindo com o cenário', 'interacting with the scenery')"><h3 class="font-bold">Interagindo com o cenário</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Em movimento', 'in motion')"><h3 class="font-bold">Em movimento</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Pensativa', 'thoughtful')"><h3 class="font-bold">Pensativa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Tocando um instrumento', 'playing an instrument')"><h3 class="font-bold">Tocando um instrumento</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Pintando em uma tela', 'painting on a canvas')"><h3 class="font-bold">Pintando em uma tela</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Bebendo café', 'drinking coffee')"><h3 class="font-bold">Bebendo café</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Olhando para o horizonte', 'looking at the horizon')"><h3 class="font-bold">Olhando para o horizonte</h3></div>
+                </div>
+                 <textarea id="actionManual" placeholder="Ou escreva os detalhes aqui (Ex: lendo um livro antigo...)" class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+                 <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(25)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'actionManual', 'action', 27)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+            </div>
+
+            <!-- Step 27: Estilo Final e Qualidade -->
+            <div id="step-27" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Estilo Final e Qualidade</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Fotografia Realista', 'realistic photography, photorealistic, 8k, ultra-detailed')"><h3 class="font-bold">Fotografia Realista</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Pintura Digital', 'digital painting, concept art')"><h3 class="font-bold">Pintura Digital</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Arte Conceitual', 'concept art, detailed illustration')"><h3 class="font-bold">Arte Conceitual</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Estilo Anime/Mangá', 'anime style, manga art')"><h3 class="font-bold">Estilo Anime/Mangá</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Preto e Branco', 'black and white photography')"><h3 class="font-bold">Preto e Branco</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Arte Barroca', 'baroque art style')"><h3 class="font-bold">Arte Barroca</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Aquarela', 'watercolor style')"><h3 class="font-bold">Aquarela</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Vaporwave', 'vaporwave aesthetic')"><h3 class="font-bold">Vaporwave</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Lente 50mm', '50mm lens, shallow depth of field')"><h3 class="font-bold">Lente 50mm</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Lente Teleobjetiva', 'telephoto lens, compressed background')"><h3 class="font-bold">Lente Teleobjetiva</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Estilo Cinematográfico', 'cinematic style, film grain')"><h3 class="font-bold">Estilo Cinematográfico</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Arte de Videogame (AAA)', 'AAA video game art, Unreal Engine')"><h3 class="font-bold">Arte de Videogame</h3></div>
+                </div>
+                <div class="mt-8 flex justify-between w-full">
+                    <button onclick="goToStep(26)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="generateAndTranslatePrompt()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Gerar Prompt</button>
+                </div>
+            </div>
+
+            <!-- Final Step: Prompt -->
+            <div id="step-final" class="step relative">
+                 <div id="loadingOverlay" class="absolute inset-0 bg-gray-900 bg-opacity-90 flex flex-col items-center justify-center rounded-lg hidden z-10">
+                    <svg class="animate-spin h-10 w-10 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-xl text-white">Processando e traduzindo o prompt...</p>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-2">Seu Prompt Profissional está Pronto!</h2>
+                <p class="text-gray-400 mb-6">Copie o prompt abaixo e use-o em sua ferramenta de geração de imagem favorita.</p>
+                <textarea id="finalPrompt" rows="10" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300" readonly></textarea>
+                <div class="mt-6 flex flex-col md:flex-row gap-4">
+                    <button id="copyButton" onclick="copyPrompt()" class="w-full md:w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                        <span id="copyButtonText">Copiar Prompt</span>
+                    </button>
+                    <button id="restartButton" onclick="restart()" class="w-full md:w-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                        Começar de Novo
+                    </button>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <script>
-        // --- STATE & CONFIG ---
-        let stepHistory = [0];
-        let selections = {};
-        const getStepById = (id) => steps.findIndex(step => step.id === id);
+        // --- State Management ---
+        let promptData = {
+            accessories: []
+        };
+        let currentStep = 1;
+        const totalSteps = 27;
 
-        // --- DATA ---
-        const sizeOptions = [ { text: 'Extra Pequeno (XS)', value: 'extra small (XS)' }, { text: 'Pequeno (S)', value: 'small (S)' }, { text: 'Médio (M)', value: 'medium (M)' }, { text: 'Largo (L)', value: 'large (L)' }, { text: 'Extra Largo (XL)', value: 'extra large (XL)' }, { text: 'Nenhum', value: '' } ];
-        const steps = [
-            { id: 'identity', type: 'input', title: 'Identidade da Personagem' },
-            { id: 'ageGroup', title: 'Faixa Etária', options: [ { text: 'Menina', description: 'Aproximadamente 8-12 anos.', value: 'a young girl' }, { text: 'Menina Adolescente', description: 'Aproximadamente 13-17 anos.', value: 'a teenage girl' }, { text: 'Garota', description: 'Aproximadamente 18-22 anos.', value: 'a girl' }, { text: 'Jovem Mulher', description: 'Aproximadamente 23-30 anos.', value: 'a young woman' }, { text: 'Mulher', description: 'Aproximadamente 31-45 anos.', value: 'an adult woman' }, { text: 'Mulher Madura', description: 'Aproximadamente 46+ anos.', value: 'a mature woman' } ] },
-            { id: 'ethnicity', title: 'Etnia', options: [ { text: 'Caucasiana', description: 'Traços europeus.', value: 'Caucasian' }, { text: 'Asiática (Leste)', description: 'China, Japão, Coreia.', value: 'East Asian' }, { text: 'Afrodescendente', description: 'Traços africanos.', value: 'of African descent' }, { text: 'Hispânica/Latina', description: 'Traços da América Latina.', value: 'Hispanic/Latina' }, { text: 'Brasileira', description: 'Traços diversos do Brasil.', value: 'Brazilian' }, { text: 'Indígena', description: 'Traços de povos nativos.', value: 'indigenous' }, { text: 'Oriente Médio', description: 'Traços do Oriente Médio.', value: 'Middle Eastern' }, { text: 'Sul Asiático', description: 'Subcontinente indiano.', value: 'South Asian' }, { text: 'Multirracial', description: 'Mistura de etnias.', value: 'multiracial' }, { text: 'Polinésia', description: 'Ilhas do Pacífico.', value: 'Polynesian' }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
-            { id: 'bodyType', title: 'Biotipo Físico', options: [ { text: 'Ectomorfo', description: 'Estrutura longa e fina, naturalmente magra.', value: "an 'Ectomorph' somatotype, with a long and slender bone structure, naturally lean" }, { text: 'Mesomorfo', description: 'Corpo atlético, facilidade para ganhar músculos.', value: "a 'Mesomorph' somatotype, with an athletic build and a natural ease in gaining muscle" }, { text: 'Endomorfo', description: 'Estrutura larga, formas mais arredondadas.', value: "an 'Endomorph' somatotype, with a wider bone structure and a softer, more rounded physique" }, { text: 'Triângulo (Pera)', description: 'Quadris mais largos que os ombros.', value: "a 'Triangle' or 'Pear' body shape, where the hips are wider than the shoulders" }, { text: 'Triângulo Invertido', description: 'Ombros mais largos que os quadris.', value: "an 'Inverted Triangle' body shape, where the shoulders are noticeably wider than the hips" }, { text: 'Retângulo', description: 'Ombros, cintura e quadris com medidas próximas.', value: "a 'Rectangle' body shape, with similar measurements for shoulders, waist, and hips, creating a straight silhouette" }, { text: 'Ampulheta', description: 'Ombros e quadris semelhantes, cintura fina.', value: "an 'Hourglass' body shape, with similarly proportioned shoulders and hips and a well-defined, narrow waist" }, { text: 'Oval (Maçã)', description: 'Cintura mais larga que ombros e quadris.', value: "an 'Oval' or 'Apple' body shape, with a wider waist and abdomen compared to the shoulders and hips" }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
-            { id: 'skinTone', title: 'Cor da Pele', options: [ { text: 'Pele Clara', description: 'Tom de pele claro, rosado.', value: 'fair skin' }, { text: 'Pele Pálida', description: 'Muito claro, quase branco.', value: 'pale skin' }, { text: 'Pele Bronzeada', description: 'Tom dourado, queimado de sol.', value: 'tanned skin' }, { text: 'Pele Oliva', description: 'Tom de pele amarelado/esverdeado.', value: 'olive skin' }, { text: 'Pele Escura', description: 'Tom de pele marrom escuro.', value: 'dark skin' }, { text: 'Pele com Sardas', description: 'Pele com pequenas manchas de melanina.', value: 'freckled skin' }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
-            { id: 'hairLength', title: 'Comprimento do Cabelo', options: [ { text: 'Longo', description: 'Abaixo dos ombros.', value: 'long' }, { text: 'Médio', description: 'Na altura dos ombros.', value: 'shoulder-length' }, { text: 'Curto', description: 'Acima do queixo.', value: 'short' }, { text: 'Raspado', description: 'Muito curto, máquina.', value: 'buzzcut' }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
-            { id: 'hairStyle', title: 'Corte de Cabelo e Penteado', options: [ { text: 'Chanel (Bob Cut)', description: 'Corte clássico na altura do queixo.', value: 'a classic bob cut' }, { text: 'Long Bob (Lob)', description: 'Versão alongada do Chanel, nos ombros.', value: 'a long bob (lob) hairstyle' }, { text: 'Pixie Cut', description: 'Curto e desfiado, cheio de personalidade.', value: 'a short and stylish pixie cut' }, { text: 'Shaggy Hair', description: 'Em camadas, com efeito "bagunçado".', value: 'layered and messy shaggy hair' }, { text: 'Corte em Camadas', description: 'Dá movimento e leveza aos fios.', value: 'a layered cut for movement and texture' }, { text: 'Blunt Cut', description: 'Base totalmente reta, minimalista.', value: 'a straight blunt cut' }, { text: 'Undercut', description: 'Laterais e/ou nuca raspadas.', value: 'an undercut style with shaved sides/nape' }, { text: 'Buzz Cut (Raspado)', description: 'Cabelo raspado com máquina.', value: 'a bold buzz cut' }, { text: 'Mullet', description: 'Curto na frente, longo atrás.', value: 'a retro mullet hairstyle' }, { text: 'Wolf Cut', description: 'Mistura de Shaggy e Mullet.', value: 'a trendy wolf cut, a mix between a shag and a mullet' }, { text: 'Rabo de Cavalo', description: 'Versátil, pode ser alto, baixo ou lateral.', value: 'hair styled in a ponytail' }, { text: 'Coque Alto', description: 'Pode ser alinhado ou "bagunçado".', value: 'hair styled in a top knot or messy bun' }, { text: 'Trança Boxeadora', description: 'Duas tranças embutidas.', value: 'boxer braids' }, { text: 'Trança Embutida', description: 'Clássico, pode ser central ou lateral.', value: 'a classic dutch braid' }, { text: 'Meio Preso', description: 'Prende apenas a parte de cima.', value: 'a half-up hairstyle' }, { text: 'Ondas de Sereia', description: 'Ondulações largas e marcadas.', value: 'mermaid waves' }, { text: 'Efeito Molhado', description: 'Impressão de cabelo molhado com gel.', value: 'a wet look hairstyle' }, { text: 'Torcidinho Lateral', description: 'Mecha lateral torcida e presa.', value: 'a simple side twist hairstyle' }, { text: 'Coque Baixo', description: 'Elegante, na altura da nuca.', value: 'a low bun' }, { text: 'Slicked Back', description: 'Cabelo penteado para trás com fixador.', value: 'slicked back hair' }, { text: 'Nenhum', description: 'Não especificar.', value: '' } ] },
-            { id: 'hairColor', title: 'Cor do Cabelo', options: [ { text: 'Preto', value: 'black' }, { text: 'Loiro', value: 'blonde' }, { text: 'Castanho', value: 'brown' }, { text: 'Ruivo', value: 'red' }, { text: 'Branco/Platinado', value: 'white/platinum' }, { text: 'Rosa', value: 'pink' }, { text: 'Azul', value: 'blue' }, { text: 'Verde', value: 'green' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'eyeColor', title: 'Cor dos Olhos', options: [ { text: 'Azuis', value: 'blue eyes' }, { text: 'Verdes', value: 'green eyes' }, { text: 'Castanhos', value: 'brown eyes' }, { text: 'Cor de Mel', value: 'hazel eyes' }, { text: 'Cinzas', value: 'gray eyes' }, { text: 'Pretos', value: 'black eyes' }, { text: 'Heterocromia', value: 'heterochromia eyes' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'breastSize', title: 'Tamanho dos Seios', options: [ { text: 'Reto (Flat)', value: 'a flat chest' }, { text: 'Pequenos', value: 'small breasts' }, { text: 'Médios', value: 'medium-sized breasts' }, { text: 'Grandes', value: 'large breasts' }, { text: 'Volumosos', value: 'voluminous breasts' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'composition', title: 'Composição da Cena', options: [ { text: 'Corpo Inteiro', value: 'Full body shot' }, { text: 'Plano Médio', value: 'Medium shot' }, { text: 'Close-up no Rosto', value: 'Close-up portrait' }, { text: 'Plano Detalhe', value: 'Extreme close-up' }, { text: 'Vista Traseira', value: 'Rear view shot' }, { text: 'Ângulo Baixo', value: 'Low-angle shot' }, { text: 'Ângulo Alto', value: 'High-angle shot' }, { text: 'Ângulo Holandês', value: 'Dutch angle shot' }, { text: 'Ponto de Vista (POV)', value: 'Point-of-view (POV) shot' }, { text: 'Sobre o Ombro', value: 'Over-the-shoulder shot' }, { text: 'Plano Americano', value: 'American shot (cowboy shot)' }, { text: 'Grande Angular', value: 'Wide-angle lens shot' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'subjectStyle', title: 'Estilo da Personagem', options: [ { text: 'Fantasia: Elfa', value: 'an elven fantasy style' }, { text: 'Fantasia: Guerreira', value: 'a warrior fantasy style' }, { text: 'Sci-Fi: Cyberpunk', value: 'a cyberpunk sci-fi style' }, { text: 'Sci-Fi: Androide', value: 'an android sci-fi style' }, { text: 'Moderno: Gótica', value: 'a modern gothic style' }, { text: 'Moderno: E-girl', value: 'a modern e-girl style' }, { text: 'Moderno: Fitness', value: 'a modern fitness style' }, { text: 'Moderno: Casual', value: 'a modern casual style' }, { text: 'Histórico: Vitoriano', value: 'a Victorian historical style' }, { text: 'Histórico: Medieval', value: 'a medieval historical style' }, { text: 'Steampunk', value: 'a steampunk style' }, { text: 'Pós-apocalíptico', value: 'a post-apocalyptic style' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'makeup', title: 'Maquiagem', options: [ { text: 'Natural', value: 'a natural makeup look' }, { text: 'Olho Esfumado', value: 'a smokey eye makeup look' }, { text: 'Glamour', value: 'a glamorous makeup look' }, { text: 'Gótica', value: 'a gothic makeup look' }, { text: 'Cores Neon', value: 'a neon-colored makeup look' }, { text: 'Artística', value: 'an artistic/editorial makeup look' }, { text: 'Nenhuma', value: 'no makeup' } ] },
-            { id: 'accessories', title: 'Acessórios', options: [ { text: 'Óculos', value: 'wearing glasses' }, { text: 'Colar', value: 'wearing a necklace' }, { text: 'Brincos', value: 'wearing earrings' }, { text: 'Piercings', value: 'with facial piercings' }, { text: 'Tatuagens', value: 'with visible tattoos' }, { text: 'Chapéu', value: 'wearing a hat' }, { text: 'Fones de Ouvido', value: 'wearing headphones' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'expression', title: 'Expressão Facial', options: [ { text: 'Sedutora', value: 'a seductive expression' }, { text: 'Confiante', value: 'a confident expression' }, { text: 'Triste', value: 'a sad expression' }, { text: 'Irritada', value: 'an angry expression' }, { text: 'Feliz/Sorrindo', value: 'a happy, smiling expression' }, { text: 'Pensativa', value: 'a thoughtful expression' }, { text: 'Assustada', value: 'a scared expression' }, { text: 'Entediada', value: 'a bored expression' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'pose', title: 'Pose Corporal', type: 'custom_input', custom_id: 'customPose', placeholder: 'Ex: sentada em um trono, com uma perna cruzada...', options: [ { text: 'Em pé', value: 'standing' }, { text: 'Sentada', value: 'sitting' }, { text: 'Deitada', value: 'lying down' }, { text: 'Andando', value: 'walking' }, { text: 'Correndo', value: 'running' }, { text: 'Dançando', value: 'dancing' }, { text: 'Pose de Luta', value: 'in a fighting stance' }, { text: 'Pose de Ação', value: 'in a dynamic action pose' }, { text: 'Encostada', value: 'leaning against a wall' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'clothingType', title: 'Tipo de Vestimenta', options: [ { text: 'Totalmente Nua', value: 'nude' }, { text: 'Apenas Roupa Íntima', value: 'lingerie' }, { text: 'Vestida', value: 'clothed' } ] },
-            { id: 'panties', title: 'Calcinha', type: 'custom_input', custom_id: 'customPanties', placeholder: 'Ex: calcinha de biquíni...', next_step: 'pantiesSize', options: [ { text: 'Clássica', description: 'Cobertura total e conforto.', value: 'classic full-coverage panties' }, { text: 'Biquíni', description: 'Mais cavada, cintura baixa.', value: 'bikini-style panties' }, { text: 'Caleçon', description: 'Parece um shortinho, confortável.', value: 'caleçon or boyshort-style panties' }, { text: 'Cintura Alta', description: 'Modela a silhueta, cós elevado.', value: 'high-waisted or hot pant panties' }, { text: 'Fio Dental', description: 'Cobertura mínima, sensual.', value: 'a G-string' }, { text: 'Fio Duplo', description: 'Fio dental com tecido duplo.', value: 'a double-string thong' }, { text: 'Tanga', description: 'Laterais finas, cobertura média.', value: 'a tanga' }, { text: 'String', description: 'Laterais formadas por tiras finas.', value: 'string panties with thin side straps' }, { text: 'Strappy', description: 'Tiras elásticas decorativas.', value: 'strappy panties with decorative elastic bands' }, { text: 'Modeladora', description: 'Tecido de compressão, modela o corpo.', value: 'shaping panties' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'pantiesSize', title: 'Tamanho da Calcinha', for: 'panties', next_step: 'pantiesColor', options: sizeOptions },
-            { id: 'pantiesColor', type: 'color_details', title: 'Cor e Detalhes da Calcinha', for: 'panties' },
-            { id: 'bra', title: 'Sutiã', type: 'custom_input', custom_id: 'customBra', placeholder: 'Ex: sutiã esportivo...', next_step: 'braSize', options: [ { text: 'Meia-taça', description: 'Cobre metade dos seios.', value: 'a demi-cup bra' }, { text: 'Push-up', description: 'Levanta e aproxima os seios.', value: 'a push-up bra' }, { text: 'Balconet', description: 'Realça o colo com decote reto.', value: 'a balconette bra' }, { text: 'Alta Sustentação', description: 'Laterais e alças largas.', value: 'a high-support bra' }, { text: 'Tomara que Caia', description: 'Sem alças, para ombros à mostra.', value: 'a strapless bra' }, { text: 'Multifuncional', description: 'Alças removíveis e versáteis.', value: 'a multiway bra' }, { text: 'Nadador', description: 'Alças unidas nas costas.', value: 'a racerback bra' }, { text: 'Triângulo', description: 'Leve e sem aros.', value: 'a triangle bra' }, { text: 'Bralette', description: 'Sem aros, parece um top.', value: 'a bralette' }, { text: 'Esportivo', description: 'Alta sustentação para exercícios.', value: 'a sports bra' }, { text: 'Decote Profundo', description: 'Decote em "U" para roupas ousadas.', value: 'a plunge bra' }, { text: 'Cropped', description: 'Corpo alongado, como um top.', value: 'a cropped top bra' }, { text: 'Nenhum (Topless)', value: 'is topless' } ] },
-            { id: 'braSize', title: 'Tamanho do Sutiã', for: 'bra', next_step: 'braColor', options: sizeOptions },
-            { id: 'braColor', type: 'color_details', title: 'Cor e Detalhes do Sutiã', for: 'bra' },
-            { id: 'topWear', title: 'Peça Superior', type: 'custom_input', custom_id: 'customTopWear', placeholder: 'Ex: jaqueta de couro...', next_step: 'topWearSize', options: [ { text: 'Camisa Social', value: 'a classic button-down shirt' }, { text: 'Ciganinha', value: 'an off-the-shoulder "ciganinha" blouse' }, { text: 'Body Justo', value: 'a sleek, form-fitting body' }, { text: 'Bata Boho', value: 'a loose, boho-style "bata" blouse' }, { text: 'Blusa com Laço', value: 'an elegant blouse with a bow tie neck' }, { text: 'Manga Bufante', value: 'a blouse with puff sleeves' }, { text: 'T-shirt Básica', value: 'a basic t-shirt' }, { text: 'Regata', value: 'a tank top' }, { text: 'Cropped', value: 'a cropped top' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'topWearSize', title: 'Tamanho da Peça Superior', for: 'topWear', next_step: 'topWearColor', options: sizeOptions },
-            { id: 'topWearColor', type: 'color_details', title: 'Cor e Detalhes da Peça Superior', for: 'topWear' },
-            { id: 'bottomWear', title: 'Peça Inferior', type: 'custom_input', custom_id: 'customBottomWear', placeholder: 'Ex: saia plissada...', next_step: 'bottomWearSize', options: [ { text: 'Calça Skinny', value: 'skinny fit pants' }, { text: 'Calça Reta', value: 'straight-leg pants' }, { text: 'Calça Flare', value: 'flare pants' }, { text: 'Calça Pantalona', value: 'pantalona pants' }, { text: 'Calça Mom', value: 'mom jeans' }, { text: 'Calça Wide Leg', value: 'wide-leg pants' }, { text: 'Calça Jogger', value: 'jogger pants' }, { text: 'Calça de Alfaiataria', value: 'tailored trousers' }, { text: 'Calça Cargo', value: 'cargo pants' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'bottomWearSize', title: 'Tamanho da Peça Inferior', for: 'bottomWear', next_step: 'bottomWearColor', options: sizeOptions },
-            { id: 'bottomWearColor', type: 'color_details', title: 'Cor e Detalhes da Peça Inferior', for: 'bottomWear' },
-            { id: 'shoes', title: 'Sapatos', type: 'custom_input', custom_id: 'customShoes', placeholder: 'Ex: botas de combate...', next_step: 'shoesSize', options: [ { text: 'Scarpin', value: 'scarpin pumps' }, { text: 'Sapatilha', value: 'ballet flats' }, { text: 'Tênis Casual', value: 'casual sneakers' }, { text: 'Salto Bloco', value: 'block-heel sandals' }, { text: 'Rasteirinha', value: 'flat sandals' }, { text: 'Bota Cano Curto', value: 'ankle boots' }, { text: 'Mule', value: 'mule shoes' }, { text: 'Mocassim', value: 'loafers' }, { text: 'Plataforma', value: 'platform shoes' }, { text: 'Descalça', value: 'is barefoot' } ] },
-            { id: 'shoesSize', title: 'Tamanho dos Sapatos', for: 'shoes', next_step: 'shoesColor', options: sizeOptions },
-            { id: 'shoesColor', type: 'color_details', title: 'Cor e Detalhes dos Sapatos', for: 'shoes' },
-            { id: 'lighting', title: 'Iluminação', options: [ { text: 'Luz Suave (Softbox)', value: 'soft studio lighting' }, { text: 'Luz Dura (Dramática)', value: 'dramatic hard lighting' }, { text: 'Luz de Rembrandt', value: 'Rembrandt lighting' }, { text: 'Contraluz (Backlight)', value: 'backlit with a strong rim light' }, { text: 'Golden Hour', value: 'warm, golden hour lighting' }, { text: 'Luz de Velas', value: 'candlelight' }, { text: 'Neon', value: 'neon lighting' }, { text: 'Subaquática', value: 'underwater lighting with caustic reflections' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'location', title: 'Fundo / Local', type: 'custom_input', custom_id: 'customLocation', placeholder: 'Ex: em um beco chuvoso de neon...', options: [ { text: 'Estúdio (Fundo Liso)', value: "against a plain studio background." }, { text: 'Floresta Mística', value: "in a mystical forest." }, { text: 'Cidade Cyberpunk', value: "on a futuristic city street." }, { text: 'Quarto Aconchegante', value: "in a cozy bedroom." }, { text: 'Praia Ensolarada', value: "on a sunny beach." }, { text: 'Biblioteca Antiga', value: "in an ancient library." }, { text: 'Ruínas Desertas', value: "amidst desert ruins." }, { text: 'Salão de Baile Gótico', value: "in a gothic ballroom." }, { text: 'Interior de Nave Espacial', value: "inside a sleek spaceship interior." }, { text: 'Nenhum', value: '' } ] },
-            { id: 'action', title: 'Ação da Personagem', type: 'custom_input', custom_id: 'customAction', placeholder: 'Ex: lendo um livro antigo...', options: [ { text: 'Olhando para a câmera', value: 'looking at the camera' }, { text: 'Ajustando a roupa', value: 'adjusting her clothing' }, { text: 'Interagindo com o cenário', value: 'interacting with the environment' }, { text: 'Em movimento', value: 'in motion' }, { text: 'Pensativa', value: 'lost in thought' }, { text: 'Tocando um instrumento', value: 'playing a musical instrument' }, { text: 'Pintando em uma tela', value: 'painting on a canvas' }, { text: 'Bebendo café', value: 'sipping coffee' }, { text: 'Olhando para o horizonte', value: 'gazing at the horizon' }, { text: 'Nenhum', value: '' } ] },
-            { id: 'style', title: 'Estilo Final e Qualidade', options: [ { text: 'Fotografia Realista', value: "Ultra-realistic photograph, 8K, sharp focus" }, { text: 'Pintura Digital', value: "Epic digital painting, detailed brushstrokes" }, { text: 'Arte Conceitual', value: "Concept art, cinematic lighting" }, { text: 'Estilo Anime/Mangá', value: "Anime art style, vibrant colors" }, { text: 'Preto e Branco', value: "Black and white photography, film grain" }, { text: 'Arte Barroca', value: 'Baroque art style, dramatic chiaroscuro lighting' }, { text: 'Aquarela', value: 'Watercolor style, soft and bleeding colors' }, { text: 'Vaporwave', value: 'Vaporwave aesthetic, neon grids, pastel colors' }, { text: 'Lente 50mm', value: 'shot on a 50mm lens, creating a natural field of view' }, { text: 'Lente Teleobjetiva', value: 'shot on a telephoto lens, compressing the background' }, { text: 'Estilo Cinematográfico', value: 'cinematic still from a movie, film grain, anamorphic lens flare' }, { text: 'Arte de Videogame (AAA)', value: 'AAA video game art, hyper-detailed textures, Unreal Engine 5 render' }, { text: 'Nenhum', value: '' } ] }
+        // --- DOM Elements ---
+        const progressBar = document.getElementById('progressBar');
+
+        // --- Color Palette ---
+        const colors = [
+            { name: 'Branco', hex: '#FFFFFF', en: 'white' }, { name: 'Prata', hex: '#C0C0C0', en: 'silver' }, { name: 'Cinza', hex: '#808080', en: 'gray' }, { name: 'Preto', hex: '#000000', en: 'black' },
+            { name: 'Marrom', hex: '#A52A2A', en: 'brown' }, { name: 'Bege', hex: '#F5F5DC', en: 'beige' }, { name: 'Marfim', hex: '#FFFFF0', en: 'ivory' }, { name: 'Creme', hex: '#FFFDD0', en: 'cream' },
+            { name: 'Vermelho', hex: '#FF0000', en: 'red' }, { name: 'Laranja', hex: '#FFA500', en: 'orange' }, { name: 'Amarelo', hex: '#FFFF00', en: 'yellow' }, { name: 'Dourado', hex: '#FFD700', en: 'gold' },
+            { name: 'Verde Limão', hex: '#32CD32', en: 'lime green' }, { name: 'Verde', hex: '#008000', en: 'green' }, { name: 'Verde Oliva', hex: '#808000', en: 'olive green' }, { name: 'Verde Musgo', hex: '#556B2F', en: 'moss green' },
+            { name: 'Ciano', hex: '#00FFFF', en: 'cyan' }, { name: 'Azul Celeste', hex: '#87CEEB', en: 'sky blue' }, { name: 'Azul', hex: '#0000FF', en: 'blue' }, { name: 'Azul Marinho', hex: '#000080', en: 'navy blue' },
+            { name: 'Roxo', hex: '#800080', en: 'purple' }, { name: 'Violeta', hex: '#EE82EE', en: 'violet' }, { name: 'Lavanda', hex: '#E6E6FA', en: 'lavender' }, { name: 'Índigo', hex: '#4B0082', en: 'indigo' },
+            { name: 'Magenta', hex: '#FF00FF', en: 'magenta' }, { name: 'Rosa', hex: '#FFC0CB', en: 'pink' }, { name: 'Rosa Choque', hex: '#FF69B4', en: 'hot pink' }, { name: 'Salmão', hex: '#FA8072', en: 'salmon' },
+            { name: 'Coral', hex: '#FF7F50', en: 'coral' }, { name: 'Pêssego', hex: '#FFDAB9', en: 'peach' }, { name: 'Turquesa', hex: '#40E0D0', en: 'turquoise' }, { name: 'Teal', hex: '#008080', en: 'teal' }
         ];
-        
-        // --- CORE FUNCTIONS ---
 
-        function renderCurrentStep() {
-            const currentStepIndex = stepHistory[stepHistory.length - 1];
-            const stepData = steps[currentStepIndex];
-            
-            const wizard = document.getElementById('wizard');
-            wizard.innerHTML = '';
-            if (!stepData) {
-                showResults();
-                return;
-            }
-
-            const stepCard = createStepCard(stepData, currentStepIndex);
-            wizard.appendChild(stepCard);
-
-            if (selections[stepData.id]) {
-                const selectedBtn = wizard.querySelector(`[data-value="${CSS.escape(selections[stepData.id])}"]`);
-                if (selectedBtn) selectedBtn.classList.add('selected');
-            }
-            addEventListeners();
-            updateProgress();
-        }
-
-        function createStepCard(stepData, currentStepIndex) {
-            const stepCard = document.createElement('div');
-            stepCard.className = 'step-card';
-            stepCard.id = `step-${currentStepIndex}`;
-
-            let contentHtml = '';
-            if (stepData.type === 'input') {
-                contentHtml = createInputContent(stepData);
-            } else if (stepData.type === 'color_details') {
-                contentHtml = createColorDetailsContent(stepData);
-            } else if (stepData.type === 'custom_input') {
-                contentHtml = createCustomInputContent(stepData);
-            } else {
-                contentHtml = createOptionContent(stepData);
-            }
-            
-            const navButtonsHtml = (stepData.type === 'input' || stepData.type === 'color_details' || stepData.type === 'custom_input') ?
-                `<button onclick="navigate(1)" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Próximo</button>` :
-                '';
-
-            stepCard.innerHTML = `
-                <h2 class="text-2xl font-bold mb-6 text-center">${stepData.title}</h2>
-                ${contentHtml}
-                <div class="flex justify-between mt-8">
-                    <button ${stepHistory.length === 1 ? 'disabled' : ''} onclick="navigate(-1)" class="nav-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
-                    ${navButtonsHtml}
-                </div>
-            `;
-            return stepCard;
-        }
-
-        function createInputContent() {
-            return `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div>
-                        <label for="characterName" class="block mb-2 text-sm font-medium text-gray-300">Nome da Personagem</label>
-                        <input type="text" id="characterName" class="input-field w-full" placeholder="Ex: Alice, Sofia, Kenji, Luna, David..." value="${selections.name || ''}">
-                    </div>
-                    <div>
-                        <label for="characterAge" class="block mb-2 text-sm font-medium text-gray-300">Idade (opcional)</label>
-                        <input type="number" id="characterAge" class="input-field w-full" placeholder="Ex: 25" value="${selections.age || ''}">
-                    </div>
-                </div>
-            `;
-        }
-        
-        function createCustomInputContent(stepData) {
-            let optionsHtml = stepData.options.map(option => `
-                <button class="option-btn text-center rounded-lg" data-category="${stepData.id}" data-value="${option.value}">
-                    <span class="text-sm md:text-base font-medium">${option.text}</span>
-                </button>
-            `).join('');
-            
-            return `
-                ${optionsHtml ? `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">${optionsHtml}</div>` : ''}
-                <div class="mt-4">
-                    <label for="${stepData.custom_id}" class="block mb-2 text-sm font-medium text-gray-300">Ou escreva os detalhes aqui:</label>
-                    <textarea id="${stepData.custom_id}" class="textarea-field" rows="3" placeholder="${stepData.placeholder || ''}">${selections[stepData.id]?.custom || ''}</textarea>
-                </div>
-            `;
-        }
-        
-        function createColorDetailsContent(stepData) {
-            const colors = ['#ffffff', '#fde047', '#f97316', '#ef4444', '#ec4899', '#d946ef', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#22c55e', '#84cc16', '#a16207', '#78350f', '#000000', '#737373', '#a3a3a3', '#e5e5e5', '#fca5a5', '#fdba74', '#fde047', '#d9f99d', '#a7f3d0', '#99f6e4', '#a5f3fc', '#bae6fd', '#bfdbfe', '#c7d2fe', '#d8b4fe', '#f0abfc'];
-            const colorSwatches = colors.map(color => 
-                `<div class="color-swatch" style="background-color:${color};" onclick="selectColor('${stepData.for}', '${color}')"></div>`
-            ).join('');
-
-            return `
-                <div class="mb-4">
-                    <label class="block mb-2 text-sm font-medium text-gray-300">Escolha uma cor:</label>
-                    <div class="flex gap-4 flex-wrap">${colorSwatches}</div>
-                </div>
-                <div>
-                    <label for="${stepData.for}Details" class="block mb-2 text-sm font-medium text-gray-300">Ou escreva a cor e detalhes (Ex: azul claro com renda):</label>
-                    <input type="text" id="${stepData.for}Details" class="input-field w-full" value="${selections[stepData.for]?.details || ''}">
-                </div>
-            `;
-        }
-
-        function createOptionContent(stepData) {
-            let optionsHtml = stepData.options.map(option => `
-                <button class="option-btn text-center rounded-lg" data-category="${stepData.id}" data-value="${option.value}">
-                    <span class="text-sm md:text-base font-medium">${option.text}</span>
-                    ${option.description ? `<span class="description">${option.description}</span>` : ''}
-                </button>
-            `).join('');
-            return `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">${optionsHtml}</div>`;
-        }
-        
-        function selectColor(itemKey, color) {
-            if (!selections[itemKey]) selections[itemKey] = {};
-            selections[itemKey].color = color;
-            
-            document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
-            event.target.classList.add('selected');
-            
-            setTimeout(() => navigate(1), 250);
-        }
-
-        function addEventListeners() {
-            document.querySelectorAll('.option-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const category = button.dataset.category;
-                    const value = button.dataset.value;
-                    
-                    if (steps.find(s => s.id === category)?.type === 'custom_input') {
-                        selections[category] = { item: value };
-                    } else {
-                         selections[category] = value;
-                    }
-                    
-                    document.querySelectorAll(`.option-btn[data-category="${category}"]`).forEach(btn => btn.classList.remove('selected'));
-                    button.classList.add('selected');
-                    
-                    setTimeout(() => navigate(1), 250);
-                });
-            });
-
-            const copyButton = document.getElementById('copyButton');
-            if(copyButton) {
-                copyButton.addEventListener('click', () => {
-                    const finalPromptTextarea = document.getElementById('finalPrompt');
-                    const copyMessage = document.getElementById('copyMessage');
-                    finalPromptTextarea.select();
-                    try { 
-                        document.execCommand('copy'); 
-                        copyMessage.textContent = 'Prompt copiado com sucesso!'; 
-                        setTimeout(() => { copyMessage.textContent = ''; }, 3000);
-                    } catch (err) { 
-                        copyMessage.textContent = 'Falha ao copiar.'; 
-                    }
-                });
-            }
-
-            const restartButton = document.getElementById('restartButton');
-            if(restartButton) {
-                restartButton.addEventListener('click', () => {
-                    stepHistory = [0];
-                    selections = {};
-                    document.getElementById('resultSection').classList.add('hidden');
-                    document.getElementById('wizard').classList.remove('hidden');
-                    renderCurrentStep();
-                });
-            }
-        }
-
-        function navigate(direction) {
-            const currentStepIndex = stepHistory[stepHistory.length - 1];
-            const currentStepData = steps[currentStepIndex];
-
-            if (direction === -1) {
-                if (stepHistory.length > 1) { stepHistory.pop(); renderCurrentStep(); }
-                return;
-            }
-
-            // --- SAVE DATA FROM CURRENT STEP ---
-            if (currentStepData.type === 'input') {
-                selections.name = document.getElementById('characterName').value;
-                selections.age = document.getElementById('characterAge').value;
-            } else if (currentStepData.type === 'custom_input') {
-                const customValue = document.getElementById(currentStepData.custom_id).value;
-                if (customValue) {
-                    selections[currentStepData.id] = { custom: customValue };
-                }
-            } else if (currentStepData.type === 'color_details') {
-                const detailsValue = document.getElementById(`${currentStepData.for}Details`).value;
-                if (!selections[currentStepData.for]) selections[currentStepData.for] = {};
-                if (detailsValue) {
-                    selections[currentStepData.for].details = detailsValue;
-                    delete selections[currentStepData.for].color;
-                }
-            }
-            
-            // --- DETERMINE NEXT STEP ---
-            let nextStepIndex;
-            if (currentStepData.next_step) {
-                const itemSelection = selections[currentStepData.id]?.item || selections[currentStepData.id];
-                if (itemSelection && itemSelection !== 'is topless' && itemSelection !== 'is barefoot') {
-                    if(typeof selections[currentStepData.id] !== 'object') {
-                        selections[currentStepData.id] = { item: itemSelection };
-                    }
-                    nextStepIndex = getStepById(currentStepData.next_step);
-                } else {
-                    nextStepIndex = getNextMajorStepIndex(currentStepIndex);
-                }
-            } else if (currentStepData.id === 'clothingType') {
-                const choice = selections.clothingType;
-                if (choice === 'nude') nextStepIndex = getStepById('lighting');
-                else if (choice === 'lingerie') nextStepIndex = getStepById('panties');
-                else if (choice === 'clothed') nextStepIndex = getStepById('topWear');
-            } else {
-                 nextStepIndex = getNextMajorStepIndex(currentStepIndex);
-            }
-            
-            if (nextStepIndex < steps.length) {
-                stepHistory.push(nextStepIndex);
-                renderCurrentStep();
-            } else {
-                showResults();
-            }
-        }
-        
-        function getNextMajorStepIndex(currentStepIndex) {
-             const currentId = steps[currentStepIndex].id;
-             if (currentId === 'braColor' || currentId === 'braSize') return getStepById('lighting');
-             if (currentId === 'shoesColor' || currentId === 'shoesSize') return getStepById('lighting');
-             if (currentId.endsWith('Color') || currentId.endsWith('Size')) {
-                 if (currentId.startsWith('panties')) return getStepById('bra');
-                 if (currentId.startsWith('topWear')) return getStepById('bottomWear');
-                 if (currentId.startsWith('bottomWear')) return getStepById('shoes');
-             }
-             return currentStepIndex + 1;
-        }
-
-        function updateProgress() {
-            const progressPercentage = (stepHistory.length / 22) * 100; // 22 is an average path length now
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.style.width = `${Math.min(progressPercentage, 100)}%`;
-            const progressText = document.getElementById('progress-text');
-            const currentStepData = steps[stepHistory[stepHistory.length - 1]];
-            if (currentStepData) {
-                progressText.textContent = `${currentStepData.title}`;
-            }
-        }
-
-        async function showResults() {
-            const wizard = document.getElementById('wizard');
-            const resultSection = document.getElementById('resultSection');
-            const loading = document.getElementById('loading');
-            const promptResult = document.getElementById('promptResult');
-            const loadingText = document.getElementById('loading-text');
-            
-            wizard.classList.add('hidden');
-            resultSection.classList.remove('hidden');
-            loading.classList.remove('hidden');
-            promptResult.classList.add('hidden');
-            document.getElementById('progress-text').textContent = 'Concluído!';
-            document.getElementById('progress-bar').style.width = '100%';
-
-            loadingText.textContent = 'Traduzindo textos personalizados...';
-            const translatedSelections = await translateCustomInputs(selections);
-
-            loadingText.textContent = 'Construindo o prompt detalhado...';
-            const finalPrompt = buildFinalPrompt(translatedSelections);
-            const generationPrompt = `Your task is to transform a set of user-selected keywords into a single, masterfully crafted, ultra-detailed paragraph for a photorealistic AI image generator. The final prompt must be in English. Do not just combine the keywords; expand upon them dramatically. Add evocative, sensory details: the texture of fabric (e.g., "soft cotton," "worn leather"), the quality of light (e.g., "soft morning light filtering through a dusty window," "harsh neon glow reflecting on wet pavement"), subtle aspects of the character's expression (e.g., "a melancholic gaze," "a smirk playing on her lips"), and intricate background elements. The goal is to create a prompt that an AI can use to generate a breathtaking, emotionally resonant, and hyper-realistic image. The final output must be ONLY the prompt text itself, without any introductory phrases or explanations. Here are the user's keywords: "${finalPrompt}"`;
-
-            try {
-                const detailedPrompt = await callGeminiApi(generationPrompt);
-                document.getElementById('finalPrompt').value = detailedPrompt.replace(/\s+/g, ' ').trim();
-            } catch (error) {
-                console.error("Error calling Gemini API:", error);
-                document.getElementById('finalPrompt').value = finalPrompt;
-            } finally {
-                loading.classList.add('hidden');
-                promptResult.classList.remove('hidden');
-            }
-        }
-
-        function buildClothingString(key, currentSelections) {
-            const itemData = currentSelections[key];
-            if (!itemData) return '';
-            if (itemData.custom) return itemData.custom;
-            if (!itemData.item) return '';
-            
-            let parts = [];
-            if (itemData.size) parts.push(itemData.size);
-            if (itemData.details) {
-                parts.push(itemData.details);
-            } else if (itemData.color) {
-                const colorMap = {'#ffffff': 'white', '#fde047': 'yellow', '#f97316': 'orange', '#ef4444': 'red', '#ec4899': 'pink', '#d946ef': 'fuchsia', '#8b5cf6': 'violet', '#6366f1': 'indigo', '#3b82f6': 'blue', '#0ea5e9': 'sky blue', '#06b6d4': 'cyan', '#14b8a6': 'teal', '#22c55e': 'green', '#84cc16': 'lime', '#a16207': 'amber', '#78350f': 'brown', '#000000': 'black', '#737373': 'gray', '#a3a3a3': 'silver', '#e5e5e5': 'light gray', '#fca5a5': 'light red', '#fdba74': 'light orange', '#fde047': 'light yellow', '#d9f99d': 'light lime', '#a7f3d0': 'light green', '#99f6e4': 'light teal', '#a5f3fc': 'light cyan', '#bae6fd': 'light sky blue', '#bfdbfe': 'light blue', '#c7d2fe': 'light indigo', '#d8b4fe': 'light purple', '#f0abfc': 'light fuchsia'};
-                parts.push(colorMap[itemData.color] || itemData.color);
-            }
-            parts.push(itemData.item);
-            return parts.join(' ');
-        }
-
-        function buildFinalPrompt(currentSelections) {
-            const { name = 'a woman', age } = currentSelections;
-            const hair = [currentSelections.hairColor, currentSelections.hairStyle, currentSelections.hairLength].filter(Boolean).join(' ');
-            
-            let clothing = '';
-            if (currentSelections.clothingType === 'nude') {
-                clothing = 'She is completely nude.';
-            } else if (currentSelections.clothingType === 'lingerie') {
-                const braDesc = currentSelections.bra?.item === 'is topless' ? 'is topless' : `wears ${buildClothingString('bra', currentSelections) || 'a bra'}`;
-                const pantiesDesc = buildClothingString('panties', currentSelections) || 'panties';
-                if (currentSelections.bra?.item && currentSelections.panties?.item) {
-                     clothing = `She ${braDesc} and ${pantiesDesc}.`;
-                } else if (currentSelections.bra?.item) {
-                    clothing = `She ${braDesc}.`;
-                } else if (currentSelections.panties?.item) {
-                    clothing = `She wears ${pantiesDesc}.`;
-                }
-            } else if (currentSelections.clothingType === 'clothed') {
-                const topDesc = buildClothingString('topWear', currentSelections);
-                const bottomDesc = buildClothingString('bottomWear', currentSelections);
-                const shoesDesc = currentSelections.shoes?.item === 'is barefoot' ? 'is barefoot' : `wears ${buildClothingString('shoes', currentSelections) || 'shoes'}`;
-                
-                let parts = [];
-                if(topDesc) parts.push(topDesc);
-                if(bottomDesc) parts.push(bottomDesc);
-                if (parts.length > 0) {
-                    clothing = `She wears ${parts.join(', ')}. ${shoesDesc.startsWith('wears') ? 'She also ' + shoesDesc : 'She ' + shoesDesc}.`;
-                } else {
-                    clothing = `She ${shoesDesc}.`;
-                }
-            }
-
-            const pose = currentSelections.pose?.custom || currentSelections.pose?.item || '';
-            const location = currentSelections.location?.custom || currentSelections.location?.item || 'in a neutral environment';
-            const action = currentSelections.action?.custom || currentSelections.action?.item || '';
-            const lighting = currentSelections.lighting || 'neutral lighting';
-
-            const ageString = age ? `${age}-year-old` : (currentSelections.ageGroup || 'an adult woman');
-
-            const fragments = [
-                `${currentSelections.composition || ''} ${currentSelections.style || ''}.`,
-                `The subject is ${name}, a ${ageString} ${currentSelections.ethnicity || ''} woman with ${currentSelections.subjectStyle || ''}, ${currentSelections.skinTone || ''} and ${currentSelections.bodyType || ''}.`,
-                `She has ${currentSelections.eyeColor || ''}, ${hair.trim()}, and ${currentSelections.breastSize || ''}.`,
-                `Her expression is ${currentSelections.expression || ''} as she is ${pose}.`,
-                action ? `She is in the middle of ${action}.` : '',
-                `She has ${currentSelections.makeup || ''} ${currentSelections.accessories ? 'and ' + selections.accessories : ''}.`,
-                clothing,
-                `The scene is set ${location} and is lit by ${lighting}.`
-            ];
-
-            return fragments.filter(f => f && f.trim() && f.trim() !== '.').join(' ');
-        }
-        
-        async function translateCustomInputs(currentSelections) {
-            const textsToTranslate = {};
-            const keysToTranslate = [];
-
-            for (const key in currentSelections) {
-                if (currentSelections[key] && typeof currentSelections[key] === 'object' && currentSelections[key].custom) {
-                    textsToTranslate[key] = currentSelections[key].custom;
-                    keysToTranslate.push(key);
-                }
-            }
-
-            if (keysToTranslate.length === 0) {
-                return currentSelections;
-            }
-
-            const translationPrompt = `Translate the string values in the following JSON object to English. Respond ONLY with the translated JSON object, maintaining the same structure and keys. Do not add any other text or explanations. JSON to translate: ${JSON.stringify(textsToTranslate)}`;
-
-            try {
-                const translatedJsonString = await callGeminiApi(translationPrompt);
-                const cleanedJsonString = translatedJsonString.replace(/```json|```/g, '').trim();
-                const translatedTexts = JSON.parse(cleanedJsonString);
-
-                const newSelections = JSON.parse(JSON.stringify(currentSelections));
-
-                for (const key of keysToTranslate) {
-                    if (translatedTexts[key]) {
-                        newSelections[key].custom = translatedTexts[key];
-                    }
-                }
-                return newSelections;
-            } catch (error) {
-                console.error("Translation API call failed:", error);
-                return currentSelections;
-            }
-        }
-
-
-        async function callGeminiApi(prompt) {
-            const apiKey = ""; // Leave empty
+        // --- Translation Function ---
+        async function translateFullPrompt(promptInPortuguese, retries = 3, delay = 1000) {
+            const systemPrompt = `Your task is to translate a text fragment used for image generation. This text is a mix of English and Portuguese. You MUST translate ALL Portuguese words and phrases into natural, descriptive English. Combine all information into a single, cohesive English paragraph. DO NOT leave any Portuguese words in the output. Respond ONLY with the final, fully translated English paragraph. Here is the text: "${promptInPortuguese}"`;
+            const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
+            const apiKey = ""; // Canvas provides this
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7, topK: 1, topP: 1, maxOutputTokens: 800 }
-            };
-            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
-            const result = await response.json();
-            if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
-                return result.candidates[0].content.parts[0].text;
-            } else {
-                 if (result.promptFeedback?.blockReason) {
-                     return `Não foi possível gerar o prompt. Motivo: ${result.promptFeedback.blockReason}. Tente fazer seleções diferentes.`;
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    const result = await response.json();
+                    const translatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (translatedText) return translatedText.trim();
+                    throw new Error("Malformed API response");
+                } catch (error) {
+                    console.error(`Translation attempt ${i + 1} failed:`, error);
+                    if (i < retries - 1) {
+                        await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                    } else {
+                        return `// Translation failed. Original prompt: ${promptInPortuguese}`; // Fallback
+                    }
                 }
-                throw new Error("Invalid response structure from API.");
+            }
+        }
+
+        // --- Navigation ---
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            const nextStep = document.getElementById(`step-${stepNumber}`);
+            if (nextStep) {
+                nextStep.classList.add('active');
+                currentStep = stepNumber;
+                updateProgressBar();
+            }
+        }
+
+        function goToStep(stepNumber) {
+            if (stepNumber === 7) {
+                const selectedLengthText = promptData.hairLength?.text || '';
+                let lengthKey = 'all';
+                if (selectedLengthText.includes('long')) lengthKey = 'long';
+                else if (selectedLengthText.includes('medium')) lengthKey = 'medium';
+                else if (selectedLengthText.includes('short')) lengthKey = 'short';
+                else if (selectedLengthText.includes('shaved')) lengthKey = 'shaved';
+                
+                document.querySelectorAll('#step-7 .option-card').forEach(card => {
+                    const compatibleLengths = card.dataset.lengths;
+                    card.style.display = (!compatibleLengths || compatibleLengths.includes(lengthKey)) ? 'block' : 'none';
+                });
+            }
+            showStep(stepNumber);
+        }
+        
+        function updateProgressBar() {
+            const progress = (currentStep / totalSteps) * 100;
+            progressBar.style.width = `${Math.min(progress, 100)}%`;
+        }
+
+        // --- Option Selection ---
+        function handleSelection(element, key, value, textToStore) {
+            const parentStep = element.closest('.step');
+            parentStep.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+
+            if (value !== 'Nenhum') {
+                promptData[key] = { text: textToStore };
+            } else {
+                delete promptData[key];
+            }
+
+            setTimeout(() => {
+                if (key === 'clothing') handleClothingChoice();
+                else if (key === 'braType' && textToStore === 'topless') goToStep(24);
+                else if (key === 'finalStyle') generateAndTranslatePrompt();
+                else goToStep(currentStep + 1);
+            }, 250);
+        }
+
+        function handleMultiSelection(element, key, textToStore) {
+            element.classList.toggle('selected');
+            const index = promptData[key].findIndex(item => item.text === textToStore);
+            if (index > -1) {
+                promptData[key].splice(index, 1);
+            } else {
+                promptData[key].push({ text: textToStore });
             }
         }
         
-        // --- INITIALIZATION ---
-        renderCurrentStep();
-        addEventListeners();
+        function getAgeDescription(age) {
+            if (age >= 8 && age <= 12) return 'a young girl';
+            if (age >= 13 && age <= 17) return 'a teenage girl';
+            if (age >= 18 && age <= 22) return 'a girl';
+            if (age >= 23 && age <= 30) return 'a young woman';
+            if (age >= 31 && age <= 45) return 'a woman';
+            if (age >= 46) return 'a mature woman';
+            return `${age} years old`;
+        }
 
+        function handleNameAndAge() {
+            const name = document.getElementById('characterName').value;
+            const age = document.getElementById('characterAge').value;
+            if (name) promptData.name = { text: name };
+            
+            if (age) {
+                promptData.age = { text: getAgeDescription(parseInt(age, 10)) };
+                promptData.ageIsNumeric = true;
+                goToStep(3);
+            } else {
+                delete promptData.age;
+                promptData.ageIsNumeric = false;
+                goToStep(2);
+            }
+        }
+        
+        function handleManualInput(button, inputId, dataKey, nextStep) {
+            const manualInput = document.getElementById(inputId).value;
+            if (manualInput) {
+                promptData[dataKey] = { text: manualInput };
+            }
+            goToStep(nextStep);
+        }
+
+        function handleClothingChoice() {
+            const choice = promptData.clothing?.text;
+            if (choice === 'nude' || choice === 'clothed') {
+                goToStep(24);
+            } else {
+                goToStep(18);
+            }
+        }
+        
+        function handleLightingPrevious() {
+            const choice = promptData.clothing?.text;
+            if (choice === 'nude' || choice === 'clothed') {
+                goToStep(17);
+            } else {
+                goToStep(23);
+            }
+        }
+
+        function handleBra(button) {
+            const manualBra = document.getElementById('braManual').value;
+            if (manualBra) {
+                promptData.braType = { text: manualBra };
+            }
+            if (promptData.braType?.text === 'topless') {
+                goToStep(24);
+            } else {
+                goToStep(22);
+            }
+        }
+
+        // --- Prompt Generation & Translation ---
+        function buildInitialPrompt() {
+            const segments = [];
+            if (promptData.sceneComposition) segments.push(promptData.sceneComposition.text);
+            if (promptData.finalStyle) segments.push(promptData.finalStyle.text);
+            
+            let characterDesc = `A portrait of`;
+            const characterParts = [
+                promptData.name?.text, promptData.age?.text, promptData.ethnicity?.text,
+                promptData.characterStyle ? `with a ${promptData.characterStyle.text}` : null
+            ].filter(Boolean);
+            if (characterParts.length > 0) characterDesc += ` ${characterParts.join(', ')}`;
+            segments.push(`${characterDesc}.`);
+
+            const physicalFeatures = [
+                promptData.bodyType ? `a ${promptData.bodyType.text}` : null, promptData.skinColor?.text,
+                promptData.breasts?.text, promptData.hairLength?.text, promptData.hairStyle?.text,
+                promptData.hairColor?.text, promptData.eyeColor?.text
+            ].filter(Boolean);
+            if (physicalFeatures.length > 0) segments.push(`She has ${physicalFeatures.join(', ')}.`);
+
+            if (promptData.clothing) {
+                if (promptData.clothing.text === 'nude') {
+                    segments.push('She is completely nude.');
+                } else if (promptData.clothing.text === 'underwear') {
+                    const underwearParts = [];
+                    if (promptData.braType?.text === 'topless') {
+                        underwearParts.push('topless');
+                    } else if (promptData.braType) {
+                        const braDetails = [promptData.braColor?.text, promptData.braDetails?.text, promptData.braType.text, promptData.braSize?.text].filter(Boolean).join(' ');
+                        underwearParts.push(`wearing a ${braDetails}`);
+                    }
+                    if (promptData.pantiesType) {
+                        const pantiesDetails = [promptData.pantiesColor?.text, promptData.pantiesDetails?.text, promptData.pantiesType.text, promptData.pantiesSize?.text].filter(Boolean).join(' ');
+                        underwearParts.push(underwearParts.length > 0 ? `and a pair of ${pantiesDetails}` : `wearing a pair of ${pantiesDetails}`);
+                    }
+                    if (underwearParts.length > 0) segments.push(`She is ${underwearParts.join(' ')}.`);
+                } else if (promptData.clothing.text === 'clothed') {
+                    segments.push('She is fully clothed.');
+                }
+            }
+            
+            const extraDetails = [];
+            if (promptData.accessories?.length > 0) extraDetails.push(`accessorized with ${promptData.accessories.map(a => a.text).join(', ')}`);
+            if (promptData.makeup) extraDetails.push(`wearing ${promptData.makeup.text}`);
+            if (extraDetails.length > 0) segments.push(`She is ${extraDetails.join(' and ')}.`);
+
+            const poseAndExpression = [
+                promptData.bodyPose ? `in a ${promptData.bodyPose.text}` : null,
+                promptData.facialExpression ? `with a ${promptData.facialExpression.text}` : null
+            ].filter(Boolean);
+            if (poseAndExpression.length > 0) segments.push(`Posed ${poseAndExpression.join(' ')}.`);
+
+            const environment = [
+                promptData.background ? `${promptData.background.text}` : null,
+                promptData.action ? `while ${promptData.action.text}` : null
+            ].filter(Boolean);
+            if (environment.length > 0) segments.push(`The scene is ${environment.join(' ')}.`);
+            if (promptData.lighting) segments.push(`${promptData.lighting.text}.`);
+
+            return segments.join(' ').replace(/\s+/g, ' ').replace(/ \./g, '.').replace(/ ,/g, ',').trim();
+        }
+
+        async function generateAndTranslatePrompt() {
+            handleManualInput(null, 'actionManual', 'action', 'final');
+            
+            showStep('final');
+            const promptTextarea = document.getElementById('finalPrompt');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const copyButton = document.getElementById('copyButton');
+            const restartButton = document.getElementById('restartButton');
+
+            const initialPrompt = buildInitialPrompt();
+            promptTextarea.value = initialPrompt;
+
+            loadingOverlay.classList.remove('hidden');
+            copyButton.disabled = true;
+            restartButton.disabled = true;
+
+            const translatedPrompt = await translateFullPrompt(initialPrompt);
+
+            promptTextarea.value = translatedPrompt;
+            loadingOverlay.classList.add('hidden');
+            copyButton.disabled = false;
+            restartButton.disabled = false;
+        }
+
+        // --- Final Actions ---
+        function copyPrompt() {
+            const promptText = document.getElementById('finalPrompt');
+            const copyButtonText = document.getElementById('copyButtonText');
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(promptText.value).then(() => {
+                    copyButtonText.textContent = 'Copiado!';
+                    setTimeout(() => { copyButtonText.textContent = 'Copiar Prompt'; }, 2000);
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(promptText, copyButtonText);
+                });
+            } else {
+                fallbackCopyTextToClipboard(promptText, copyButtonText);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(textArea, buttonTextElement) {
+            textArea.select();
+            textArea.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                buttonTextElement.textContent = 'Copiado!';
+                setTimeout(() => { buttonTextElement.textContent = 'Copiar Prompt'; }, 2000);
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                buttonTextElement.textContent = 'Falhou!';
+                 setTimeout(() => { buttonTextElement.textContent = 'Copiar Prompt'; }, 2000);
+            }
+        }
+        
+        function restart() {
+            promptData = { accessories: [] };
+            document.querySelectorAll('textarea, input[type="text"], input[type="number"]').forEach(el => el.value = '');
+            document.querySelectorAll('.option-card.selected').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.color-swatch.selected').forEach(s => s.classList.remove('selected'));
+            showStep(1);
+        }
+        
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const pantiesColorGrid = document.getElementById('pantiesColorGrid');
+            const braColorGrid = document.getElementById('braColorGrid');
+            
+            colors.forEach(color => {
+                const swatchPanties = document.createElement('div');
+                swatchPanties.className = 'color-swatch';
+                swatchPanties.style.backgroundColor = color.hex;
+                swatchPanties.title = color.name;
+                swatchPanties.onclick = () => {
+                    promptData.pantiesColor = { text: color.en };
+                    document.querySelectorAll('#pantiesColorGrid .color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatchPanties.classList.add('selected');
+                    handleManualInput(null, 'pantiesDetails', 'pantiesDetails', 21);
+                };
+                pantiesColorGrid.appendChild(swatchPanties);
+
+                const swatchBra = document.createElement('div');
+                swatchBra.className = 'color-swatch';
+                swatchBra.style.backgroundColor = color.hex;
+                swatchBra.title = color.name;
+                swatchBra.onclick = () => {
+                    promptData.braColor = { text: color.en };
+                    document.querySelectorAll('#braColorGrid .color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatchBra.classList.add('selected');
+                    handleManualInput(null, 'braDetails', 'braDetails', 24);
+                };
+                braColorGrid.appendChild(swatchBra);
+            });
+        });
     </script>
+
 </body>
 </html>
