@@ -434,8 +434,7 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Fio Dental', 'thong')"><h3 class="font-bold">Fio Dental</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Fio Duplo', 'g-string')"><h3 class="font-bold">Fio Duplo</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Tanga', 'tanga panties')"><h3 class="font-bold">Tanga</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'String', 'string panties')"><h3 class="font-bold">String</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Strappy', 'strappy panties')"><h3 class="font-bold">Strappy</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'String', 'string panties')"><h3 class="font-bold">Strappy</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Modeladora', 'shaping panties')"><h3 class="font-bold">Modeladora</h3></div>
                 </div>
                  <textarea id="pantiesManual" placeholder="Ou escreva os detalhes aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
@@ -669,6 +668,7 @@
             const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
             const apiKey = "AIzaSyCSmhUh1sgXvXRmILgrR-RtaH7zwiRwb9o";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            let lastError = null;
 
             for (let i = 0; i < retries; i++) {
                 try {
@@ -677,20 +677,28 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+                    if (!response.ok) {
+                        let errorBody = await response.text();
+                        try {
+                           errorBody = JSON.parse(errorBody).error.message;
+                        } catch(e) { /* Ignore if not JSON */ }
+                        throw new Error(`API Error: ${response.status} - ${errorBody}`);
+                    }
+
                     const result = await response.json();
                     const translatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (translatedText) return translatedText.trim();
                     throw new Error("Malformed API response");
                 } catch (error) {
                     console.error(`Translation attempt ${i + 1} failed:`, error);
+                    lastError = error;
                     if (i < retries - 1) {
                         await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
-                    } else {
-                        return `// Translation failed. Original prompt: ${promptInPortuguese}`; // Fallback
                     }
                 }
             }
+            return `// Translation failed: ${lastError.message}. Please check your API key, billing status, and browser console for CORS errors. Original prompt: ${promptInPortuguese}`;
         }
 
         // --- Navigation ---
