@@ -83,22 +83,104 @@
 
         <main id="prompt-builder" class="bg-gray-900 p-6 md:p-8 rounded-2xl shadow-2xl">
 
-            <!-- Step 1: Nome da Personagem -->
+            <!-- Step 1: Categoria Principal -->
             <div id="step-1" class="step active">
+                <h2 class="text-2xl font-semibold mb-6">Qual é a base da sua imagem?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="option-card p-6 rounded-lg cursor-pointer" onclick="handleMainCategory('photorealistic')">
+                        <h3 class="font-bold text-xl">Fotorealista</h3>
+                        <p class="text-sm text-gray-400 mt-1">Crie imagens que parecem fotografias reais, com foco em lentes, iluminação e detalhes do mundo real.</p>
+                    </div>
+                    <div class="option-card p-6 rounded-lg cursor-pointer" onclick="handleMainCategory('illustration')">
+                        <h3 class="font-bold text-xl">Ilustração</h3>
+                        <p class="text-sm text-gray-400 mt-1">Crie arte com estilos visuais distintos, como mangá, comics, aquarela, e outros traços artísticos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Estilo Fotorealista -->
+            <div id="step-2" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Estilo Fotorealista</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(1)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(4)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Retrato em Estúdio', 'Studio Portrait, neutral background, controlled lighting, 85mm telephoto lens, sharp focus on the subject.')"><h3 class="font-bold text-lg">Retrato em Estúdio</h3><p class="text-sm text-gray-400 mt-1">Fundo neutro, iluminação controlada, foco total no rosto ou corpo.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Retrato Ambiental', 'Environmental Portrait, subject in their environment, background in focus, 35mm lens, natural diffused light.')"><h3 class="font-bold text-lg">Retrato Ambiental</h3><p class="text-sm text-gray-400 mt-1">Retrato com fundo em foco mostrando o ambiente.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Cinematográfico', 'Cinematic style, dramatic colors and lighting, shallow depth of field, 50mm lens, inspired by film.')"><h3 class="font-bold text-lg">Cinematográfico</h3><p class="text-sm text-gray-400 mt-1">Composição inspirada em filmes, cores e iluminação dramáticas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Golden Hour', 'Golden Hour photography, warm golden light, long shadows, lens flare, shot at sunrise/sunset.')"><h3 class="font-bold text-lg">Golden Hour</h3><p class="text-sm text-gray-400 mt-1">Foto ao nascer/pôr do sol com luz dourada suave.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Noir / Preto e Branco', 'Black and white noir style, high contrast, deep shadows, dramatic hard side light.')"><h3 class="font-bold text-lg">Noir / Preto e Branco</h3><p class="text-sm text-gray-400 mt-1">Alto contraste, sombras profundas, clima dramático.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Fotografia de Rua', 'Spontaneous street photography, documentary vibe, urban scene, 35mm lens, natural city light.')"><h3 class="font-bold text-lg">Fotografia de Rua</h3><p class="text-sm text-gray-400 mt-1">Cena espontânea urbana com vibe documental.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Documental / Jornalístico', 'Raw documentary style, unretouched, realistic, 35mm lens, pure natural light.')"><h3 class="font-bold text-lg">Documental / Jornalístico</h3><p class="text-sm text-gray-400 mt-1">Estilo cru, sem retoque, realista.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Foto de Moda', 'Stylized fashion photography, clothing is prominent, 85mm lens, soft frontal light or dramatic backlight.')"><h3 class="font-bold text-lg">Foto de Moda</h3><p class="text-sm text-gray-400 mt-1">Composição estilizada, roupas em destaque.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Lifestyle / Cotidiano', 'Natural and spontaneous lifestyle photo, everyday scene, 35mm lens, soft window light.')"><h3 class="font-bold text-lg">Lifestyle / Cotidiano</h3><p class="text-sm text-gray-400 mt-1">Cenas naturais e espontâneas do dia a dia.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Produto / Still Life', 'Clean product still life photography, controlled scene, 100mm macro lens, diffused softbox lighting.')"><h3 class="font-bold text-lg">Produto / Still Life</h3><p class="text-sm text-gray-400 mt-1">Produtos com fundo limpo ou cenário controlado.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Macro Fotografia', 'Extreme close-up macro photography, focusing on tiny details, 100mm macro lens, directional LED light.')"><h3 class="font-bold text-lg">Macro Fotografia</h3><p class="text-sm text-gray-400 mt-1">Close extremo de pequenos detalhes.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Arquitetura', 'Architectural photography, clean lines, wide perspective, 14mm ultra-wide lens, soft natural light.')"><h3 class="font-bold text-lg">Arquitetura</h3><p class="text-sm text-gray-400 mt-1">Fachadas, interiores e linhas limpas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Paisagem Natural', 'Natural landscape photography, wide vista, 14mm lens, golden hour or diffused overcast light.')"><h3 class="font-bold text-lg">Paisagem Natural</h3><p class="text-sm text-gray-400 mt-1">Montanhas, praias, florestas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Vintage / Analógico', 'Vintage analog film look, film grain, classic 50mm lens, soft natural light or harsh midday shadow.')"><h3 class="font-bold text-lg">Vintage / Analógico</h3><p class="text-sm text-gray-400 mt-1">Simula filme fotográfico antigo.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Neon / Noturno Urbano', 'Urban night scene with vibrant neon lights and wet reflections, 35mm lens.')"><h3 class="font-bold text-lg">Neon / Noturno Urbano</h3><p class="text-sm text-gray-400 mt-1">Cenas urbanas à noite com neon e reflexos.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Silhueta / Contra-luz', 'Silhouette against a bright background, subject is dark, shot against the sunset.')"><h3 class="font-bold text-lg">Silhueta / Contra-luz</h3><p class="text-sm text-gray-400 mt-1">Sujeito escuro com fundo claro.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Bokeh Estilizado', 'Stylized bokeh background with round light points, 85mm lens with a wide aperture, fairy lights in the background.')"><h3 class="font-bold text-lg">Bokeh Estilizado</h3><p class="text-sm text-gray-400 mt-1">Fundo desfocado com pontos de luz arredondados.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Drone / Vista Aérea', 'Aerial drone shot, top-down perspective showing patterns and geometry, wide-angle lens.')"><h3 class="font-bold text-lg">Drone / Vista Aérea</h3><p class="text-sm text-gray-400 mt-1">Perspectiva de cima, padrão e geometria.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Underwater / Subaquática', 'Underwater photography, bluish light, light rays filtering through water, wide-angle lens.')"><h3 class="font-bold text-lg">Underwater / Subaquática</h3><p class="text-sm text-gray-400 mt-1">Fotos debaixo d’água com luz azulada.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Editorial Cinematic Dramático', 'Dramatic cinematic editorial, dark background, intense expression, 85mm lens, hard side light (low key).')"><h3 class="font-bold text-lg">Editorial Cinematic Dramático</h3><p class="text-sm text-gray-400 mt-1">Fundo escuro, expressões intensas, alta emoção.</p></div>
+                </div>
+            </div>
+
+            <!-- Step 3: Estilo de Ilustração -->
+            <div id="step-3" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Estilo de Ilustração</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(1)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(4)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Comic Book Americano Clássico', 'Classic American comic book style, inspired by Marvel/DC, thick black outlines, hatched shading, vibrant saturated colors.')"><h3 class="font-bold text-lg">Comic Book Americano Clássico</h3><p class="text-sm text-gray-400 mt-1">Linhas fortes, cores vibrantes, inspirado em HQs de super-heróis.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Comic Noir / Pulp', 'Pulp noir comic style, high contrast, heavy shadows, solid blacks, on yellowed newsprint paper.')"><h3 class="font-bold text-lg">Comic Noir / Pulp</h3><p class="text-sm text-gray-400 mt-1">Estilo sombrio, inspirado em HQs noir dos anos 40-50.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Manga Shonen', 'Dynamic Shonen manga style, thin lines, speed lines for action, exaggerated expressions, black and white.')"><h3 class="font-bold text-lg">Manga Shonen</h3><p class="text-sm text-gray-400 mt-1">Estilo japonês dinâmico com foco em ação.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Manga Shojo', 'Delicate Shojo manga style, large expressive eyes, soft sparkles, thin lines, ornamental details, pastel colors.')"><h3 class="font-bold text-lg">Manga Shojo</h3><p class="text-sm text-gray-400 mt-1">Delicado e romântico, olhos grandes e brilhos suaves.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Estilo Ghibli', 'Ghibli-inspired style, soft painting, cozy natural scenes, thin outlines, digital watercolor brush, textured paper.')"><h3 class="font-bold text-lg">Estilo Ghibli</h3><p class="text-sm text-gray-400 mt-1">Pintura suave, cenas aconchegantes e naturais.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Anime Cyberpunk', 'Cyberpunk anime style, inspired by Akira, precise lines, mechanical details, neon colors (pink, blue, purple).')"><h3 class="font-bold text-lg">Anime Cyberpunk</h3><p class="text-sm text-gray-400 mt-1">Estilo futurista japonês, inspirado em Akira e Ghost in the Shell.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Arte Conceitual Fantasia Épica', 'Epic fantasy concept art, magical worlds, semi-realistic broad brushstrokes, rich saturated colors.')"><h3 class="font-bold text-lg">Arte Conceitual Fantasia Épica</h3><p class="text-sm text-gray-400 mt-1">Ambientes e criaturas de mundos mágicos.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Arte Conceitual Sci-Fi', 'Sci-fi concept art, futuristic cities, precise digital brush, metallic textures, cool color palette with neon accents.')"><h3 class="font-bold text-lg">Arte Conceitual Sci-Fi</h3><p class="text-sm text-gray-400 mt-1">Cidades futuristas, naves e tecnologia.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Arte Steampunk', 'Steampunk art, retro-futurism with gears and steam, medium lines, metallic and rusty textures, on aged paper.')"><h3 class="font-bold text-lg">Arte Steampunk</h3><p class="text-sm text-gray-400 mt-1">Retro-futurismo com engrenagens e vapor.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Pixel Art', 'Retro pixel art style, visible square pixels, low resolution, limited vibrant color palette.')"><h3 class="font-bold text-lg">Pixel Art</h3><p class="text-sm text-gray-400 mt-1">Estilo retrô com pixels visíveis.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Low Poly', 'Simplified low poly 3D look, geometric shapes, no outlines, just colored polygons.')"><h3 class="font-bold text-lg">Low Poly</h3><p class="text-sm text-gray-400 mt-1">Visual 3D simplificado com formas geométricas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Pintura a Óleo Clássica', 'Classic oil painting style, visible brushstrokes, color blending, on linen canvas.')"><h3 class="font-bold text-lg">Pintura a Óleo Clássica</h3><p class="text-sm text-gray-400 mt-1">Estilo tradicional de museu.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Aquarela Tradicional', 'Traditional watercolor painting, soft washes, diffused edges, on rough watercolor paper.')"><h3 class="font-bold text-lg">Aquarela Tradicional</h3><p class="text-sm text-gray-400 mt-1">Lavagens suaves, bordas difusas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Sketch a Lápis', 'Detailed graphite pencil sketch, fine lines, cross-hatching shading, on sketch paper.')"><h3 class="font-bold text-lg">Sketch a Lápis</h3><p class="text-sm text-gray-400 mt-1">Desenho rápido e detalhado a grafite.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Arte Vetorial Flat', 'Flat vector art, simple shapes, solid colors, minimal or no lines.')"><h3 class="font-bold text-lg">Arte Vetorial Flat</h3><p class="text-sm text-gray-400 mt-1">Formas simples e cores chapadas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Pop Art', 'Pop art style, inspired by Warhol, halftone dots, thick black outlines, highly saturated primary colors.')"><h3 class="font-bold text-lg">Pop Art</h3><p class="text-sm text-gray-400 mt-1">Inspirado em Andy Warhol e Roy Lichtenstein.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Arte Infantil / Ilustração Fofa', 'Cute children\'s book illustration, simple lines, rounded shapes, bright and friendly colors.')"><h3 class="font-bold text-lg">Arte Infantil / Ilustração Fofa</h3><p class="text-sm text-gray-400 mt-1">Traços simples, formas arredondadas.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Chibi', 'Chibi style, miniaturized characters with large heads and exaggerated expressions, vibrant colors.')"><h3 class="font-bold text-lg">Chibi</h3><p class="text-sm text-gray-400 mt-1">Personagens miniaturizados com cabeça grande.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Cartoon Ocidental', 'Western cartoon style, like Looney Tunes, black outlines, simple shapes, saturated flat colors.')"><h3 class="font-bold text-lg">Cartoon Ocidental</h3><p class="text-sm text-gray-400 mt-1">Estilo de animações como Looney Tunes ou Simpsons.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'imageStyle', 'Arte Minimalista Monocromática', 'Monochromatic minimalist art, simple shapes, focus on composition, use of negative space.')"><h3 class="font-bold text-lg">Arte Minimalista Monocromática</h3><p class="text-sm text-gray-400 mt-1">Formas simples e foco na composição.</p></div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Nome da Personagem -->
+            <div id="step-4" class="step">
                 <h2 class="text-2xl font-semibold mb-2">Nome e Idade da Personagem</h2>
                 <p class="text-gray-400 mb-6">Comece dando um nome e uma idade para sua personagem. A idade é opcional.</p>
+                <div class="mb-8 flex justify-between w-full">
+                     <button onclick="goToStep(promptData.mainCategory === 'photorealistic' ? 2 : 3)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleNameAndAge()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="space-y-4">
                     <input type="text" id="characterName" placeholder="Digite o nome da personagem" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
                     <input type="number" id="characterAge" placeholder="Digite a idade (opcional)" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
                 </div>
-                 <div class="mt-8 flex justify-end w-full">
-                    <button onclick="handleNameAndAge()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 2: Faixa Etária -->
-            <div id="step-2" class="step">
+            <!-- Step 5: Faixa Etária -->
+            <div id="step-5" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Faixa Etária</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(4)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(6)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'age', 'Garota (18-22 anos)', 'a girl, approximately 18-22 years old')">
                         <h3 class="font-bold text-lg">Garota</h3><p class="text-sm text-gray-400">Aprox. 18-22 anos.</p>
@@ -113,15 +195,15 @@
                         <h3 class="font-bold text-lg">Mulher Madura</h3><p class="text-sm text-gray-400">Aprox. 46+ anos.</p>
                     </div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(1)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(3)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 3: Nacionalidades e Ascendências -->
-            <div id="step-3" class="step">
+            <!-- Step 6: Nacionalidades e Ascendências -->
+            <div id="step-6" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Nacionalidades e Ascendências</h2>
+                 <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(promptData.ageIsNumeric ? 4 : 5)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(7)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="space-y-6">
                     <!-- Américas -->
                     <div>
@@ -218,15 +300,15 @@
                     </div>
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'ethnicity', 'Nenhum', '')"><h3 class="font-bold text-sm">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(promptData.ageIsNumeric ? 1 : 2)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(4)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 4: Biotipo Físico -->
-            <div id="step-4" class="step">
+            <!-- Step 7: Biotipo Físico -->
+            <div id="step-7" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Biotipo Físico</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(6)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(8)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="space-y-6">
                     <!-- Peso e Estrutura -->
                     <div>
@@ -264,15 +346,15 @@
                     </div>
                      <div class="option-card p-3 rounded-lg cursor-pointer mt-4" onclick="handleSelection(this, 'bodyType', 'Nenhum', '')"><h3 class="font-bold text-sm">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(3)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(5)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
             
-            <!-- Step 5: Cor da Pele -->
-            <div id="step-5" class="step">
+            <!-- Step 8: Cor da Pele -->
+            <div id="step-8" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Cor da Pele</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(7)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(9)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele Clara', 'light, rosy skin tone')"><h3 class="font-bold">Pele Clara</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele Pálida', 'pale, very light skin')"><h3 class="font-bold">Pele Pálida</h3></div>
@@ -282,15 +364,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Pele com Sardas', 'skin with freckles')"><h3 class="font-bold">Pele com Sardas</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'skinColor', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(4)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(6)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 6: Comprimento do Cabelo -->
-            <div id="step-6" class="step">
+            <!-- Step 9: Comprimento do Cabelo -->
+            <div id="step-9" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Comprimento do Cabelo</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(8)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(10)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Longo', 'long hair')"><h3 class="font-bold">Longo</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Médio', 'medium hair')"><h3 class="font-bold">Médio</h3></div>
@@ -298,15 +380,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Raspado', 'shaved hair')"><h3 class="font-bold">Raspado</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairLength', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(5)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(7)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 7: Corte de Cabelo e Penteado -->
-            <div id="step-7" class="step">
+            <!-- Step 10: Corte de Cabelo e Penteado -->
+            <div id="step-10" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Corte de Cabelo e Penteado</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(9)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(11)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <!-- Cabelo LONGO -->
                     <div class="option-card p-4 rounded-lg cursor-pointer" data-lengths="long" onclick="handleSelection(this, 'hairStyle', 'Corte em Camadas Longas', 'long layers')"><h3 class="font-bold">Corte em Camadas</h3><p class="text-sm text-gray-400 mt-1">Cria movimento e volume em cabelos longos.</p></div>
@@ -344,15 +426,15 @@
                     <!-- Nenhum -->
                     <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-3" data-lengths="long,medium,short,shaved" onclick="handleSelection(this, 'hairStyle', 'Nenhum', '')"><h3 class="font-bold">Nenhum / Não especificar</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(6)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(8)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 8: Cor do Cabelo -->
-            <div id="step-8" class="step">
+            <!-- Step 11: Cor do Cabelo -->
+            <div id="step-11" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Cor do Cabelo</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(10)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(12)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-3 md:grid-cols-4 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Preto', 'black hair')"><h3 class="font-bold">Preto</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Loiro', 'blonde hair')"><h3 class="font-bold">Loiro</h3></div>
@@ -364,15 +446,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Verde', 'green hair')"><h3 class="font-bold">Verde</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'hairColor', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(7)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(9)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 9: Cor dos Olhos -->
-            <div id="step-9" class="step">
+            <!-- Step 12: Cor dos Olhos -->
+            <div id="step-12" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Cor dos Olhos</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(11)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(13)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Azuis Claros', 'light blue eyes')"><h3 class="font-bold">Azuis Claros</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Azuis Escuros', 'dark blue eyes')"><h3 class="font-bold">Azuis Escuros</h3></div>
@@ -387,15 +469,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Heterocromia', 'heterochromia eyes')"><h3 class="font-bold">Heterocromia</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'eyeColor', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                 <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(8)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(10)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 10: Tamanho dos Seios -->
-            <div id="step-10" class="step">
+            <!-- Step 13: Tamanho dos Seios -->
+            <div id="step-13" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tamanho dos Seios</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(12)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(14)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Reto (Flat)', 'flat chest')"><h3 class="font-bold">Reto (Flat)</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Pequenos', 'small breasts')"><h3 class="font-bold">Pequenos</h3></div>
@@ -404,16 +486,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Volumosos', 'voluminous breasts')"><h3 class="font-bold">Volumosos</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'breasts', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(9)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(11)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 11: Composição da Cena -->
-            <div id="step-11" class="step">
+            <!-- Step 14: Composição da Cena -->
+            <div id="step-14" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Composição da Cena</h2>
-
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(13)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(15)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Orientação da Personagem</h3>
                     <div class="grid grid-cols-3 gap-4">
@@ -422,7 +503,6 @@
                         <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleViewSelection(this, 'characterView', 'Costas', 'from behind')"><h3 class="font-bold">De Costas</h3></div>
                     </div>
                 </div>
-
                 <div>
                     <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Enquadramento e Composição (Múltipla Escolha)</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -450,15 +530,15 @@
                         <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'sceneComposition', 'shot from a low angle, looking up')"><h3 class="font-bold text-sm">Visão Inferior</h3></div>
                     </div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(10)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(12)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 12: Estilo da Personagem -->
-            <div id="step-12" class="step">
+            <!-- Step 15: Estilo da Personagem -->
+            <div id="step-15" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Estilo da Personagem</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(14)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(16)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Fantasia: Elfa', 'fantasy elf style')"><h3 class="font-bold">Fantasia: Elfa</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Fantasia: Guerreira', 'fantasy warrior style')"><h3 class="font-bold">Fantasia: Guerreira</h3></div>
@@ -474,15 +554,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'characterStyle', 'Pós-apocalíptico', 'post-apocalyptic style')"><h3 class="font-bold">Pós-apocalíptico</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer col-span-2 md:col-span-1" onclick="handleSelection(this, 'characterStyle', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(11)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(13)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 13: Maquiagem -->
-            <div id="step-13" class="step">
+            <!-- Step 16: Maquiagem -->
+            <div id="step-16" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Maquiagem</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(15)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(17)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Natural', 'natural makeup')"><h3 class="font-bold">Natural</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Olho Esfumado', 'smokey eyes makeup')"><h3 class="font-bold">Olho Esfumado</h3></div>
@@ -492,15 +572,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Artística', 'artistic makeup')"><h3 class="font-bold">Artística</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'makeup', 'Nenhuma', 'no makeup')"><h3 class="font-bold">Nenhuma</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(12)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(14)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 14: Acessórios -->
-            <div id="step-14" class="step">
+            <!-- Step 17: Acessórios -->
+            <div id="step-17" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Acessórios (múltipla escolha)</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(16)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'tattooDescription', 'tattooDescription', 18)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="space-y-6">
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Estilos</h3>
@@ -616,15 +696,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(13)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'tattooDescription', 'tattooDescription', 15)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 15: Expressão Facial -->
-            <div id="step-15" class="step">
+            <!-- Step 18: Expressão Facial -->
+            <div id="step-18" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Expressão Facial (Múltipla Escolha)</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(17)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(19)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'seductive expression')"><h3 class="font-bold">Sedutora</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'confident expression')"><h3 class="font-bold">Confiante</h3></div>
@@ -640,15 +720,15 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'crying expression')"><h3 class="font-bold">Chorando</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleMultiSelection(this, 'facialExpression', 'with tears in eyes')"><h3 class="font-bold">Lágrimas</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(14)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(16)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 16: Pose Corporal -->
-            <div id="step-16" class="step">
+            <!-- Step 19: Pose Corporal -->
+            <div id="step-19" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Pose Corporal (Múltipla Escolha)</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(18)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'bodyPoseManual', 'manualPose', 20)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="space-y-6">
                     <div>
                         <h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">Poses Básicas e Cotidianas</h3>
@@ -703,29 +783,29 @@
                     </div>
                 </div>
                  <textarea id="bodyPoseManual" placeholder="Ou escreva a pose aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
-                 <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(15)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'bodyPoseManual', 'manualPose', 17)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 17: Tipo de Vestimenta -->
-            <div id="step-17" class="step">
+            <!-- Step 20: Tipo de Vestimenta -->
+            <div id="step-20" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tipo de Vestimenta</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(19)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleClothingChoice()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'clothing', 'nude', 'nude')"><h3 class="font-bold">Totalmente Nua</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'clothing', 'underwear', 'underwear')"><h3 class="font-bold">Apenas Roupa Íntima</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'clothing', 'clothed', 'clothed')"><h3 class="font-bold">Vestida</h3></div>
                 </div>
-                 <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(16)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleClothingChoice()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 18: Calcinha -->
-            <div id="step-18" class="step">
+            <!-- Step 21: Calcinha -->
+            <div id="step-21" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tipo de Calcinha</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(20)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'pantiesManual', 'pantiesType', 22)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Clássica', 'classic cut panties')"><h3 class="font-bold text-sm">Clássica</h3><p class="text-xs text-gray-400 mt-1">Cobertura moderada, confortável.</p></div>
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Biquíni', 'bikini cut panties')"><h3 class="font-bold text-sm">Biquíni</h3><p class="text-xs text-gray-400 mt-1">Corte mais baixo e cavado que a clássica.</p></div>
@@ -740,15 +820,15 @@
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesType', 'Aberta', 'crotchless panties')"><h3 class="font-bold text-sm">Aberta</h3><p class="text-xs text-gray-400 mt-1">Abertura na região íntima, design erótico.</p></div>
                 </div>
                  <textarea id="pantiesManual" placeholder="Ou escreva os detalhes aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
-                 <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(17)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'pantiesManual', 'pantiesType', 19)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
             
-            <!-- Step 19: Tamanho da Calcinha -->
-            <div id="step-19" class="step">
+            <!-- Step 22: Tamanho da Calcinha -->
+            <div id="step-22" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tamanho da Calcinha</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(21)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(23)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'XS', 'XS size')"><h3 class="font-bold">Extra Pequeno (XS)</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'S', 'S size')"><h3 class="font-bold">Pequeno (S)</h3></div>
@@ -757,27 +837,27 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'XL', 'XL size')"><h3 class="font-bold">Extra Largo (XL)</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'pantiesSize', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(18)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(20)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 20: Cor e Detalhes da Calcinha -->
-            <div id="step-20" class="step">
+            <!-- Step 23: Cor e Detalhes da Calcinha -->
+            <div id="step-23" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Cor da Calcinha</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(22)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'pantiesDetails', 'pantiesDetails', 24)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div id="pantiesColorGrid" class="grid grid-cols-6 md:grid-cols-9 gap-3 mb-4"></div>
                 <h3 class="text-xl font-semibold mb-4 mt-6">Detalhes da Calcinha</h3>
                 <textarea id="pantiesDetails" placeholder="Ex: azul claro com renda, transparente..." class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(19)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'pantiesDetails', 'pantiesDetails', 21)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 21: Sutiã -->
-            <div id="step-21" class="step">
+            <!-- Step 24: Sutiã -->
+            <div id="step-24" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tipo de Sutiã</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(23)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleBra(this)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                      <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Meia-taça', 'demi-cup bra')"><h3 class="font-bold text-sm">Meia-taça</h3><p class="text-xs text-gray-400 mt-1">Cobre metade dos seios, ideal para decotes.</p></div>
                      <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Push-up', 'push-up bra')"><h3 class="font-bold text-sm">Push-up</h3><p class="text-xs text-gray-400 mt-1">Com bojo, aproxima e levanta os seios.</p></div>
@@ -794,15 +874,15 @@
                      <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braType', 'Nenhum (Topless)', 'topless')"><h3 class="font-bold text-sm">Nenhum (Topless)</h3><p class="text-xs text-gray-400 mt-1">Sem sutiã, seios à mostra.</p></div>
                 </div>
                 <textarea id="braManual" placeholder="Ou escreva os detalhes aqui..." class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(20)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleBra(this)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 22: Tamanho do Sutiã -->
-            <div id="step-22" class="step">
+            <!-- Step 25: Tamanho do Sutiã -->
+            <div id="step-25" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Tamanho do Sutiã</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(24)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(26)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'XS', 'XS size')"><h3 class="font-bold">Extra Pequeno (XS)</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'S', 'S size')"><h3 class="font-bold">Pequeno (S)</h3></div>
@@ -811,27 +891,69 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'XL', 'XL size')"><h3 class="font-bold">Extra Largo (XL)</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'braSize', 'Nenhum', '')"><h3 class="font-bold">Nenhum</h3></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(21)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(23)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 23: Cor e Detalhes do Sutiã -->
-            <div id="step-23" class="step">
+            <!-- Step 26: Cor e Detalhes do Sutiã -->
+            <div id="step-26" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Cor do Sutiã</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(25)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'braDetails', 'braDetails', 27)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div id="braColorGrid" class="grid grid-cols-6 md:grid-cols-9 gap-3 mb-4"></div>
                 <h3 class="text-xl font-semibold mb-4 mt-6">Detalhes do Sutiã</h3>
                 <textarea id="braDetails" placeholder="Ex: azul claro com renda, transparente..." class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(22)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'braDetails', 'braDetails', 24)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 24: Iluminação -->
-            <div id="step-24" class="step">
+            <!-- Step 27: Fundo / Local -->
+            <div id="step-27" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Fundo / Local</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="handleLightingPrevious()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleManualInput(this, 'backgroundManual', 'background', 28)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Estúdio (Fundo Liso)', 'in a studio with a plain gray background')"><h3 class="font-bold">Estúdio</h3><p class="text-sm text-gray-400 mt-1">Ambiente controlado com fundo neutro.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Floresta Mística', 'in a mystical forest')"><h3 class="font-bold">Floresta Mística</h3><p class="text-sm text-gray-400 mt-1">Bosque denso com névoa e elementos mágicos.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Cidade Cyberpunk', 'in a cyberpunk city')"><h3 class="font-bold">Cidade Cyberpunk</h3><p class="text-sm text-gray-400 mt-1">Metrópole futurista com neon e chuva.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Quarto Aconchegante', 'in a cozy room')"><h3 class="font-bold">Quarto Aconchegante</h3><p class="text-sm text-gray-400 mt-1">Espaço íntimo com cama e iluminação suave.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Praia Ensolarada', 'on a sunny beach')"><h3 class="font-bold">Praia Ensolarada</h3><p class="text-sm text-gray-400 mt-1">Areia branca, mar azul-turquesa e céu limpo.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Biblioteca Antiga', 'in an old library')"><h3 class="font-bold">Biblioteca Antiga</h3><p class="text-sm text-gray-400 mt-1">Prateleiras de madeira com livros antigos.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Ruínas Desertas', 'in deserted ruins')"><h3 class="font-bold">Ruínas Desertas</h3><p class="text-sm text-gray-400 mt-1">Estruturas antigas tomadas pela natureza.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Salão de Baile Gótico', 'in a gothic ballroom')"><h3 class="font-bold">Salão de Baile Gótico</h3><p class="text-sm text-gray-400 mt-1">Arquitetura ornamentada e candelabros.</p></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Interior de Nave Espacial', 'inside a spaceship')"><h3 class="font-bold">Nave Espacial</h3><p class="text-sm text-gray-400 mt-1">Corredores metálicos e painéis de controle.</p></div>
+                </div>
+                 <textarea id="backgroundManual" placeholder="Ou escreva os detalhes aqui (Ex: em um beco chuvoso de neon...)" class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+            </div>
+
+            <!-- Step 28: Ação da Personagem -->
+            <div id="step-28" class="step">
+                <h2 class="text-2xl font-semibold mb-6">Ação da Personagem</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(27)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="handleActionNext()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Olhando para a câmera', 'looking at the camera')"><h3 class="font-bold">Olhando para a câmera</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Ajustando a roupa', 'adjusting clothes')"><h3 class="font-bold">Ajustando a roupa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Interagindo com o cenário', 'interacting with the scenery')"><h3 class="font-bold">Interagindo com o cenário</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Em movimento', 'in motion')"><h3 class="font-bold">Em movimento</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Pensativa', 'thoughtful')"><h3 class="font-bold">Pensativa</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Tocando um instrumento', 'playing an instrument')"><h3 class="font-bold">Tocando um instrumento</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Pintando em uma tela', 'painting on a canvas')"><h3 class="font-bold">Pintando em uma tela</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Bebendo café', 'drinking coffee')"><h3 class="font-bold">Bebendo café</h3></div>
+                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Olhando para o horizonte', 'looking at the horizon')"><h3 class="font-bold">Olhando para o horizonte</h3></div>
+                </div>
+                 <textarea id="actionManual" placeholder="Ou escreva os detalhes aqui (Ex: lendo um livro antigo...)" class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
+            </div>
+
+            <!-- Step 29: Iluminação -->
+            <div id="step-29" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Iluminação</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(28)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="goToStep(30)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Iluminação Cinematográfica', 'cinematic lighting')"><h3 class="font-bold text-sm">Cinematográfica</h3><p class="text-xs text-gray-400 mt-1">Luz dramática com alto contraste, como em filmes.</p></div>
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Luz Suave', 'soft light')"><h3 class="font-bold text-sm">Luz Suave</h3><p class="text-xs text-gray-400 mt-1">Difusa e sem sombras duras, ideal para retratos.</p></div>
@@ -846,57 +968,15 @@
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Silhueta', 'silhouette')"><h3 class="font-bold text-sm">Silhueta</h3><p class="text-xs text-gray-400 mt-1">Objeto escuro contra um fundo claro.</p></div>
                     <div class="option-card p-3 rounded-lg cursor-pointer" onclick="handleSelection(this, 'lighting', 'Nenhum', '')"><h3 class="font-bold text-sm">Nenhum (Escuridão)</h3><p class="text-xs text-gray-400 mt-1">Cena escura, com pouca ou nenhuma luz.</p></div>
                 </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="handleLightingPrevious()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="goToStep(25)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
             </div>
 
-            <!-- Step 25: Fundo / Local -->
-            <div id="step-25" class="step">
-                <h2 class="text-2xl font-semibold mb-6">Fundo / Local</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Estúdio (Fundo Liso)', 'in a studio with a plain gray background')"><h3 class="font-bold">Estúdio</h3><p class="text-sm text-gray-400 mt-1">Ambiente controlado com fundo neutro.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Floresta Mística', 'in a mystical forest')"><h3 class="font-bold">Floresta Mística</h3><p class="text-sm text-gray-400 mt-1">Bosque denso com névoa e elementos mágicos.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Cidade Cyberpunk', 'in a cyberpunk city')"><h3 class="font-bold">Cidade Cyberpunk</h3><p class="text-sm text-gray-400 mt-1">Metrópole futurista com neon e chuva.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Quarto Aconchegante', 'in a cozy room')"><h3 class="font-bold">Quarto Aconchegante</h3><p class="text-sm text-gray-400 mt-1">Espaço íntimo com cama e iluminação suave.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Praia Ensolarada', 'on a sunny beach')"><h3 class="font-bold">Praia Ensolarada</h3><p class="text-sm text-gray-400 mt-1">Areia branca, mar azul-turquesa e céu limpo.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Biblioteca Antiga', 'in an old library')"><h3 class="font-bold">Biblioteca Antiga</h3><p class="text-sm text-gray-400 mt-1">Prateleiras de madeira com livros antigos.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Ruínas Desertas', 'in deserted ruins')"><h3 class="font-bold">Ruínas Desertas</h3><p class="text-sm text-gray-400 mt-1">Estruturas antigas tomadas pela natureza.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Salão de Baile Gótico', 'in a gothic ballroom')"><h3 class="font-bold">Salão de Baile Gótico</h3><p class="text-sm text-gray-400 mt-1">Arquitetura ornamentada e candelabros.</p></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'background', 'Interior de Nave Espacial', 'inside a spaceship')"><h3 class="font-bold">Nave Espacial</h3><p class="text-sm text-gray-400 mt-1">Corredores metálicos e painéis de controle.</p></div>
-                </div>
-                 <textarea id="backgroundManual" placeholder="Ou escreva os detalhes aqui (Ex: em um beco chuvoso de neon...)" class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
-                 <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(24)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'backgroundManual', 'background', 26)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
-            </div>
-
-            <!-- Step 26: Ação da Personagem -->
-            <div id="step-26" class="step">
-                <h2 class="text-2xl font-semibold mb-6">Ação da Personagem</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Olhando para a câmera', 'looking at the camera')"><h3 class="font-bold">Olhando para a câmera</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Ajustando a roupa', 'adjusting clothes')"><h3 class="font-bold">Ajustando a roupa</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Interagindo com o cenário', 'interacting with the scenery')"><h3 class="font-bold">Interagindo com o cenário</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Em movimento', 'in motion')"><h3 class="font-bold">Em movimento</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Pensativa', 'thoughtful')"><h3 class="font-bold">Pensativa</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Tocando um instrumento', 'playing an instrument')"><h3 class="font-bold">Tocando um instrumento</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Pintando em uma tela', 'painting on a canvas')"><h3 class="font-bold">Pintando em uma tela</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Bebendo café', 'drinking coffee')"><h3 class="font-bold">Bebendo café</h3></div>
-                    <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'action', 'Olhando para o horizonte', 'looking at the horizon')"><h3 class="font-bold">Olhando para o horizonte</h3></div>
-                </div>
-                 <textarea id="actionManual" placeholder="Ou escreva os detalhes aqui (Ex: lendo um livro antigo...)" class="mt-4 w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"></textarea>
-                 <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(25)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="handleManualInput(this, 'actionManual', 'action', 27)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Próximo</button>
-                </div>
-            </div>
-
-            <!-- Step 27: Estilo Final e Qualidade -->
-            <div id="step-27" class="step">
+            <!-- Step 30: Estilo Final e Qualidade -->
+            <div id="step-30" class="step">
                 <h2 class="text-2xl font-semibold mb-6">Estilo Final e Qualidade</h2>
+                <div class="mb-8 flex justify-between w-full">
+                    <button onclick="goToStep(29)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
+                    <button onclick="generateAndTranslatePrompt()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Gerar Prompt</button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Fotografia Realista', 'realistic photography, photorealistic, 8k, ultra-detailed')"><h3 class="font-bold">Fotografia Realista</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Pintura Digital', 'digital painting, concept art')"><h3 class="font-bold">Pintura Digital</h3></div>
@@ -910,10 +990,6 @@
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Lente Teleobjetiva', 'telephoto lens, compressed background')"><h3 class="font-bold">Lente Teleobjetiva</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Estilo Cinematográfico', 'cinematic style, film grain')"><h3 class="font-bold">Estilo Cinematográfico</h3></div>
                     <div class="option-card p-4 rounded-lg cursor-pointer" onclick="handleSelection(this, 'finalStyle', 'Arte de Videogame (AAA)', 'AAA video game art, Unreal Engine')"><h3 class="font-bold">Arte de Videogame</h3></div>
-                </div>
-                <div class="mt-8 flex justify-between w-full">
-                    <button onclick="goToStep(26)" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Anterior</button>
-                    <button onclick="generateAndTranslatePrompt()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Gerar Prompt</button>
                 </div>
             </div>
 
@@ -950,7 +1026,13 @@
                     <span id="copySeedButtonText">Copiar Código</span>
                 </button>
 
-                <div class="mt-8">
+                <div class="mt-8 flex items-center gap-4">
+                    <button onclick="handleFinalStepBack()" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Voltar
+                    </button>
                     <button id="restartButton" onclick="restart()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
                         Começar de Novo
@@ -970,7 +1052,7 @@
             bodyPose: []
         };
         let currentStep = 1;
-        const totalSteps = 27;
+        const totalSteps = 30; // Updated total steps
 
         // --- DOM Elements ---
         const progressBar = document.getElementById('progressBar');
@@ -1038,7 +1120,7 @@
         }
 
         function goToStep(stepNumber) {
-            if (stepNumber === 7) {
+            if (stepNumber === 10) { // Updated step number for hair style
                 const selectedLengthText = promptData.hairLength?.text || '';
                 let lengthKey = 'all';
                 if (selectedLengthText.includes('long')) lengthKey = 'long';
@@ -1046,7 +1128,7 @@
                 else if (selectedLengthText.includes('short')) lengthKey = 'short';
                 else if (selectedLengthText.includes('shaved')) lengthKey = 'shaved';
                 
-                document.querySelectorAll('#step-7 .option-card').forEach(card => {
+                document.querySelectorAll('#step-10 .option-card').forEach(card => {
                     const compatibleLengths = card.dataset.lengths;
                     card.style.display = (!compatibleLengths || compatibleLengths.includes(lengthKey)) ? 'flex' : 'none';
                 });
@@ -1060,6 +1142,15 @@
         }
 
         // --- Option Selection ---
+        function handleMainCategory(category) {
+            promptData.mainCategory = category;
+            if (category === 'photorealistic') {
+                goToStep(2);
+            } else {
+                goToStep(3);
+            }
+        }
+
         function handleSelection(element, key, value, textToStore) {
             const parentStep = element.closest('.step');
             parentStep.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
@@ -1073,8 +1164,9 @@
 
             setTimeout(() => {
                 if (key === 'clothing') handleClothingChoice();
-                else if (key === 'braType' && textToStore === 'topless') goToStep(24);
+                else if (key === 'braType' && textToStore === 'topless') goToStep(promptData.mainCategory === 'illustration' ? 27 : 29);
                 else if (key === 'finalStyle') generateAndTranslatePrompt();
+                else if (key === 'imageStyle') goToStep(4);
                 else goToStep(currentStep + 1);
             }, 250);
         }
@@ -1123,11 +1215,11 @@
             if (age) {
                 promptData.age = { text: getAgeDescription(parseInt(age, 10)) };
                 promptData.ageIsNumeric = true;
-                goToStep(3);
+                goToStep(6); // Go to nationalities
             } else {
                 delete promptData.age;
                 promptData.ageIsNumeric = false;
-                goToStep(2);
+                goToStep(5); // Go to age range
             }
         }
         
@@ -1145,18 +1237,18 @@
         function handleClothingChoice() {
             const choice = promptData.clothing?.text;
             if (choice === 'nude' || choice === 'clothed') {
-                goToStep(24);
+                goToStep(promptData.mainCategory === 'illustration' ? 27 : 29);
             } else {
-                goToStep(18);
+                goToStep(21);
             }
         }
         
         function handleLightingPrevious() {
             const choice = promptData.clothing?.text;
             if (choice === 'nude' || choice === 'clothed') {
-                goToStep(17);
+                goToStep(20);
             } else {
-                goToStep(23);
+                goToStep(26);
             }
         }
 
@@ -1166,30 +1258,46 @@
                 promptData.braType = { text: manualBra };
             }
             if (promptData.braType?.text === 'topless') {
-                goToStep(24);
+                goToStep(promptData.mainCategory === 'illustration' ? 27 : 29);
             } else {
-                goToStep(22);
+                goToStep(25);
+            }
+        }
+        
+        function handleActionNext() {
+            handleManualInput(null, 'actionManual', 'action', 'final');
+            if (promptData.mainCategory === 'illustration') {
+                 generateAndTranslatePrompt();
+            } else {
+                goToStep(29);
+            }
+        }
+
+        function handleFinalStepBack() {
+            if (promptData.mainCategory === 'illustration') {
+                goToStep(28);
+            } else {
+                goToStep(30);
             }
         }
 
         // --- Prompt Generation & Translation ---
         function generateNegativePrompt(data) {
-            const baseNegative = "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), watermark, watermarked, oversaturated, censored, distorted hands, amputation, missing hands, obese, doubled face, doubled hands, text, signature";
+            let baseNegative = "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), watermark, watermarked, oversaturated, censored, distorted hands, amputation, missing hands, obese, doubled face, doubled hands, text, signature";
             
-            const dynamicNegatives = new Set();
+            if (data.mainCategory === 'illustration') {
+                baseNegative += ', photorealistic, realistic, photo, 3d render, photography';
+            } else {
+                baseNegative += ', illustration, drawing, painting, anime, cartoon, sketch';
+            }
 
+            const dynamicNegatives = new Set();
             const negativeMappings = {
                 hairLength: {
                     'long hair': 'short hair, medium hair',
                     'medium hair': 'long hair, short hair',
                     'short hair': 'long hair, medium hair',
                     'shaved hair': 'long hair, medium hair, short hair, wig'
-                },
-                finalStyle: {
-                    'realistic photography, photorealistic, 8k, ultra-detailed': 'painting, drawing, illustration, anime, cartoon, 3d render, sketch',
-                    'digital painting, concept art': 'photo, photograph, photorealistic, 3d render, realism',
-                    'anime style, manga art': 'photo, photograph, photorealistic, realism, 3d render',
-                    'black and white photography': 'color, colorful'
                 },
                 bodyType: {
                     'thin body, low body fat': 'fat, chubby, overweight, muscular, plus-size',
@@ -1213,13 +1321,16 @@
         function buildInitialPrompt() {
             const segments = [];
             
-            let characterDesc = `A portrait of`;
+            if (promptData.imageStyle) {
+                segments.push(promptData.imageStyle.text);
+            }
+
+            let characterDesc = ``;
             const characterParts = [
                 promptData.name?.text, promptData.age?.text, promptData.ethnicity?.text,
                 promptData.characterStyle ? `with a ${promptData.characterStyle.text}` : null
             ].filter(Boolean);
-            if (characterParts.length > 0) characterDesc += ` ${characterParts.join(', ')}`;
-            segments.push(`${characterDesc}.`);
+            if (characterParts.length > 0) segments.push(`${characterParts.join(', ')}.`);
 
             const physicalFeatures = [
                 promptData.bodyType?.text, promptData.skinColor?.text,
@@ -1296,7 +1407,9 @@
         }
 
         async function generateAndTranslatePrompt() {
-            handleManualInput(null, 'actionManual', 'action', 'final');
+            if (currentStep !== 'final') {
+                handleManualInput(null, 'actionManual', 'action', 'final');
+            }
             showStep('final');
 
             const promptTextarea = document.getElementById('finalPrompt');
@@ -1393,7 +1506,7 @@
                     promptData.pantiesColor = { text: color.en };
                     document.querySelectorAll('#pantiesColorGrid .color-swatch').forEach(s => s.classList.remove('selected'));
                     swatchPanties.classList.add('selected');
-                    setTimeout(() => handleManualInput(null, 'pantiesDetails', 'pantiesDetails', 21), 250);
+                    setTimeout(() => handleManualInput(null, 'pantiesDetails', 'pantiesDetails', 24), 250);
                 };
                 pantiesColorGrid.appendChild(swatchPanties);
 
@@ -1405,7 +1518,7 @@
                     promptData.braColor = { text: color.en };
                     document.querySelectorAll('#braColorGrid .color-swatch').forEach(s => s.classList.remove('selected'));
                     swatchBra.classList.add('selected');
-                    setTimeout(() => handleManualInput(null, 'braDetails', 'braDetails', 24), 250);
+                    setTimeout(() => handleManualInput(null, 'braDetails', 'braDetails', 26), 250);
                 };
                 braColorGrid.appendChild(swatchBra);
             });
