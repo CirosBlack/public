@@ -1336,51 +1336,38 @@
             const buttonTextElement = document.getElementById(buttonTextId);
             const textToCopy = element.tagName === 'TEXTAREA' ? element.value : element.innerText;
 
-            if (!navigator.clipboard) {
-                fallbackCopy(element, buttonTextElement, originalText);
-                return;
-            }
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                buttonTextElement.textContent = 'Copiado!';
-                setTimeout(() => {
-                    buttonTextElement.textContent = originalText;
-                }, 2000);
-            }).catch(err => {
-                console.error('Async: Could not copy text: ', err);
-                fallbackCopy(element, buttonTextElement, originalText);
-            });
-        }
-
-        function fallbackCopy(element, buttonTextElement, originalText) {
-            let textArea;
-            if (element.tagName !== 'TEXTAREA') {
-                textArea = document.createElement('textarea');
-                textArea.value = element.innerText;
-                textArea.style.position = 'fixed';
-                textArea.style.top = '-9999px';
-                document.body.appendChild(textArea);
-            } else {
-                textArea = element;
-            }
+            // Create a temporary textarea to securely copy the text
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
             
-            textArea.focus();
-            textArea.select();
+            // Make the textarea non-editable and invisible
+            textArea.style.position = 'fixed';
+            textArea.style.top = '-9999px';
+            textArea.style.left = '-9999px';
+            textArea.setAttribute('readonly', '');
 
+            document.body.appendChild(textArea);
+            textArea.select();
+            
             try {
                 const successful = document.execCommand('copy');
-                buttonTextElement.textContent = successful ? 'Copiado!' : 'Falhou!';
+                if (buttonTextElement) {
+                    buttonTextElement.textContent = successful ? 'Copiado!' : 'Falha ao copiar';
+                }
             } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-                buttonTextElement.textContent = 'Falhou!';
+                console.error('Não foi possível copiar o texto: ', err);
+                if (buttonTextElement) {
+                    buttonTextElement.textContent = 'Falha ao copiar';
+                }
             }
 
-            if (element.tagName !== 'TEXTAREA') {
-                document.body.removeChild(textArea);
+            document.body.removeChild(textArea);
+
+            if (buttonTextElement) {
+                 setTimeout(() => {
+                    buttonTextElement.textContent = originalText;
+                }, 2000);
             }
-            
-            setTimeout(() => {
-                buttonTextElement.textContent = originalText;
-            }, 2000);
         }
         
         function restart() {
