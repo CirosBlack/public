@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criador de Prompts Profissional (v17)</title>
+    <title>Criador de Prompts Profissional (v18 - Consistência com IA)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -684,7 +684,8 @@
         clothing: 'Vestimenta', pantiesType: 'Calcinha', pantiesSize: 'Calcinha (Tam.)', pantiesColor: 'Calcinha (Cor)',
         pantiesDetails: 'Calcinha (Detalhes)', braType: 'Sutiã', braSize: 'Sutiã (Tam.)', braColor: 'Sutiã (Cor)',
         braDetails: 'Sutiã (Detalhes)', lighting: 'Iluminação', background: 'Fundo', action: 'Ação',
-        characterView: 'Orientação', sceneComposition: 'Composição', manualPose: 'Pose Manual', manualAction: 'Ação Manual'
+        characterView: 'Orientação', sceneComposition: 'Composição', manualPose: 'Pose Manual', manualAction: 'Ação Manual',
+        ai_generated_input: 'Ideia Original (Editável)'
     };
 
     // =================================================================================
@@ -767,7 +768,7 @@
                     </button>
                     <button id="addConsistencyButton" data-action="add-consistency" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
-                        <span>Adicionar Consistência</span>
+                        <span>Adicionar Consistência (IA)</span>
                     </button>
                     <button id="removeConsistencyButton" data-action="remove-consistency" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg>
@@ -1117,18 +1118,23 @@
         if (closeTechSheet) {
             techSheetBar.classList.remove('visible');
         }
-        const manualInputAction = document.getElementById('actionManual');
-        if (manualInputAction) {
-            const value = manualInputAction.value.trim();
-            const key = manualInputAction.dataset.key;
-            if (value) {
-                promptData[key] = { label: value, value: value, weight: 1.0 };
-            } else {
-                delete promptData[key];
+        
+        if (promptData.ai_generated_input && promptData.ai_generated_input.value) {
+            handleAutoGenerate(promptData.ai_generated_input.value);
+        } else {
+            const manualInputAction = document.getElementById('actionManual');
+            if (manualInputAction) {
+                const value = manualInputAction.value.trim();
+                const key = manualInputAction.dataset.key;
+                if (value) {
+                    promptData[key] = { label: value, value: value, weight: 1.0 };
+                } else {
+                    delete promptData[key];
+                }
             }
+            updateTechSheet();
+            generateAndDisplayManualPrompt();
         }
-        updateTechSheet();
-        generateAndDisplayManualPrompt();
     }
 
     mainContainer.addEventListener('click', (e) => {
@@ -1192,17 +1198,33 @@
 
     function updateTechSheet() {
         const hasData = Object.keys(promptData).length > 0;
-        if (!isFinalPromptGenerated && !hasData) {
+        if (!hasData) {
             techSheetBar.classList.remove('visible');
             return;
         }
 
         techSheetContent.innerHTML = '';
-        const displayOrder = ['ai_generated', ...Object.keys(sidebarLabels)];
+        const displayOrder = ['ai_generated_input', ...Object.keys(sidebarLabels).filter(k => k !== 'ai_generated_input')];
 
         displayOrder.forEach(key => {
             const data = promptData[key];
             if (!data) return;
+
+            if (key === 'ai_generated_input') {
+                const item = promptData[key];
+                const entry = document.createElement('div');
+                entry.className = 'w-full px-1';
+                entry.innerHTML = `
+                    <label class="font-semibold text-indigo-400 text-sm">${sidebarLabels[key]}:</label>
+                    <textarea class="w-full p-2 bg-gray-800 border border-gray-600 rounded-md mt-1 text-sm leading-tight" rows="2">${item.value}</textarea>
+                `;
+                entry.querySelector('textarea').addEventListener('input', (e) => {
+                    promptData.ai_generated_input.value = e.target.value;
+                    promptData.ai_generated_input.label = e.target.value;
+                });
+                techSheetContent.appendChild(entry);
+                return;
+            }
 
             const processEntry = (item) => {
                 const weight = item.weight ? item.weight.toFixed(1) : '1.0';
@@ -1210,7 +1232,7 @@
                 const valueText = weight !== '1.0' ? `${item.label} (${weight})` : item.label;
                 const entry = document.createElement('div');
                 entry.className = 'tech-sheet-entry';
-                if (isFinalPromptGenerated && key !== 'ai_generated') {
+                if (isFinalPromptGenerated && !promptData.ai_generated_input) {
                     entry.classList.add('clickable');
                     const stepId = Object.keys(stepsData).find(id => {
                         const s = stepsData[id];
@@ -1297,7 +1319,7 @@
         return weight !== 1.0 ? `(${item.value}:${weight.toFixed(1)})` : item.value;
     }
 
-    function buildInitialPrompt(includeConsistency = false) {
+    function buildManualPrompt() {
         const p = promptData;
         const segments = [];
 
@@ -1355,27 +1377,48 @@
         ].filter(Boolean);
         if(finalDetails.length > 0) segments.push(finalDetails.join(', ') + '.');
         
-        if (includeConsistency) {
-            segments.push(generateConsistencyText());
-        }
-
         return segments.join(' ').replace(/\s+/g, ' ').replace(/ \./g, '.').replace(/ ,/g, ',').trim();
     }
     
-    function generateConsistencyText() {
-        const p = promptData;
-        const consistencyParts = [p.name?.value, p.age?.value, p.ethnicity?.value, p.hairColor?.value, p.hairStyle?.value || p.hairLength?.value, p.eyeColor?.value, p.bodyType?.value].filter(Boolean).map(s => s.split(',')[0]); 
-        return consistencyParts.length > 2 ? `(character sheet for consistency: ${consistencyParts.join(', ')})` : '';
+    async function generateConsistencyWithAPI(positivePrompt) {
+        loadingOverlay.classList.remove('hidden');
+        loadingText.textContent = "Analisando consistência...";
+        
+        const systemPrompt = `Analyze the following prompt and extract key, consistent character descriptors. Return them as a simple comma-separated list in English. Focus on core, reusable traits like name, age, ethnicity, hair color/style, eye color, and body type.
+        Positive Prompt: "${positivePrompt}"
+        Respond with ONLY the comma-separated list of keywords. Example: "Lara, 25 years old, Brazilian, blonde long hair, blue eyes, athletic body"`;
+
+        const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
+
+        try {
+            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const result = await response.json();
+            const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+            return text ? `(character sheet for consistency: ${text.trim()})` : '';
+        } catch (error) {
+            console.error("Failed to generate consistency text with API:", error);
+            showToast("Falha ao gerar consistência com IA.", 4000, true);
+            return '';
+        } finally {
+            loadingOverlay.classList.add('hidden');
+        }
     }
 
-    function addConsistencyText() {
+    async function addConsistencyText() {
         const promptTextarea = document.getElementById('finalPrompt');
-        const consistencyText = generateConsistencyText();
-        if (consistencyText && !promptTextarea.value.includes(consistencyText)) {
+        const consistencyText = await generateConsistencyWithAPI(promptTextarea.value);
+        if (consistencyText && !promptTextarea.value.includes("character sheet for consistency")) {
             promptTextarea.value += ` ${consistencyText}`;
             showToast("Texto de consistência adicionado!");
         } else if (!consistencyText) {
-            showToast("Não há dados suficientes para gerar o texto de consistência.", 3000, true);
+            showToast("Não foi possível gerar texto de consistência.", 3000, true);
         }
     }
 
@@ -1392,15 +1435,6 @@
         }
     }
     
-    // Fallback negative prompt generator
-    function generateNegativePrompt(data) {
-        const baseNegative = "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), watermark, watermarked, oversaturated, censored, distorted hands, amputation, missing hands, obese, doubled face, doubled hands, text, signature";
-        const dynamicNegatives = new Set();
-        if (data.baseCategory?.value === 'photo') 'painting, drawing, illustration, anime, cartoon, 3d render, sketch'.split(',').forEach(term => dynamicNegatives.add(term.trim()));
-        else if (data.baseCategory?.value === 'illustration') 'photo, photograph, photorealistic, 3d render, realism'.split(',').forEach(term => dynamicNegatives.add(term.trim()));
-        return [baseNegative, ...Array.from(dynamicNegatives)].join(', ');
-    }
-
     async function generateNegativePromptWithAPI(positivePrompt) {
         const systemPrompt = `Based on the following positive prompt for an AI image generator, create a concise, comma-separated, all-lowercase negative prompt in English. The negative prompt should include common negative terms (like bad anatomy, ugly, deformed, blurry, watermark, text, signature) and also include specific terms that contradict the positive prompt's style and subject (e.g., if the positive prompt is 'photorealistic', the negative should include 'painting, illustration, 3d render').
 
@@ -1408,12 +1442,10 @@ Positive Prompt: "${positivePrompt}"
 
 Respond with ONLY the comma-separated list of negative keywords.`;
 
-        const payload = {
-            contents: [{ role: "user", parts: [{ text: systemPrompt }] }]
-        };
+        const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
 
         try {
-            const apiKey = ""; // API key is handled by the environment
+            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             const response = await fetch(apiUrl, {
@@ -1422,23 +1454,16 @@ Respond with ONLY the comma-separated list of negative keywords.`;
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
             const result = await response.json();
             const negativeText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            if (negativeText) {
-                return negativeText.trim();
-            } else {
-                throw new Error("Malformed API response for negative prompt.");
-            }
-
+            if (negativeText) return negativeText.trim();
+            throw new Error("Malformed API response for negative prompt.");
         } catch (error) {
             console.error("Failed to generate negative prompt with API:", error);
             showToast("Falha ao gerar prompt negativo com IA. Usando padrão.", 4000, true);
-            return generateNegativePrompt(promptData); // Fallback to the old static method
+            const baseNegative = "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), watermark, watermarked, oversaturated, censored, distorted hands, amputation, missing hands, obese, doubled face, doubled hands, text, signature";
+            return baseNegative;
         }
     }
 
@@ -1446,6 +1471,7 @@ Respond with ONLY the comma-separated list of negative keywords.`;
         goToStep(29);
         isFinalPromptGenerated = true;
         isEditingFromTechSheet = false;
+        delete promptData.ai_generated_input;
 
         await new Promise(resolve => setTimeout(resolve, 0));
         
@@ -1458,7 +1484,7 @@ Respond with ONLY the comma-separated list of negative keywords.`;
         loadingOverlay.classList.remove('hidden');
         loadingText.textContent = "Gerando prompt positivo...";
 
-        const positivePrompt = buildInitialPrompt(false);
+        const positivePrompt = buildManualPrompt();
         finalPromptTextarea.value = positivePrompt;
         
         loadingText.textContent = "Gerando prompt negativo com IA...";
@@ -1475,8 +1501,8 @@ Respond with ONLY the comma-separated list of negative keywords.`;
     // =================================================================================
     // Intelligent Auto-Prompt Generation Logic (API Driven)
     // =================================================================================
-    async function handleAutoGenerate() {
-        const userText = document.getElementById('autoPromptManual').value.trim();
+    async function handleAutoGenerate(textOverride) {
+        const userText = textOverride || document.getElementById('autoPromptManual').value.trim();
         if (!userText) {
             showToast("Por favor, descreva sua ideia no campo de texto.", 3000, true);
             return;
@@ -1485,9 +1511,8 @@ Respond with ONLY the comma-separated list of negative keywords.`;
         loadingOverlay.classList.remove('hidden');
         loadingText.textContent = "Analisando sua ideia...";
         
-        promptData = {};
+        promptData = {}; // Clear previous manual data
         isFinalPromptGenerated = false;
-        updateTechSheet();
 
         const systemPrompt = `Você é um engenheiro de prompt profissional para modelos avançados de IA de texto para imagem. Sua tarefa é pegar a ideia simples de um usuário, escrita em português, e expandi-la para um **prompt positivo** e um **prompt negativo** altamente detalhados e descritivos.
 
@@ -1521,7 +1546,7 @@ Respond with ONLY the comma-separated list of negative keywords.`;
         loadingText.textContent = "Gerando prompts detalhados...";
         
         try {
-            const apiKey = ""; // API key is handled by the environment
+            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             
             const response = await fetch(apiUrl, {
@@ -1530,9 +1555,7 @@ Respond with ONLY the comma-separated list of negative keywords.`;
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status} ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
 
             const result = await response.json();
             const contentPart = result?.candidates?.[0]?.content?.parts?.[0];
@@ -1544,7 +1567,7 @@ Respond with ONLY the comma-separated list of negative keywords.`;
                 document.getElementById('negativePrompt').value = parsedJson.negative_prompt || "Falha ao gerar o prompt negativo.";
                 document.getElementById('consistencySeed').textContent = Math.floor(Math.random() * 999999999999999);
                 isFinalPromptGenerated = true;
-                promptData['ai_generated'] = {label: `Baseado em: "${userText}"`, value: userText};
+                promptData['ai_generated_input'] = {label: userText, value: userText, isEditable: true};
                 updateTechSheet();
             } else {
                 throw new Error("Resposta da API malformada ou vazia.");
