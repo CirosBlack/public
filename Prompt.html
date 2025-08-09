@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criador de Prompts Profissional (v18 - Consistência com IA)</title>
+    <title>Criador de Prompts Profissional (v20 - Correção de Tradução)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -529,6 +529,7 @@
                 { label: "Cintura Alta", value: "high-waist panties" }, { label: "Fio Dental", value: "thong" }, { label: "Tanga", value: "tanga panties" },
                 { label: "Strappy", value: "strappy panties" }, { label: "Asa Delta", value: "high-leg or V-cut panties" }, { label: "Sem Costura", value: "seamless panties" },
                 { label: "De Renda", value: "lace panties" }, { label: "Aberta", value: "crotchless panties" },
+                { label: "Calcinha de Biquíni Fio Dental", value: "matching tiny thong bikini bottom" },
             ]
         },
         21: {
@@ -559,6 +560,7 @@
                 { label: "Alta Sustentação", value: "high support bra" }, { label: "Tomara que Caia", value: "strapless bra" }, { label: "Nadador", value: "racerback bra" },
                 { label: "Triângulo", value: "triangle bra" }, { label: "Bralette", value: "bralette" }, { label: "Esportivo", value: "sports bra" },
                 { label: "Decote Profundo", value: "plunge bra" }, { label: "Cropped", value: "cropped bra" }, { label: "Strappy", value: "strappy bra" },
+                { label: "Top de Biquíni Minimalista", value: "minimalist tiny black bikini top" },
                 { label: "Nenhum (Topless)", value: "topless" },
             ]
         },
@@ -1331,7 +1333,7 @@
         segments.push(`${charDesc}.`);
 
         const hairColorDesc = [formatValue(p.hairColor), formatValue(p.hairColorDetails)].filter(Boolean).join(' ');
-        const hairStyleDesc = p.hairStyle ? `${p.hairStyle.label} (${formatValue(p.hairStyle)})` : formatValue(p.hairLength);
+        const hairStyleDesc = p.hairStyle ? formatValue(p.hairStyle) : formatValue(p.hairLength);
         const physicalFeatures = [formatValue(p.bodyType), formatValue(p.skinColor), formatValue(p.breasts), hairStyleDesc, hairColorDesc, formatValue(p.eyeColor)].filter(Boolean);
         if (physicalFeatures.length > 0) segments.push(`She has ${physicalFeatures.join(', ')}.`);
 
@@ -1341,12 +1343,12 @@
                 const underwearParts = [];
                 if (p.braType?.value === 'topless') underwearParts.push('topless');
                 else if (p.braType) {
-                    const braDesc = p.braType.label.includes('(') ? formatValue(p.braType) : `${p.braType.label} (${formatValue(p.braType)})`;
+                    const braDesc = formatValue(p.braType);
                     const braDetails = [formatValue(p.braColor), formatValue(p.braDetails), braDesc, formatValue(p.braSize)].filter(Boolean).join(' ');
                     underwearParts.push(`wearing a ${braDetails}`);
                 }
                 if (p.pantiesType) {
-                    const pantiesDesc = p.pantiesType.label.includes('(') ? formatValue(p.pantiesType) : `${p.pantiesType.label} (${formatValue(p.pantiesType)})`;
+                    const pantiesDesc = formatValue(p.pantiesType);
                     const pantiesDetails = [formatValue(p.pantiesColor), formatValue(p.pantiesDetails), pantiesDesc, formatValue(p.pantiesSize)].filter(Boolean).join(' ');
                     underwearParts.push(underwearParts.length > 0 ? `and a pair of ${pantiesDetails}` : `wearing a pair of ${pantiesDetails}`);
                 }
