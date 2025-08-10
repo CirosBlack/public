@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criador de Prompts Profissional (v20 - Correção de Tradução)</title>
+    <title>Criador de Prompts Profissional (v54 - Ficha Técnica Interativa)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,7 @@
         .option-card { background-color: #1F2937; border: 2px solid #374151; transition: all 0.2s ease-in-out; display: flex; flex-direction: column; justify-content: space-between; }
         .option-card:hover { border-color: #4f46e580; transform: translateY(-2px); }
         .option-card.selected { border-color: #4F46E5; background-color: #3730a3; }
-        .color-swatch { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s ease-in-out; }
+        .color-swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s ease-in-out; }
         .color-swatch:hover, .color-swatch.selected { border-color: #F9FAFB; transform: scale(1.1); }
         .progress-bar-fill { transition: width 0.5s ease-in-out; }
         button:disabled { cursor: not-allowed; opacity: 0.7; }
@@ -50,35 +50,16 @@
             border-radius: 9999px;
             font-size: 0.875rem; 
             white-space: nowrap; 
+            display: inline-flex;
+            align-items: center;
         }
         .tech-sheet-entry.clickable { cursor: pointer; transition: background-color 0.2s; }
         .tech-sheet-entry.clickable:hover { background-color: #4b5563; }
-        .weight-controls {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid #374151;
+        .tech-sheet-entry.is-editing {
+            width: 100%;
+            white-space: normal;
         }
-        .weight-btn {
-            background-color: #4f46e5;
-            color: white;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            font-size: 1.25rem;
-            transition: background-color 0.2s;
-        }
-        .weight-btn:hover { background-color: #6366f1; }
-        .weight-value { font-size: 1rem; font-weight: 600; min-width: 40px; text-align: center; }
-         #loadingOverlay {
+        #loadingOverlay {
             position: absolute;
             inset: 0;
             background-color: rgba(17, 24, 39, 0.95);
@@ -88,6 +69,28 @@
             justify-content: center;
             border-radius: 1rem; /* Corresponds to rounded-2xl */
             z-index: 20;
+        }
+        .example-tag {
+            background-color: #374151;
+            border: 1px solid #4B5563;
+            color: #D1D5DB;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .example-tag:hover {
+            background-color: #4F46E5;
+            color: #FFF;
+            border-color: #4F46E5;
+        }
+        .clothing-details-section {
+            background-color: #111827;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            border: 1px solid #374151;
         }
     </style>
 </head>
@@ -128,10 +131,14 @@
                     <!-- Dynamic content here -->
                 </div>
             </div>
-            <div class="flex-shrink-0 w-full sm:w-auto mt-4 sm:mt-0">
-                <button id="regenerateButton" onclick="triggerFinalGeneration(true)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors hidden items-center justify-center gap-2">
+            <div class="flex-shrink-0 w-full sm:w-auto mt-4 sm:mt-0 space-y-2">
+                <button id="regenerateButton" onclick="this.disabled=true; triggerFinalGeneration(true).finally(() => this.disabled=false)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors hidden items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
                     Gerar Novo Prompt
+                </button>
+                <button id="returnToPromptButton" onclick="cancelEditAndReturn()" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors hidden items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                    Voltar ao Prompt
                 </button>
             </div>
         </div>
@@ -162,35 +169,23 @@
         },
         2: {
             title: "Escolha o Estilo Específico",
-            type: 'single-choice-category',
+            type: 'ai-generated-choice',
             key: 'baseStyle',
             nextStep: 3,
-            categories: {
-                photo: [
-                    { label: "Retrato em Estúdio", value: "Studio portrait, neutral background, controlled lighting, full focus on the subject" }, { label: "Retrato Ambiental", value: "Environmental portrait, background in focus showing the environment" },
-                    { label: "Cinematográfico", value: "Cinematic style, film-inspired composition, dramatic colors and lighting" }, { label: "Golden Hour", value: "Golden hour photo, soft golden light at sunrise/sunset" },
-                    { label: "Noir / P&B", value: "Noir style, black and white, high contrast, deep shadows, dramatic mood" }, { label: "Fotografia de Rua", value: "Street photography, candid urban scene with a documentary vibe" },
-                    { label: "Documental", value: "Documentary/journalistic style, raw, unretouched, realistic" }, { label: "Foto de Moda", value: "Fashion photography, stylized composition, clothing highlighted" },
-                    { label: "Lifestyle / Cotidiano", value: "Lifestyle photography, natural and candid daily scenes" }, { label: "Produto / Still Life", value: "Product/still life photography, clean background or controlled setting" },
-                    { label: "Macro Fotografia", value: "Macro photography, extreme close-up of small details" }, { label: "Arquitetura", value: "Architectural photography, facades, interiors, clean lines" },
-                    { label: "Paisagem Natural", value: "Natural landscape photography, mountains, beaches, forests" }, { label: "Vintage / Analógico", value: "Vintage/analog photography style, simulates old photographic film" },
-                    { label: "Neon / Noturno", value: "Neon/urban night photography, urban scenes at night with neon and reflections" }, { label: "Silhueta / Contra-luz", value: "Silhouette/backlit photography, dark subject with a light background" },
-                    { label: "Bokeh Estilizado", value: "Stylized bokeh photography, blurred background with rounded light points" }, { label: "Drone / Vista Aérea", value: "Drone/aerial view photography, top-down perspective, patterns and geometry" },
-                    { label: "Subaquática", value: "Underwater photography, bluish light and water effects" }, { label: "Editorial Dramático", value: "Dramatic cinematic editorial, dark background, intense expressions, high emotion" },
-                ],
-                illustration: [
-                    { label: "Comic Americano", value: "Classic American comic book style, strong lines, vibrant colors", styleKey: 'comic-classic' }, { label: "Comic Noir / Pulp", value: "Noir/pulp comic style, dark, inspired by 40s-50s noir comics", styleKey: 'comic-noir' },
-                    { label: "Manga Shonen", value: "Shonen manga style, dynamic Japanese style with a focus on action", styleKey: 'manga-shonen' }, { label: "Manga Shojo", value: "Shojo manga style, delicate and romantic, large eyes and soft glows", styleKey: 'manga-shojo' },
-                    { label: "Estilo Ghibli", value: "Ghibli studio style, soft painting, cozy and natural scenes", styleKey: 'ghibli' }, { label: "Anime Cyberpunk", value: "Cyberpunk anime style, futuristic Japanese style, inspired by Akira", styleKey: 'anime-cyberpunk' },
-                    { label: "Fantasia Épica", value: "Epic fantasy concept art, environments and creatures from magical worlds", styleKey: 'fantasy-concept' }, { label: "Sci-Fi Conceitual", value: "Sci-fi concept art, futuristic cities, spaceships, and technology", styleKey: 'scifi-concept' },
-                    { label: "Steampunk", value: "Steampunk art, retro-futurism with gears and steam", styleKey: 'steampunk' }, { label: "Pixel Art", value: "Pixel art style, retro with visible pixels", styleKey: 'pixel' },
-                    { label: "Low Poly", value: "Low poly style, simplified 3D look with geometric shapes", styleKey: 'low-poly' }, { label: "Pintura a Óleo", value: "Classic oil painting style, traditional museum look", styleKey: 'oil-painting' },
-                    { label: "Aquarela", value: "Traditional watercolor style, soft washes, diffuse edges", styleKey: 'watercolor' }, { label: "Sketch a Lápis", value: "Pencil sketch style, quick and detailed graphite drawing", styleKey: 'pencil-sketch' },
-                    { label: "Vetor Flat", value: "Flat vector art, simple shapes and solid colors", styleKey: 'vector' }, { label: "Pop Art", value: "Pop art style, inspired by Andy Warhol and Roy Lichtenstein", styleKey: 'pop-art' },
-                    { label: "Infantil / Fofa", value: "Childrens art / cute illustration style, simple lines, rounded shapes", styleKey: 'kids' }, { label: "Chibi", value: "Chibi style, miniaturized characters with large heads", styleKey: 'chibi' },
-                    { label: "Cartoon Ocidental", value: "Western cartoon style, like Looney Tunes or The Simpsons", styleKey: 'western-cartoon' }, { label: "Minimalista", value: "Monochromatic minimalist art, simple shapes and focus on composition", styleKey: 'minimalist' },
-                ]
-            }
+            exampleTags: {
+                photo: ["Cinematográfico", "Retrato em Estúdio", "Golden Hour", "Noir / P&B", "Fotografia de Rua"],
+                illustration: ["Estilo Ghibli", "Anime Cyberpunk", "Fantasia Épica", "Comic Americano", "Aquarela"]
+            },
+            aiPrompt: (userInput, baseCategory) => `Você é um diretor de arte e engenheiro de prompt de IA extremamente criativo. Sua tarefa é gerar uma lista de estilos visuais inspiradores para um prompt de imagem, com base na entrada do usuário. Pense fora da caixa e evite clichês.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Cinematográfico"):** Interprete o texto como um tema e gere no mínimo 10 variações criativas e detalhadas sobre esse tema. Explore subgêneros, artistas famosos, técnicas específicas, etc.
+2.  **Se a entrada for um número (ex: "7"):** Gere exatamente essa quantidade de estilos visuais diversos e interessantes, cobrindo uma ampla gama de possibilidades dentro da categoria de ${baseCategory}.
+**Para cada estilo gerado, forneça um objeto JSON com:**
+-   "label": O nome do estilo, em português.
+-   "description": Uma descrição curta, evocativa e inspiradora em português.
+-   "value": O termo técnico correspondente em inglês para o prompt.
+**Retorne um array JSON de objetos.**`
         },
         3: {
             title: "Nome e Idade da Personagem",
@@ -208,93 +203,92 @@
             key: 'age',
             nextStep: 5,
             options: [
-                { label: "Garota", value: "a girl, approximately 18-22 years old" }, { label: "Jovem Mulher", value: "a young woman, approximately 23-30 years old" },
-                { label: "Mulher", value: "a woman, approximately 31-45 years old" }, { label: "Mulher Madura", value: "a mature woman, approximately 46+ years old" },
+                { label: "Garota (18-22 anos)", value: "a girl, approximately 18-22 years old" }, 
+                { label: "Jovem Mulher (23-25 anos)", value: "a young woman, approximately 23-25 years old" },
+                { label: "Mulher (26-34 anos)", value: "a woman, approximately 26-34 years old" }, 
+                { label: "Mulher Madura (35+ anos)", value: "a mature woman, 35+ years old" },
             ]
         },
         5: {
             title: "Nacionalidades e Ascendências",
-            type: 'single-choice-sections',
+            type: 'ai-generated-choice',
             key: 'ethnicity',
             nextStep: 6,
-            sections: [
-                { title: "Américas", options: [ { label: "Brasileiro / Brasileira", value: "Brazilian" }, { label: "Americano / Americana", value: "American" }, { label: "Argentino / Argentina", value: "Argentinian" }, { label: "Boliviano / Boliviana", value: "Bolivian" }, { label: "Canadense", value: "Canadian" }, { label: "Chileno / Chilena", value: "Chilean" }, { label: "Colombiano / Colombiana", value: "Colombian" }, { label: "Cubano / Cubana", value: "Cuban" }, { label: "Equatoriano / Equatoriana", value: "Ecuadorian" }, { label: "Haitiano / Haitiana", value: "Haitian" }, { label: "Mexicano / Mexicana", value: "Mexican" }, { label: "Paraguaio / Paraguaia", value: "Paraguayan" }, { label: "Peruano / Peruana", value: "Peruvian" }, { label: "Uruguaio / Uruguaia", value: "Uruguayan" }, { label: "Venezuelano / Venezuelana", value: "Venezuelan" } ] },
-                { title: "Europa", options: [ { label: "Espanhol / Espanhola", value: "Spanish" }, { label: "Alemão / Alemã", value: "German" }, { label: "Belga", value: "Belgian" }, { label: "Britânico / Britânica", value: "British" }, { label: "Croata", value: "Croatian" }, { label: "Dinamarquês / Dinamarquesa", value: "Danish" }, { label: "Francês / Francesa", value: "French" }, { label: "Grego / Grega", value: "Greek" }, { label: "Holandês / Holandesa", value: "Dutch" }, { label: "Irlandês / Irlandesa", value: "Irish" }, { label: "Italiano / Italiana", value: "Italian" }, { label: "Polonês / Polonesa", value: "Polish" }, { label: "Português / Portuguesa", value: "Portuguese" }, { label: "Romeno / Romena", value: "Romanian" }, { label: "Russo / Russa", value: "Russian" }, { label: "Sueco / Sueca", value: "Swedish" }, { label: "Suíço / Suíça", value: "Swiss" }, { label: "Ucraniano / Ucraniana", value: "Ukrainian" } ] },
-                { title: "Ásia", options: [ { label: "Chinês / Chinesa", value: "Chinese" }, { label: "Japonês / Japonesa", value: "Japanese" }, { label: "Afegão / Afegã", value: "Afghan" }, { label: "Coreano / Coreana", value: "Korean" }, { label: "Filipino / Filipina", value: "Filipino" }, { label: "Indiano / Indiana", value: "Indian" }, { label: "Indonésio / Indonésia", value: "Indonesian" }, { label: "Iraniano / Iraniana", value: "Iranian" }, { label: "Iraquiano / Iraquiana", value: "Iraqi" }, { label: "Israelense", value: "Israeli" }, { label: "Libanês / Libanesa", value: "Lebanese" }, { label: "Paquistanês / Paquistanesa", value: "Pakistani" }, { label: "Palestino / Palestina", value: "Palestinian" }, { label: "Sírio / Síria", value: "Syrian" }, { label: "Tailandês / Tailandesa", value: "Thai" }, { label: "Turco / Turca", value: "Turkish" }, { label: "Vietnamita", value: "Vietnamese" } ] },
-                { title: "África", options: [ { label: "Angolano / Angolana", value: "Angolan" }, { label: "Argelino / Argelina", value: "Algerian" }, { label: "Cabo-verdiano / Cabo-verdiana", value: "Cape Verdean" }, { label: "Congolês / Congolesa", value: "Congolese" }, { label: "Egípcio / Egípcia", value: "Egyptian" }, { label: "Ganês / Ganesa", value: "Ghanaian" }, { label: "Marroquino / Marroquina", value: "Moroccan" }, { label: "Moçambicano / Moçambicana", value: "Mozambican" }, { label: "Nigeriano / Nigeriana", value: "Nigerian" }, { label: "Senegalês / Senegalesa", value: "Senegalese" }, { label: "Sul-africano / Sul-africana", value: "South African" } ] },
-                { title: "Oceania", options: [ { label: "Australiano / Australiana", value: "Australian" }, { label: "Neozelandês / Neozelandesa", value: "New Zealander" } ] }
-            ],
-            finalOption: { label: "Nenhum", value: "" }
+            exampleTags: {
+                all: ["Américas", "Europa", "Ásia", "África", "Oceania", "Fantasia"]
+            },
+            aiPrompt: (userInput) => `Você é um demógrafo criativo e world-builder. Sua tarefa é gerar uma lista de nacionalidades ou ascendências.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Europeu" ou "Asiático"):** Gere no mínimo 10 nacionalidades populares e interessantes daquela região.
+2.  **Se a entrada for "Fantasia":** Gere no mínimo 10 ascendências de fantasia criativas (ex: "Elfo da Floresta Negra", "Humano com ascendência Dracônica", "Nascido do Fogo").
+3.  **Se a entrada for um número (ex: "12"):** Gere essa quantidade de nacionalidades diversas de todo o mundo.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": O nome em português (ex: "Brasileiro / Brasileira" ou "Elfo da Lua").
+-   "description": Uma descrição curta e inspiradora.
+-   "value": O termo correspondente em inglês (ex: "Brazilian" ou "Moon Elf").
+**Adicione uma opção final:** \`{ "label": "Nenhum", "description": "Não especificar uma nacionalidade.", "value": "" }\`.
+**Retorne um array JSON de objetos.**`
         },
         6: {
             title: "Biotipo Físico",
-            type: 'single-choice',
+            type: 'ai-generated-choice',
             key: 'bodyType',
             nextStep: 7,
-            options: [
-                { label: "Magra / Magrinha", value: "thin body, low body fat" }, { label: "Magrela", value: "extremely thin body" },
-                { label: "Fina / Delgada", value: "slender, elegant, and slim body" }, { label: "Cheinha / Fofinha", value: "chubby, soft body with some body fat" },
-                { label: "Gorda / Gordinha", value: "fat, plump body with plenty of body fat" }, { label: "Plus Size", value: "plus-size body type" },
-                { label: "Robusta / Forte", value: "robust, strong, wide body frame" }, { label: "Sarada", value: "toned body with well-defined muscles and low fat" },
-                { label: "Malhada", value: "fit body, toned from working out" }, { label: "Definida", value: "defined body with visible muscles" },
-                { label: "Musculosa", value: "muscular body with large muscle volume" }, { label: "Atlética", value: "athletic body, functional and strong" },
-                { label: "Curvilínea Acentuada", value: "very voluptuous and curvy body" }, { label: "Silhueta Ampulheta", value: "hourglass figure, very curvy body with wide hips and bust, and a thin waist" },
-                { label: "Voluptuosa", value: "voluptuous, curvy and attractive body" }, { label: "Curvilínea", value: "curvaceous, voluptuous body with full shapes" },
-                { label: "Nenhum", value: "" },
-            ]
+            exampleTags: { all: ["Magra", "Atlética", " curvilínea", "Gorda"] },
+            aiPrompt: (userInput) => `Você é um diretor de casting e artista de personagens. Sua tarefa é gerar uma lista de biotipos físicos.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Atlética"):** Gere no mínimo 10 variações criativas desse biotipo (ex: "Corpo de dançarina", "Fisiculturista leve", "Corredora de longa distância").
+2.  **Se a entrada for um número (ex: "8"):** Gere essa quantidade de biotipos diversos.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": O nome em português.
+-   "description": Uma breve descrição evocativa.
+-   "value": O termo em inglês para o prompt.
+**Adicione uma opção final:** \`{ "label": "Nenhum", "description": "Não especificar.", "value": "" }\`.
+**Retorne um array JSON de objetos.**`
         },
         7: {
             title: "Cor da Pele",
-            type: 'single-choice',
+            type: 'ai-generated-choice',
             key: 'skinColor',
             nextStep: 8,
-            options: [
-                { label: "Pele Clara", value: "light, rosy skin tone" }, { label: "Pele Pálida", value: "pale, very light skin" },
-                { label: "Pele Bronzeada", value: "tanned, golden skin tone" }, { label: "Pele Oliva", value: "olive, yellowish/greenish skin tone" },
-                { label: "Pele Escura", value: "dark brown skin tone" }, { label: "Pele com Sardas", value: "skin with freckles" },
-                { label: "Nenhum", value: "" },
-            ]
+            exampleTags: { all: ["Pele Clara", "Pele Pálida", "Pele Bronzeada", "Pele Oliva", "Pele Escura"] },
+            aiPrompt: (userInput) => `Você é um especialista em dermatologia e artista de retratos. Sua tarefa é gerar uma lista de tons de pele.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Pele Escura"):** Gere no mínimo 10 variações poéticas e detalhadas (ex: "Pele cor de ébano", "Tom de chocolate amargo", "Pele de obsidiana polida").
+2.  **Se a entrada for um número (ex: "10"):** Gere essa quantidade de tons de pele diversos.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": O nome em português.
+-   "description": Uma breve descrição poética.
+-   "value": O termo em inglês para o prompt.
+**Adicione uma opção final:** \`{ "label": "Nenhum", "description": "Não especificar.", "value": "" }\`.
+**Retorne um array JSON de objetos.**`
         },
         8: {
-            title: "Comprimento do Cabelo",
-            type: 'single-choice',
-            key: 'hairLength',
+            title: "Corte de Cabelo e Penteado",
+            type: 'ai-generated-choice',
+            key: 'hairStyle',
             nextStep: 9,
-            options: [
-                { label: "Longo", value: "long hair", filterKey: "long" }, { label: "Médio", value: "medium hair", filterKey: "medium" },
-                { label: "Curto", value: "short hair", filterKey: "short" }, { label: "Raspado", value: "shaved hair", filterKey: "shaved" },
-                { label: "Nenhum", value: "", filterKey: "all" },
-            ]
+            exampleTags: { all: ["Longo", "Médio", "Curto", "Raspado", "Tranças"] },
+            aiPrompt: (userInput) => `Você é um cabeleireiro de vanguarda e artista de personagens. Sua tarefa é gerar uma lista de penteados criativos e únicos.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Longo" ou "Tranças"):** Interprete como um tema e gere no mínimo 10 variações criativas. Pense em combinações, texturas, acessórios e estilos de diferentes culturas ou épocas.
+2.  **Se a entrada for um número (ex: "12"):** Gere exatamente essa quantidade de penteados variados, explorando diferentes comprimentos e estilos.
+**Para cada penteado, forneça um objeto JSON com:**
+-   "label": O nome do penteado em português.
+-   "description": Uma descrição curta e estilosa em português.
+-   "value": O termo técnico correspondente em inglês para o prompt.
+**Adicione uma opção final:** \`{ "label": "Nenhum", "description": "Não especificar o penteado.", "value": "" }\`.
+**Retorne um array JSON de objetos.**`
         },
         9: {
-            title: "Corte de Cabelo e Penteado",
-            type: 'single-choice-filtered',
-            key: 'hairStyle',
-            filterOn: 'hairLength',
-            nextStep: 10,
-            options: [
-                { label: "Corte em Camadas", value: "long layers", filterKey: "long" }, { label: "Corte Reto", value: "long blunt cut", filterKey: "long" },
-                { label: "Shaggy Hair", value: "long shaggy hair", filterKey: "long" }, { label: "Franja Cortininha", value: "curtain bangs", filterKey: "long" },
-                { label: "Rabo de Cavalo Alto", value: "high polished ponytail", filterKey: "long" }, { label: "Ondas Sereia", value: "mermaid waves", filterKey: "long" },
-                { label: "Meio Preso", value: "half-up hairstyle", filterKey: "long" }, { label: "Trança Boxeadora", value: "double boxer braids", filterKey: "long" },
-                { label: "Franja Reta e Cheia", value: "long hair with full straight bangs", filterKey: "long" }, { label: "Efeito Molhado", value: "wet look hairstyle", filterKey: "long" },
-                { label: "Long Bob (Lob)", value: "long bob (lob)", filterKey: "medium" }, { label: "Chanel de Bico", value: "A-line bob", filterKey: "medium" },
-                { label: "Blunt Cut", value: "medium blunt cut", filterKey: "medium" }, { label: "Shaggy", value: "medium shaggy hair", filterKey: "medium" },
-                { label: "Clavicut", value: "clavicut", filterKey: "medium" }, { label: "Ondas Suaves", value: "soft beach waves", filterKey: "medium" },
-                { label: "Liso com Divisão Central", value: "sleek straight hair with a center part", filterKey: "medium" }, { label: "Glass Hair", value: "glass hair look", filterKey: "medium" },
-                { label: "Pixie Cut", value: "classic pixie cut", filterKey: "short" }, { label: "Short Bob (Chanel)", value: "short bob", filterKey: "short" },
-                { label: "Bixie Cut", value: "bixie cut", filterKey: "short" }, { label: "Topete (Pompadour)", value: "pompadour hairstyle", filterKey: "short" },
-                { label: "Slicked Back", value: "slicked back short hair", filterKey: "short" }, { label: "Franja Curta", value: "short hair with baby bangs", filterKey: "short" },
-                { label: "Undercut", value: "female undercut", filterKey: "short" }, { label: "Buzz Cut Uniforme", value: "uniform buzz cut", filterKey: "shaved" },
-                { label: "Buzz Cut com Degradê", value: "buzz cut with a fade", filterKey: "shaved" }, { label: "Careca", value: "completely bald, razor shaved", filterKey: "shaved" },
-                { label: "Hair Tattoo", value: "hair tattoo, razor designs", filterKey: "shaved" }, { label: "Nenhum / Não especificar", value: "", filterKey: "all" },
-            ]
-        },
-        10: {
             title: "Cor do Cabelo",
             type: 'single-choice',
             key: 'hairColor',
-            nextStep: 11,
+            nextStep: 10,
             manualInput: { id: 'hairColorManual', placeholder: 'Detalhes adicionais (ex: mechas azuis...)', key: 'hairColorDetails' },
             options: [
                 { label: "Preto", value: "black hair" }, { label: "Loiro", value: "blonde hair" }, { label: "Castanho", value: "brown hair" },
@@ -302,323 +296,213 @@
                 { label: "Azul", value: "blue hair" }, { label: "Verde", value: "green hair" }, { label: "Nenhum", value: "" },
             ]
         },
-        11: {
+        10: {
             title: "Cor dos Olhos",
-            type: 'single-choice',
+            type: 'ai-generated-choice',
             key: 'eyeColor',
+            nextStep: 11,
+            exampleTags: { all: ["Azuis", "Verdes", "Castanhos", "Cor de Mel", "Pretos", "Fantasia"] },
+            aiPrompt: (userInput) => `Você é um diretor de fotografia e artista de personagens. Sua tarefa é gerar variações de cor de olhos.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Azuis" ou "Fantasia"):** Gere no mínimo 10 variações criativas, incluindo detalhes como heterocromia, anéis limbares, brilho sobrenatural, padrões na íris, etc.
+2.  **Se a entrada for um número (ex: "8"):** Gere essa quantidade de cores de olhos diversas, incluindo opções realistas e fantásticas.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": O nome em português.
+-   "description": Uma breve descrição evocativa.
+-   "value": O termo em inglês para o prompt.
+**Adicione uma opção final:** \`{ "label": "Nenhum", "description": "Não especificar.", "value": "" }\`.
+**Retorne um array JSON de objetos.**`
+        },
+        11: {
+            title: "Tamanho dos Seios",
+            type: 'ai-generated-choice',
+            key: 'breasts',
             nextStep: 12,
-            options: [
-                { label: "Azuis Claros", value: "light blue eyes" }, { label: "Azuis Escuros", value: "dark blue eyes" },
-                { label: "Verdes Claros", value: "light green eyes" }, { label: "Verdes Escuros", value: "dark green eyes" },
-                { label: "Castanhos Claros", value: "light brown eyes" }, { label: "Castanhos Escuros", value: "dark brown eyes" },
-                { label: "Cor de Mel", value: "honey-colored eyes" }, { label: "Cinza Claro", value: "light gray eyes" },
-                { label: "Cinza Escuro", value: "dark gray eyes" }, { label: "Pretos", value: "black eyes" },
-                { label: "Heterocromia", value: "heterochromia eyes" }, { label: "Nenhum", value: "" },
-            ]
+            exampleTags: { all: ["Pequenos", "Médios", "Grandes", "Volumosos"] },
+            aiPrompt: (userInput) => `Você é um designer de personagens e anatomista. Sua tarefa é gerar variações para o tamanho dos seios de uma personagem.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Grandes"):** Gere no mínimo 10 variações criativas, descrevendo forma, volume e caimento de maneira respeitosa e artística (ex: "Seios fartos e redondos", "Busto proeminente e natural", "Seios em formato de gota").
+2.  **Se a entrada for um número (ex: "6"):** Gere essa quantidade de variações de tamanho e forma.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": O nome em português.
+-   "description": Uma breve descrição anatômica e artística.
+-   "value": O termo em inglês para o prompt.
+**Adicione uma opção final:** \`{ "label": "Nenhum", "description": "Não especificar.", "value": "" }\`.
+**Retorne um array JSON de objetos.**`
         },
         12: {
-            title: "Tamanho dos Seios",
-            type: 'single-choice',
-            key: 'breasts',
-            nextStep: 13,
-            options: [
-                { label: "Reto (Flat)", value: "flat chest" }, { label: "Pequenos", value: "small breasts" },
-                { label: "Médios", value: "medium breasts" }, { label: "Grandes", value: "large breasts" },
-                { label: "Volumosos", value: "voluminous breasts" }, { label: "Nenhum", value: "" },
-            ]
-        },
-        13: {
             title: "Composição da Cena",
             type: 'multi-choice-sections',
-            nextStep: 14,
+            nextStep: 13,
             sections: [
                 {
                     title: "Orientação da Personagem",
                     key: 'characterView',
-                    type: 'multi',
+                    type: 'single-nav', // Custom type to trigger navigation
                     options: [
                         { label: "De Frente", value: "facing the camera" }, { label: "De Lado", value: "side view" }, { label: "De Costas", value: "from behind" },
                     ]
                 },
-                {
-                    title: "Enquadramento e Composição (Múltipla Escolha)",
-                    key: 'sceneComposition',
-                    type: 'multi',
-                    options: [
-                        { label: "Corpo Inteiro", value: "full body shot, long shot" }, { label: "Plano Médio", value: "medium shot" },
-                        { label: "Close-up no Rosto", value: "close-up shot on face" }, { label: "Plano Detalhe", value: "extreme close-up on a detail" },
-                        { label: "Ângulo Baixo", value: "low angle shot" }, { label: "Ângulo Alto", value: "high angle shot" },
-                        { label: "Ângulo Holandês", value: "dutch angle" }, { label: "Ponto de Vista (POV)", value: "point of view (POV)" },
-                        { label: "Sobre o Ombro", value: "over the shoulder shot" }, { label: "Plano Americano", value: "american shot, medium long shot" },
-                        { label: "Plano Geral Amplo", value: "establishing shot, wide shot" }, { label: "Plano Conjunto", value: "two-shot or group shot" },
-                        { label: "Regra dos Terços", value: "rule of thirds composition" }, { label: "Linhas Guia", value: "leading lines composition" },
-                        { label: "Enquadramento Natural", value: "frame within a frame composition" }, { label: "Simetria e Ponto Central", value: "symmetrical composition, centered subject" },
-                        { label: "Espaço Negativo", value: "negative space composition" }, { label: "Profundidade de Campo", value: "shallow depth of field or deep depth of field" },
-                        { label: "Visão Macro", value: "macro view" }, { label: "Enquadramento com Foco", value: "focused framing" },
-                        { label: "Enquadramento Centralizado", value: "centered framing" }, { label: "Visão Inferior", value: "shot from a low angle, looking up" },
-                    ]
-                }
             ]
+        },
+        13: {
+            title: "Enquadramento e Composição",
+            type: 'ai-generated-choice',
+            isMulti: true,
+            key: 'sceneComposition',
+            nextStep: 14,
+            exampleTags: { all: ["Corpo Inteiro", "Plano Médio", "Close-up no Rosto", "Ângulo Baixo", "Regra dos Terços"] },
+            aiPrompt: (userInput) => `Você é um diretor de fotografia premiado. Sua tarefa é gerar opções de enquadramento e composição de cena.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Close-up"):** Gere no mínimo 10 variações criativas de close-ups e planos de detalhe (ex: "Close-up extremo nos olhos", "Plano detalhe das mãos", "Close-up com lente grande angular").
+2.  **Se a entrada for um número (ex: "10"):** Gere essa quantidade de técnicas de composição e enquadramento diversas.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": Nome em português.
+-   "description": Breve descrição técnica/artística.
+-   "value": Termo em inglês para o prompt.
+**Retorne um array JSON de objetos.**`
         },
         14: {
             title: "Estilo da Personagem",
-            type: 'single-choice',
+            type: 'ai-generated-choice',
             key: 'characterStyle',
             nextStep: 15,
-            options: [
-                { label: "Fantasia: Elfa", value: "fantasy elf style" }, { label: "Fantasia: Guerreira", value: "fantasy warrior style" },
-                { label: "Sci-Fi: Cyberpunk", value: "sci-fi cyberpunk style" }, { label: "Sci-Fi: Androide", value: "sci-fi android style" },
-                { label: "Moderno: Gótica", value: "modern gothic style" }, { label: "Moderno: E-girl", value: "modern e-girl style" },
-                { label: "Moderno: Fitness", value: "modern fitness style" }, { label: "Moderno: Casual", value: "modern casual style" },
-                { label: "Histórico: Vitoriano", value: "historical victorian style" }, { label: "Histórico: Medieval", value: "historical medieval style" },
-                { label: "Steampunk", value: "steampunk style" }, { label: "Pós-apocalíptico", value: "post-apocalyptic style" },
-                { label: "Nenhum", value: "" },
-            ]
+            exampleTags: { all: ["Fantasia", "Sci-Fi", "Moderno", "Histórico", "Steampunk"] },
+            aiPrompt: (userInput) => `Você é um figurinista e diretor de arte. Sua tarefa é gerar estilos de personagem.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Sci-Fi"):** Gere no mínimo 10 variações criativas de sub-estilos (ex: "Cyberpunk de rua", "Nobreza solar-punk", "Explorador de planetas retrô").
+2.  **Se a entrada for um número (ex: "8"):** Gere essa quantidade de estilos diversos.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": Nome em português.
+-   "description": Breve descrição do conceito.
+-   "value": Termo em inglês para o prompt.
+**Adicione uma opção final:** \`{ "label": "Nenhum", "description": "", "value": "" }\`.
+**Retorne um array JSON de objetos.**`
         },
         15: {
             title: "Maquiagem",
-            type: 'single-choice',
+            type: 'ai-generated-choice',
             key: 'makeup',
             nextStep: 16,
-            options: [
-                { label: "Natural", value: "natural makeup" }, { label: "Olho Esfumado", value: "smokey eyes makeup" },
-                { label: "Glamour", value: "glamour makeup" }, { label: "Gótica", value: "gothic makeup" },
-                { label: "Cores Neon", value: "neon colors makeup" }, { label: "Artística", value: "artistic makeup" },
-                { label: "Nenhuma", value: "no makeup" },
-            ]
+            exampleTags: { all: ["Natural", "Olho Esfumado", "Glamour", "Gótica", "Artística"] },
+            aiPrompt: (userInput) => `Você é um maquiador profissional de Hollywood. Sua tarefa é gerar estilos de maquiagem.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Artística"):** Gere no mínimo 10 variações criativas e ousadas (ex: "Maquiagem com respingos de tinta neon", "Delineado gráfico inspirado em caligrafia", "Sardas de folha de ouro").
+2.  **Se a entrada for um número (ex: "10"):** Gere essa quantidade de estilos de maquiagem diversos.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": Nome em português.
+-   "description": Breve descrição do estilo.
+-   "value": Termo em inglês para o prompt.
+**Adicione uma opção final:** \`{ "label": "Nenhuma", "description": "", "value": "no makeup" }\`.
+**Retorne um array JSON de objetos.**`
         },
         16: {
             title: "Acessórios",
-            subtitle: "(múltipla escolha)",
-            type: 'multi-choice-sections-toggle',
+            subtitle: "(Múltipla Escolha)",
+            type: 'ai-generated-choice',
+            isMulti: true,
             key: 'accessories',
             nextStep: 17,
-            sections: [
-                {
-                    title: "Gótica",
-                    options: [
-                        { label: "Choker de Veludo", value: "velvet choker" }, { label: "Harness de Couro", value: "leather harness" },
-                        { label: "Cinto com Fivela Elaborada", value: "belt with ornate buckle" }, { label: "Correntes para Calças", value: "pants chains" },
-                        { label: "Luvas de Renda/Arrastão", value: "lace or fishnet gloves" }, { label: "Colares de Crucifixo/Ankh", value: "crucifix or ankh necklaces" },
-                        { label: "Anéis com Pedras Escuras", value: "rings with dark stones" }, { label: "Brincos de Argola com Cruz", value: "hoop earrings with cross pendants" },
-                        { label: "Meia-calça Arrastão/Vitoriana", value: "fishnet or victorian pattern tights" }, { label: "Bolsa de Caixão", value: "coffin-shaped bag" },
-                        { label: "Broches de Camafeu/Insetos", value: "cameo or insect brooches" }, { label: "Chapéu de Aba Larga/Cartola", value: "wide-brimmed hat or top hat" },
-                        { label: "Óculos de Sol Vintage", value: "round vintage sunglasses" }, { label: "Pulseira de Couro com Spikes", value: "leather bracelet with spikes" },
-                        { label: "Acessórios de Cabelo com Penas", value: "hair accessories with black feathers" }, { label: "Gargantilha com Spikes", value: "spiked garter" },
-                        { label: "Leg-harness", value: "leg harness" }, { label: "Piercings (Septo, Lábio)", value: "septum or lip piercing" },
-                        { label: "Ankle Boots com Plataforma", value: "platform ankle boots" }, { label: "Véus", value: "short or long veils" },
-                    ]
-                },
-                {
-                    title: "Rockeira",
-                    options: [
-                        { label: "Jaqueta de Couro Perfecto", value: "perfecto leather jacket" }, { label: "Bandanas", value: "bandana" },
-                        { label: "Cinto de Couro com Tachas", value: "studded leather belt" }, { label: "Pulseiras de Couro com Rebites", value: "leather wristbands with rivets" },
-                        { label: "Munhequeiras", value: "band logo wristbands" }, { label: "Colar com Palheta", value: "guitar pick necklace" },
-                        { label: "Anéis de Caveira", value: "silver skull rings" }, { label: "Correntes Grossas", value: "thick chains" },
-                        { label: "Óculos de Sol Aviador", value: "aviator sunglasses" }, { label: "Botas de Combate", value: "combat boots" },
-                        { label: "Patches de Bandas", value: "band patches on jacket" }, { label: "Boné Trucker", value: "trucker hat" },
-                        { label: "Meias Arrastão", value: "fishnet stockings" }, { label: "Brincos de Argola Grandes", value: "large hoop earrings" },
-                        { label: "Lenços de Caveira/Xadrez", value: "skull or plaid scarf" }, { label: "Luvas sem Dedos", value: "fingerless leather gloves" },
-                        { label: "Carteira com Corrente", value: "wallet with chain" }, { label: "Cinto de Lona", value: "canvas belt with metal buckle" },
-                        { label: "Tornozeleiras de Corrente", value: "chain anklets" }, { label: "Pins de Bandas", value: "band pins" },
-                    ]
-                },
-                {
-                    title: "Sadomasoquista",
-                    options: [
-                        { label: "Harness de Corpo Inteiro", value: "full body harness" }, { label: "Coleira de Couro", value: "leather collar with O-ring" },
-                        { label: "Algemas", value: "leather or metal cuffs" }, { label: "Mordaças", value: "ball gag or tape gag" },
-                        { label: "Chicotes", value: "whip or riding crop" }, { label: "Máscaras", value: "leather or latex mask" },
-                        { label: "Cinto de Castidade", value: "aesthetic chastity belt" }, { label: "Gag de Anel", value: "ring gag" },
-                        { label: "Body Chains", value: "heavy metal body chains" }, { label: "Luvas de Látex", value: "elbow-length latex gloves" },
-                        { label: "Meias 7/8 de Vinil", value: "vinyl thigh-high stockings with garter belt" }, { label: "Pasties", value: "nipple pasties" },
-                        { label: "Cuffs de Couro", value: "wide leather cuffs" }, { label: "Correntes de Coleira", value: "leash chains" },
-                        { label: "Piercings Estratégicos", value: "nipple or genital piercings" }, { label: "Botas de Cano Altíssimo", value: "thigh-high stiletto boots" },
-                        { label: "Espartilho de Couro/Vinil", value: "leather or vinyl corset" }, { label: "Tapa-olho de Couro", value: "leather eyepatch" },
-                        { label: "Plugue de Cauda", value: "aesthetic tail plug" }, { label: "Joias para o Corpo", value: "body jewelry with chains" },
-                    ]
-                },
-                {
-                    title: "Patricinha",
-                    options: [
-                        { label: "Bolsa de Grife", value: "designer handbag" }, { label: "Tiara Acolchoada/Pérolas", value: "padded or pearl headband" },
-                        { label: "Laços de Fita", value: "ribbon bows in hair" }, { label: "Óculos de Sol Grandes", value: "large designer sunglasses" },
-                        { label: "Colar de Inicial", value: "initial pendant necklace" }, { label: "Pulseira de Berloques", value: "charm bracelet" },
-                        { label: "Brincos de Pérola/Brilhantes", value: "pearl or diamond stud earrings" }, { label: "Relógio de Marca", value: "gold-plated watch" },
-                        { label: "Lenço de Seda", value: "designer silk scarf" }, { label: "Cinto Fino de Couro", value: "thin leather belt" },
-                        { label: "Sapatilhas", value: "ballet flats" }, { label: "Scarpins", value: "high-heeled pumps" },
-                        { label: "Presilhas com Strass", value: "rhinestone hair clips" }, { label: "Anéis Delicados", value: "delicate stackable rings" },
-                        { label: "Porta-celular de Grife", value: "designer phone case with chain" }, { label: "Necessaire de Marca", value: "designer makeup bag" },
-                        { label: "Chaveiro de Pelúcia", value: "plush keychain" }, { label: "Faixas de Cabelo", value: "fabric headbands" },
-                        { label: "Meias-calças Finas", value: "sheer neutral-colored tights" }, { label: "Luvas de Couro Curtas", value: "short leather gloves in pastel colors" },
-                    ]
-                }
-            ]
+            exampleTags: { all: ["Gótico", "Rockeira", "Patricinha", "Fantasia", "Sci-Fi"] },
+            aiPrompt: (userInput) => `Você é um estilista de moda. Sua tarefa é gerar uma lista de acessórios.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Fantasia"):** Gere no mínimo 10 acessórios criativos e relevantes para o tema (ex: "Brincos de cristal lunar", "Gargantilha de vinhas espinhosas", "Anel com gema que pulsa luz").
+2.  **Se a entrada for um número (ex: "15"):** Gere essa quantidade de acessórios diversos.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": Nome em português.
+-   "description": "".
+-   "value": Termo em inglês para o prompt.
+**Retorne um array JSON de objetos.**`
         },
         17: {
             title: "Expressão Facial",
             subtitle: "(Múltipla Escolha)",
-            type: 'multi-choice',
+            type: 'ai-generated-choice',
+            isMulti: true,
             key: 'facialExpression',
             nextStep: 18,
-            options: [
-                { label: "Sedutora", value: "seductive expression" }, { label: "Confiante", value: "confident expression" },
-                { label: "Triste", value: "sad expression" }, { label: "Irritada", value: "angry expression" },
-                { label: "Feliz/Sorrindo", value: "happy, smiling expression" }, { label: "Pensativa", value: "thoughtful expression" },
-                { label: "Assustada", value: "scared expression" }, { label: "Entediada", value: "bored expression" },
-                { label: "Meiga", value: "sweet, gentle expression" }, { label: "Fofinha", value: "cute expression" },
-                { label: "Gritando", value: "shouting, screaming expression" }, { label: "Chorando", value: "crying expression" },
-                { label: "Lágrimas", value: "with tears in eyes" },
-            ]
+            exampleTags: { all: ["Feliz", "Triste", "Irritada", "Sedutora", "Surpresa"] },
+            aiPrompt: (userInput) => `Você é um diretor de atores e psicólogo. Sua tarefa é gerar expressões faciais complexas.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Feliz"):** Gere no mínimo 10 variações de felicidade com nuances (ex: "Sorriso melancólico", "Riso contido", "Alegria serena", "Euforia extasiada").
+2.  **Se a entrada for um número (ex: "10"):** Gere essa quantidade de expressões diversas e com profundidade emocional.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": Nome em português.
+-   "description": Breve descrição da emoção por trás da expressão.
+-   "value": Termo em inglês para o prompt.
+**Retorne um array JSON de objetos.**`
         },
         18: {
             title: "Pose Corporal",
             subtitle: "(Múltipla Escolha)",
-            type: 'multi-choice-sections',
+            type: 'ai-generated-choice',
+            isMulti: true,
+            key: 'bodyPose',
             nextStep: 19,
-            manualInput: { id: 'bodyPoseManual', placeholder: 'Ou escreva a pose aqui...', key: 'manualPose' },
-            sections: [
-                { title: "Poses Básicas e Cotidianas", key: 'bodyPose', type: 'multi', options: [ { label: "Em pé", value: "standing pose" }, { label: "Sentada(o)", value: "sitting pose" }, { label: "Deitada(o)", value: "lying down pose" }, { label: "Andando", value: "walking pose" }, { label: "Correndo", value: "running pose" }, { label: "Dançando", value: "dancing pose" }, { label: "Encostada(o)", value: "leaning pose" }, { label: "Agachada(o)", value: "squatting pose" }, ] },
-                { title: "Poses de Ação e Movimento", key: 'bodyPose', type: 'multi', options: [ { label: "Pose de Luta", value: "fighting stance" }, { label: "Pose de Ação", value: "action pose (jumping, climbing)" }, { label: "Pose de Super-herói", value: "superhero pose" }, { label: "Ajoelhada(o)", value: "kneeling pose" }, ] },
-                { 
-                    title: "Poses Sensuais e Provocantes", 
-                    key: 'bodyPose', 
-                    type: 'multi', 
-                    options: [ 
-                        { label: "De Quatro", value: "on all fours" }, { label: "Pernas Abertas", value: "legs spread" }, { label: "Bunda Empinada para Trás", value: "butt pushed back" },
-                        { label: "Foco na Bunda", value: "focus on the ass" }, { label: "Foco na Vagina", value: "focus on pussy" }, { label: "Vagina Aberta", value: "spread pussy" },
-                        { label: "Vagina Fechada", value: "closed pussy" }, { label: "Pernas Cruzadas", value: "crossed legs" }, { label: "Ajoelhada (sensual)", value: "kneeling" },
-                        { label: "Masturbação", value: "masturbating" }, { label: "Dedos na Vagina", value: "fingers in pussy" }, { label: "Dedos no Ânus", value: "fingers in anus" },
-                        { label: "Puxando a Roupa", value: "pulling on clothing" }, { label: "Arco nas Costas (Arching Back)", value: "arching back pose, standing or lying down, enhancing body curves" },
-                        { label: "Olhar por Cima do Ombro", value: "looking over the shoulder, back to the camera, creating a mysterious and inviting mood" }, { label: "Reclinada no Sofá", value: "reclining on a sofa or bed, relaxed body, conveying comfort and sensuality" },
-                        { label: "Jack-O' Pose", value: "Jack-O' pose, on all fours with chest on the ground and hips raised high, face often turned to the camera" }, { label: "Mãos na Nuca", value: "hands behind head, sitting or lying down, arms raised, elongating the torso" },
-                        { label: "Pernas para Cima", value: "legs up pose, lying on back with legs straight up, possibly against a wall" }, { label: "Abraço por Trás", value: "embrace from behind, focusing on intimacy and the touch of hands" },
-                        { label: "Sentada com Joelhos Dobrados", value: "sitting on the floor hugging knees to chest, suggesting intimate vulnerability" }, { label: "Silhueta na Janela", value: "silhouette in a window, dark body against a bright window, focusing on contour" },
-                        { label: "Alongamento Matinal", value: "morning stretch pose, stretching in bed as if just waking up, natural and intimate" }, { label: "Contrapposto Sensual", value: "sensual contrapposto pose, weight on one leg, accentuating hip shape" },
-                        { label: "Molhada pela Chuva", value: "drenched in rain, clothes clinging to the body, dramatic aesthetic" }, { label: "Segurando um Lençol", value: "holding a sheet to strategically cover the body" },
-                        { label: "Deitada de Bruços", value: "lying on stomach, propped up on elbows, relaxed and casually attractive pose" }, { label: "Pose Pin-up Clássica", value: "classic pin-up pose, inspired by 50s illustrations" },
-                        { label: "Tocando os Lábios", value: "touching the lips gently with a finger, drawing focus to the mouth" }, { label: "Dança Íntima", value: "slow dance pose, two people close together, focusing on connection" },
-                        { label: "Ajoelhada de Costas", value: "kneeling, back view, focusing on the line of the back and hips" }, { label: "Saindo da Água", value: "emerging from water, body partially submerged, water dripping from skin" },
-                        { label: "Equilíbrio em um Pé", value: "balancing on one foot, dynamic and elegant pose" }, { label: "Bunda com quadril empinado para cima", value: "ass with hips pushed up" },
-                        { label: "De bruços, seios no chão", value: "lying on stomach, breasts pressed to the floor" }, { label: "De bruços, apoiada nos cotovelos", value: "lying on stomach, propped on elbows" },
-                        { label: "De quatro, peito no chão", value: "on all fours, chest on the ground" }, { label: "Quadril levantado para o alto", value: "hips raised high" },
-                        { label: "Rosto para frente, quadril para trás", value: "face forward, hips back" }
-                    ] 
-                },
-                { title: "Poses Expressivas e Artísticas", key: 'bodyPose', type: 'multi', options: [ { label: "Pose de Yoga", value: "yoga pose (e.g., lotus, warrior)" }, { label: "Contorcionismo", value: "contortionist pose" }, { label: "Pose Fetal", value: "fetal position" }, { label: "Abraçando a si mesma(o)", value: "hugging self" }, ] }
-            ]
+            exampleTags: { all: ["Poses Básicas", "Poses de Ação", "Poses Sensuais", "Poses Deitadas", "Poses Sentadas", "Poses de Pé"] },
+            aiPrompt: (userInput) => `Você é um fotógrafo de moda e coreógrafo. Sua tarefa é gerar poses corporais dinâmicas e expressivas.
+**Entrada do Usuário:** "${userInput}"
+**Regras de Geração:**
+1.  **Se a entrada for um texto (ex: "Poses de Ação"):** Gere no mínimo 10 variações de poses de ação criativas (ex: "No meio de um salto", "Aterrissando com impacto", "Desviando de um golpe", "Preparando um feitiço").
+2.  **Se a entrada for um número (ex: "15"):** Gere essa quantidade de poses diversas.
+**Para cada item, forneça um objeto JSON com:**
+-   "label": Nome em português.
+-   "description": Breve descrição do movimento ou da atitude.
+-   "value": Termo em inglês para o prompt.
+**Retorne um array JSON de objetos.**`
         },
         19: {
-            title: "Tipo de Vestimenta",
-            type: 'single-choice',
+            title: "Vestimenta",
+            type: 'clothing-builder',
             key: 'clothing',
-            nextLogic: (data) => data.clothing?.value === 'nude' || data.clothing?.value === 'clothed' ? 26 : 20,
-            options: [
-                { label: "Totalmente Nua", value: "nude" }, { label: "Apenas Roupa Íntima", value: "underwear" }, { label: "Vestida", value: "clothed" },
-            ]
+            nextLogic: (data) => data.baseCategory.value === 'photo' ? 20 : 100,
+            aiPrompt: (userInput) => `Você é um estilista de moda e figurinista de cinema. Analise a solicitação: "${userInput}".
+**Regras de Geração:**
+1. **Se a entrada for um texto (ex: "biquíni", "roupa íntima", "calcinha", "sutiã"):** Gere no mínimo 10 variações criativas e únicas. Pense em materiais, cortes, estilos (vintage, futurista, fantasia) e detalhes inesperados.
+2. **Se a entrada for um número (ex: "8"):** Gere essa quantidade de peças de vestuário variadas (conjuntos, calcinhas, sutiãs).
+**Para cada item, forneça um objeto JSON com:**
+- "label": O nome criativo do item/conjunto.
+- "description": Uma descrição evocativa do estilo e material.
+- "value": O prompt em inglês para o item.
+- "type": O tipo de item ("set", "panty", ou "bra").
+**Retorne um array JSON de objetos.**`
         },
         20: {
-            title: "Tipo de Calcinha",
+            title: "Iluminação (Fotográfica)",
+            key: 'lighting',
             type: 'single-choice',
-            key: 'pantiesType',
             nextStep: 21,
-            manualInput: { id: 'pantiesManual', placeholder: 'Ou escreva os detalhes aqui...', key: 'pantiesDetails' },
             options: [
-                { label: "Clássica", value: "classic cut panties" }, { label: "Biquíni", value: "bikini cut panties" }, { label: "Caleçon", value: "boyshort panties" },
-                { label: "Cintura Alta", value: "high-waist panties" }, { label: "Fio Dental", value: "thong" }, { label: "Tanga", value: "tanga panties" },
-                { label: "Strappy", value: "strappy panties" }, { label: "Asa Delta", value: "high-leg or V-cut panties" }, { label: "Sem Costura", value: "seamless panties" },
-                { label: "De Renda", value: "lace panties" }, { label: "Aberta", value: "crotchless panties" },
-                { label: "Calcinha de Biquíni Fio Dental", value: "matching tiny thong bikini bottom" },
+                { label: "Cinematográfica", value: "cinematic lighting", description: "A luz é usada para contar uma história, criar atmosfera e guiar o olhar com contraste, profundidade e cor." }, { label: "Luz Suave", value: "soft light", description: "Cria sombras suaves com transições graduais, ideal para retratos de beleza por ser lisonjeira." },
+                { label: "Luz Dura", value: "hard light", description: "Produz sombras fortes e com bordas definidas, uma luz dramática que revela textura e cria alto contraste." }, { label: "Luz de Rembrandt", value: "Rembrandt lighting", description: "Padrão clássico que cria um pequeno triângulo de luz na bochecha sombreada, gerando um visual dramático." },
+                { label: "Contraluz", value: "backlight", description: "A luz vem de trás do sujeito, usada para separá-lo do fundo com um contorno luminoso ou criar uma silhueta." }, { label: "Golden Hour", value: "golden hour lighting", description: "Luz naturalmente suave, quente e direcional do início da manhã ou final da tarde, criando uma atmosfera mágica." },
+                { label: "Luz de Velas", value: "candlelight", description: "Fonte de luz quente, fraca e cintilante, que cria um ambiente íntimo, romântico ou misterioso com sombras profundas." }, { label: "Neon", value: "neon lighting", description: "Iluminação com cores vibrantes e saturadas de letreiros, criando uma atmosfera urbana, moderna ou cyberpunk." },
+                { label: "Luz Subaquática", value: "underwater lighting", description: "Luz filtrada pela água, com dominante azul ou verde e padrões cáusticos, gerando uma atmosfera etérea." }, { label: "Luz de Recorte", value: "rim light, kicker", description: "Uma fina linha de luz no contorno do sujeito, essencial para separá-lo de um fundo escuro." },
+                { label: "Silhueta", value: "silhouette", description: "Forma extrema de contraluz onde o sujeito aparece como uma forma preta sólida contra um fundo brilhante." }, { label: "Luz de Borboleta", value: "butterfly lighting", description: "Luz principal alta e frontal, criando uma pequena sombra sob o nariz. Look clássico e glamoroso." },
+                { label: "Luz Dividida", value: "split lighting", description: "Ilumina exatamente metade do rosto, deixando a outra em sombra profunda para criar drama e tensão." }, { label: "High Key", value: "high key lighting", description: "Cena predominantemente clara e brilhante, com poucas sombras, transmitindo um visual otimista e limpo." },
+                { label: "Low Key", value: "low key lighting", description: "Cena predominantemente escura, onde as sombras são o elemento principal para criar mistério e drama." }, { label: "Luz de Janela", value: "window light", description: "Uso de uma janela como fonte de luz principal, criando retratos com uma aparência natural e pictórica." },
             ]
         },
         21: {
-            title: "Tamanho da Calcinha",
-            type: 'single-choice',
-            key: 'pantiesSize',
-            nextStep: 22,
-            options: [
-                { label: "Extra Pequeno (XS)", value: "XS size" }, { label: "Pequeno (S)", value: "S size" }, { label: "Médio (M)", value: "M size" },
-                { label: "Largo (L)", value: "L size" }, { label: "Extra Largo (XL)", value: "XL size" }, { label: "Nenhum", value: "" },
-            ]
-        },
-        22: {
-            title: "Cor e Detalhes da Calcinha",
-            type: 'color-picker',
-            key: 'pantiesColor',
-            nextStep: 23,
-            manualInput: { id: 'pantiesDetails', placeholder: 'Ex: azul claro com renda, transparente...', key: 'pantiesDetails' }
-        },
-        23: {
-            title: "Tipo de Sutiã",
-            type: 'single-choice',
-            key: 'braType',
-            nextLogic: (data) => data.braType?.value === 'topless' ? 26 : 24,
-            manualInput: { id: 'braManual', placeholder: 'Ou escreva os detalhes aqui...', key: 'braType' },
-            options: [
-                { label: "Meia-taça", value: "demi-cup bra" }, { label: "Push-up", value: "push-up bra" }, { label: "Balconet", value: "balconette bra" },
-                { label: "Alta Sustentação", value: "high support bra" }, { label: "Tomara que Caia", value: "strapless bra" }, { label: "Nadador", value: "racerback bra" },
-                { label: "Triângulo", value: "triangle bra" }, { label: "Bralette", value: "bralette" }, { label: "Esportivo", value: "sports bra" },
-                { label: "Decote Profundo", value: "plunge bra" }, { label: "Cropped", value: "cropped bra" }, { label: "Strappy", value: "strappy bra" },
-                { label: "Top de Biquíni Minimalista", value: "minimalist tiny black bikini top" },
-                { label: "Nenhum (Topless)", value: "topless" },
-            ]
-        },
-        24: {
-            title: "Tamanho do Sutiã",
-            type: 'single-choice',
-            key: 'braSize',
-            nextStep: 25,
-            options: [
-                { label: "Extra Pequeno (XS)", value: "XS size" }, { label: "Pequeno (S)", value: "S size" }, { label: "Médio (M)", value: "M size" },
-                { label: "Largo (L)", value: "L size" }, { label: "Extra Largo (XL)", value: "XL size" }, { label: "Nenhum", value: "" },
-            ]
-        },
-        25: {
-            title: "Cor e Detalhes do Sutiã",
-            type: 'color-picker',
-            key: 'braColor',
-            nextStep: 26,
-            manualInput: { id: 'braDetails', placeholder: 'Ex: azul claro com renda, transparente...', key: 'braDetails' }
-        },
-        26: {
-            title: "Iluminação / Textura do Papel",
-            type: 'conditional-choice',
-            condition: (data) => data.baseCategory?.value === 'photo',
-            nextStep: 27,
-            true: { // Lighting
-                title: "Iluminação",
-                key: 'lighting',
-                type: 'single-choice',
-                options: [
-                    { label: "Cinematográfica", value: "cinematic lighting" }, { label: "Luz Suave", value: "soft light" }, { label: "Luz Dura", value: "hard light" },
-                    { label: "Luz de Rembrandt", value: "Rembrandt lighting" }, { label: "Contraluz", value: "backlight" }, { label: "Golden Hour", value: "golden hour lighting" },
-                    { label: "Luz de Velas", value: "candlelight" }, { label: "Neon", value: "neon lighting" }, { label: "Luz Subaquática", value: "underwater lighting" },
-                    { label: "Luz de Recorte", value: "rim light, kicker" }, { label: "Silhueta", value: "silhouette" }, { label: "Nenhum (Escuridão)", value: "" },
-                ]
-            },
-            false: { // Paper Texture
-                title: "Tipo de Papel / Textura",
-                key: 'paperTexture',
-                type: 'single-choice',
-                options: []
-            }
-        },
-        27: {
             title: "Fundo / Local",
             type: 'single-choice',
             key: 'background',
-            nextStep: 28,
+            nextStep: 22,
             manualInput: { id: 'backgroundManual', placeholder: 'Ou escreva os detalhes aqui...', key: 'background' },
             options: [
                 { label: "Estúdio", value: "in a studio with a plain gray background" }, { label: "Floresta Mística", value: "in a mystical forest" },
                 { label: "Cidade Cyberpunk", value: "in a cyberpunk city" }, { label: "Quarto Aconchegante", value: "in a cozy room" },
                 { label: "Praia Ensolarada", value: "on a sunny beach" }, { label: "Biblioteca Antiga", value: "in an old library" },
-                { label: "Ruínas Desertas", value: "in deserted ruins" }, { label: "Salão de Baile Gótico", value: "in a gothic ballroom" },
-                { label: "Nave Espacial", value: "inside a spaceship" },
             ]
         },
-        28: {
+        22: {
             title: "Ação da Personagem",
             type: 'multi-choice',
             key: 'action',
@@ -627,30 +511,47 @@
             options: [
                 { label: "Olhando para a câmera", value: "looking at the camera" }, { label: "Ajustando a roupa", value: "adjusting clothes" },
                 { label: "Interagindo com o cenário", value: "interacting with the scenery" }, { label: "Em movimento", value: "in motion" },
-                { label: "Pensativa", value: "thoughtful" }, { label: "Tocando um instrumento", value: "playing an instrument" },
-                { label: "Pintando em uma tela", value: "painting on a canvas" }, { label: "Bebendo café", value: "drinking coffee" },
-                { label: "Olhando para o horizonte", value: "looking at the horizon" },
             ]
         },
-        29: { // Final prompt display step
+        23: { // Final prompt display step
             title: "Seu Prompt Profissional está Pronto!",
             subtitle: "Copie o prompt e use-o no seu gerador de imagens. Para máxima consistência, use o mesmo \"Código de Consistência\" em todas as imagens.",
             type: 'final-display',
+        },
+        100: {
+            title: "Estilo de Iluminação (Artístico)",
+            key: 'lighting',
+            type: 'single-choice',
+            nextStep: 101,
+            options: [
+                { label: "Luz Suave e Difusa", value: "soft, diffused lighting", description: "Ideal para retratos e cenas calmas, sem sombras fortes." },
+                { label: "Contraste Alto (Chiaroscuro)", value: "high contrast, chiaroscuro lighting", description: "Usa sombras profundas e luz forte para criar drama e volume." },
+                { label: "Contraluz (Rim Light)", value: "dramatic rim lighting, backlight", description: "Cria um contorno brilhante ao redor da personagem, separando-a do fundo." },
+                { label: "Iluminação Mágica/Etérea", value: "magical, ethereal glow, god rays", description: "Luz que parece emanar da personagem ou de fontes místicas, com brilhos e raios." },
+                { label: "Cores Vibrantes de Neon", value: "vibrant neon lighting", description: "Perfeito para temas cyberpunk ou cenas noturnas com uma atmosfera moderna." },
+                { label: "Luz de Destaque (Spotlight)", value: "dramatic spotlight", description: "Foca um feixe de luz intenso na personagem, deixando o resto na escuridão." }
+            ]
+        },
+        101: {
+            title: "Tipo de Papel / Textura",
+            key: 'paperTexture',
+            type: 'single-choice',
+            nextStep: 21,
+            options: [] // Será preenchido dinamicamente
         }
     };
 
     const paperOptions = {
-        'comic-classic': { label: 'Papel Offset Branco (90-120 g/m²)', value: 'on heavy white offset paper or smooth Bristol board texture' }, 'comic-noir': { label: 'Papel Jornal (Newsprint)', value: 'on newsprint paper texture' },
-        'manga-shonen': { label: 'Papel Offset Branco (80-100 g/m²)', value: 'on standard white manga paper' }, 'manga-shojo': { label: 'Papel Offset Extra-Branco', value: 'on extra-white smooth offset paper for fine lines' },
         'ghibli': { label: 'Papel Aquarela (Cold Press)', value: 'on cold press watercolor paper or textured gouache paper' }, 'anime-cyberpunk': { label: 'Papel Liso (Simulação Digital)', value: 'on a smooth digital illustration surface simulating hot press paper' },
         'fantasy-concept': { label: 'Papel Aquarela (Hot Press)', value: 'on hot press watercolor paper or acrylic painting paper' }, 'scifi-concept': { label: 'Papel para Marcadores (Marker Paper)', value: 'on smooth marker paper or Bristol board' },
-        'steampunk': { label: 'Papel Kraft ou Sépia', value: 'on brown kraft paper or textured sepia-toned paper' }, 'pixel': { label: 'Papel Couchê Fosco', value: 'printed on high-resolution matte coated paper' },
-        'low-poly': { label: 'Papel Couchê Brilhante', value: 'printed on glossy coated paper to enhance colors' }, 'oil-painting': { label: 'Tela de Algodão ou Linho', value: 'on cotton or linen canvas texture' },
         'watercolor': { label: 'Papel Aquarela 100% Algodão', value: 'on 100% cotton cold or hot press watercolor paper (300 g/m²)' }, 'pencil-sketch': { label: 'Papel de Esboço (Sketchbook)', value: 'on sketchbook paper with a slight texture' },
-        'vector': { label: 'Papel Couchê Fosco', value: 'printed on matte coated or smooth offset paper' }, 'pop-art': { label: 'Papel Couchê Brilhante', value: 'printed on glossy coated paper for vibrant colors' },
-        'kids': { label: 'Papel Canson Colorido', value: 'on colored Canson paper or white offset paper (120 g/m²)' }, 'chibi': { label: 'Papel para Marcadores', value: 'on smooth marker paper for flat colors' },
-        'western-cartoon': { label: 'Papel Bristol', value: 'on white offset paper (100-120 g/m²) or Bristol board' }, 'minimalist': { label: 'Papel Algodão Liso', value: 'on smooth cotton paper or printmaking paper' }
     };
+
+    const clothingSizes = [
+        { label: "Extra Pequeno (XS)", value: "extra small (XS) size" }, { label: "Pequeno (S)", value: "small (S) size" },
+        { label: "Médio (M)", value: "medium (M) size" }, { label: "Largo (L)", value: "large (L) size" },
+        { label: "Extra Largo (XL)", value: "extra large (XL) size" }
+    ];
 
     const colors = [
         { name: 'Branco', hex: '#FFFFFF', value: 'white' }, { name: 'Preto', hex: '#000000', value: 'black' }, { name: 'Cinza', hex: '#808080', value: 'gray' },
@@ -658,7 +559,13 @@
         { name: 'Verde', hex: '#008000', value: 'green' }, { name: 'Azul', hex: '#0000FF', value: 'blue' }, { name: 'Roxo', hex: '#800080', value: 'purple' },
         { name: 'Rosa', hex: '#FFC0CB', value: 'pink' }, { name: "Marrom", value: "brown", hex: "#A52A2A" }, { name: "Bege", value: "beige", hex: "#F5F5DC" },
         { name: 'Dourado', hex: '#FFD700', value: 'gold' }, { name: 'Prata', hex: '#C0C0C0', value: 'silver' }, { name: 'Ciano', hex: '#00FFFF', value: 'cyan' },
-        { name: 'Magenta', hex: '#FF00FF', value: 'magenta' }, { name: 'Verde Limão', hex: '#32CD32', value: 'lime green' }, { name: 'Azul Marinho', hex: '#000080', value: 'navy blue' }
+        { name: 'Magenta', hex: '#FF00FF', value: 'magenta' }, { name: 'Verde Limão', hex: '#32CD32', value: 'lime green' }, { name: 'Azul Marinho', hex: '#000080', value: 'navy blue' },
+        { name: 'Verde-azulado', hex: '#008080', value: 'teal' }, { name: 'Bordô', hex: '#800000', value: 'maroon' }, { name: 'Oliva', hex: '#808000', value: 'olive' },
+        { name: 'Coral', hex: '#FF7F50', value: 'coral' }, { name: 'Salmão', hex: '#FA8072', value: 'salmon' }, { name: 'Turquesa', hex: '#40E0D0', value: 'turquoise' },
+        { name: 'Índigo', hex: '#4B0082', value: 'indigo' }, { name: 'Violeta', hex: '#EE82EE', value: 'violet' }, { name: 'Cáqui', hex: '#F0E68C', value: 'khaki' },
+        { name: 'Ameixa', hex: '#DDA0DD', value: 'plum' }, { name: 'Orquídea', hex: '#DA70D6', value: 'orchid' }, { name: 'Carmesim', hex: '#DC143C', value: 'crimson' },
+        { name: 'Azul Céu', hex: '#87CEEB', value: 'sky blue' }, { name: 'Verde-claro', hex: '#7FFF00', value: 'chartreuse' }, { name: 'Lavanda', hex: '#E6E6FA', value: 'lavender' },
+        { name: 'Verde Menta', hex: '#98FF98', value: 'mint green' }
     ];
 
     // =================================================================================
@@ -668,27 +575,80 @@
     let currentStep = 0;
     let isFinalPromptGenerated = false;
     let isEditingFromTechSheet = false;
-    const totalStepsBeforeFinal = 28;
+    let aiGeneratedOptionsCache = {};
+    let lastPositivePrompt = "";
+    let lastNegativePrompt = "";
+    let clothingStepState = {}; // State specific to the clothing builder step
+    let promptDataBeforeEdit = null;
+    
+    const photoPath = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+    const illustrationPath = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 100, 101, 21, 22, 23];
+
 
     const mainContainer = document.getElementById('prompt-builder');
     const progressBar = document.getElementById('progressBar');
     const techSheetBar = document.getElementById('tech-sheet-bar');
     const techSheetContent = document.getElementById('tech-sheet-content');
     const regenerateButton = document.getElementById('regenerateButton');
+    const returnToPromptButton = document.getElementById('returnToPromptButton');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const loadingText = document.getElementById('loadingText');
 
     const sidebarLabels = {
         baseCategory: 'Base', baseStyle: 'Estilo', paperTexture: 'Textura', name: 'Nome', age: 'Idade',
-        ethnicity: 'Etnia', bodyType: 'Biotipo', skinColor: 'Pele', hairLength: 'Cabelo (Comp.)',
+        ethnicity: 'Etnia', bodyType: 'Biotipo', skinColor: 'Pele',
         hairStyle: 'Cabelo (Penteado)', hairColor: 'Cabelo (Cor)', hairColorDetails: 'Cabelo (Detalhes)', eyeColor: 'Olhos', breasts: 'Seios',
         makeup: 'Maquiagem', accessories: 'Acessórios', facialExpression: 'Expressão', bodyPose: 'Pose',
-        clothing: 'Vestimenta', pantiesType: 'Calcinha', pantiesSize: 'Calcinha (Tam.)', pantiesColor: 'Calcinha (Cor)',
-        pantiesDetails: 'Calcinha (Detalhes)', braType: 'Sutiã', braSize: 'Sutiã (Tam.)', braColor: 'Sutiã (Cor)',
-        braDetails: 'Sutiã (Detalhes)', lighting: 'Iluminação', background: 'Fundo', action: 'Ação',
+        clothing: 'Vestimenta',
+        lighting: 'Iluminação', background: 'Fundo', action: 'Ação',
         characterView: 'Orientação', sceneComposition: 'Composição', manualPose: 'Pose Manual', manualAction: 'Ação Manual',
-        ai_generated_input: 'Ideia Original (Editável)'
+        ai_generated_input: 'Ideia Original'
     };
+    
+    // =================================================================================
+    // API HELPER with KEY ROTATION and RETRY LOGIC
+    // =================================================================================
+    const apiKeys = [
+        "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM", // Padrão
+        "AIzaSyAEfzBCsoj9bj-V8d4wNou4XGFY-tAK51c", // Opção 2
+        "AIzaSyANSX1GhESE_aKwcooAYrTkf3FXUDulKNI"  // Opção 3
+    ];
+    let currentApiKeyIndex = 0;
+    
+    async function fetchWithRetry(baseUrl, options, maxRetryRounds = 2) {
+        for (let round = 0; round < maxRetryRounds; round++) {
+            for (let i = 0; i < apiKeys.length; i++) {
+                const apiKey = apiKeys[currentApiKeyIndex];
+                const url = `${baseUrl}?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(url, options);
+
+                    if (response.status !== 429) {
+                        return response; // Success or a non-rate-limit error
+                    }
+                    
+                    // If 429, rotate key for the next attempt in this round
+                    currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
+
+                } catch (error) {
+                    // Handle network errors, etc.
+                    if (i === apiKeys.length - 1 && round === maxRetryRounds - 1) {
+                        throw error; // Re-throw last error if all retries fail
+                    }
+                    // Rotate key and continue
+                    currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
+                }
+            }
+            // If all keys failed in a round, wait before starting the next round
+            if (round < maxRetryRounds - 1) {
+                const delay = Math.pow(2, round) * 1000 + Math.random() * 1000;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+        throw new Error('API request failed after all retries with all keys.');
+    }
+
 
     // =================================================================================
     // CORE LOGIC: Rendering, Navigation, Selection
@@ -700,29 +660,20 @@
         card.dataset.key = option.key || stepData.key;
         card.dataset.label = option.label;
         card.dataset.value = option.value;
-        if (option.nextStep) card.dataset.nextStep = option.nextStep;
-        if (option.styleKey) card.dataset.styleKey = option.styleKey;
-        if (option.filterKey) card.dataset.filterKey = option.filterKey;
+        if (option.type) card.dataset.type = option.type;
         
-        const type = stepData.type || '';
-        const isMulti = type.includes('multi');
-        const isSingle = type.includes('single') || type.includes('category');
+        const isMulti = stepData.isMulti || (stepData.type || '').includes('multi');
+        const isSingleNav = stepData.type === 'single-nav';
 
         if (isMulti) card.dataset.multi = 'true';
-        if (isSingle) card.dataset.single = 'true';
+        if (isSingleNav) card.dataset.singleNav = 'true';
 
         let content = `<div class="card-content flex-grow">
             <h3 class="font-bold text-lg">${option.label}</h3>`;
-        if (option.description) {
+        if (option.description && option.description.trim() !== "") {
             content += `<p class="text-sm text-gray-400 mt-1">${option.description}</p>`;
         }
         content += `</div>`;
-        
-        content += `<div class="weight-controls">
-            <button class="weight-btn" data-action="decrease-weight" data-key="${card.dataset.key}" data-value="${option.value}">-</button>
-            <span class="weight-value">1.0</span>
-            <button class="weight-btn" data-action="increase-weight" data-key="${card.dataset.key}" data-value="${option.value}">+</button>
-        </div>`;
 
         card.innerHTML = content;
         return card;
@@ -754,10 +705,7 @@
                 <div>
                     <h3 class="text-xl font-semibold mb-4 text-center">${stepData.autoPrompt.title}</h3>
                     <p class="text-center text-gray-400 mb-6">Descreva sua ideia abaixo e a IA criará um prompt detalhado para você.</p>
-                    
-                    <h4 class="font-semibold text-indigo-400 mb-2 mt-6">Descreva sua ideia (aqui a mágica acontece):</h4>
                     <textarea id="autoPromptManual" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Ex: ilustração de uma elfa loira na floresta, estilo ghibli..."></textarea>
-                                        
                     <button class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-6" data-action="generate-auto">Gerar Prompt Inteligente</button>
                 </div>
             `;
@@ -780,20 +728,30 @@
                 <textarea id="finalPrompt" rows="8" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300"></textarea>
                 <h3 class="text-xl font-semibold mb-2 mt-6">Prompt Negativo</h3>
                 <textarea id="negativePrompt" rows="4" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300"></textarea>
-                <button data-action="copy" data-target="negativePrompt" class="w-full mt-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
-                    <span class="copy-text">Copiar Negativo</span>
-                </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                    <button data-action="copy" data-target="negativePrompt" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                        <span class="copy-text">Copiar Negativo</span>
+                    </button>
+                    <button data-action="regenerate-negative" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                        <span>Gerar Novo Negativo</span>
+                    </button>
+                </div>
                 <h3 class="text-xl font-semibold mb-2 mt-6">Código de Consistência (Seed)</h3>
                 <div id="consistencySeed" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 font-mono"></div>
                 <button data-action="copy" data-target="consistencySeed" class="w-full mt-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
                     <span class="copy-text">Copiar Código</span>
                 </button>
-                <div class="mt-8 flex items-center gap-4">
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <button id="toggleTechSheetButton" onclick="toggleTechSheet()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         Ficha Técnica (Editar)
+                    </button>
+                    <button data-action="regenerate" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                        Gerar Novo Prompt
                     </button>
                     <button data-action="restart" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
@@ -804,100 +762,82 @@
             // Navigation Buttons for regular steps
             const prevStep = getPreviousStep(stepId);
             const isFinal = stepData.isFinalStep;
-            if (stepId > 0) {
-                stepHtml += `<div class="mb-8 flex justify-between w-full">
+             if (stepId > 0) {
+                 stepHtml += `<div class="mb-8 flex justify-between w-full">
                     <button class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors" data-action="prev" data-step="${prevStep}">Anterior</button>
-                    ${!isFinal ? `<button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors" data-action="next">Próximo</button>` : ''}
-                    ${isFinal ? `<button class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors" data-action="generate">Gerar Prompt</button>` : ''}
+                    <button id="nextButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors" data-action="next" ${stepData.type === 'clothing-builder' ? 'disabled' : ''}>${isFinal ? 'Gerar Prompt' : 'Próximo'}</button>
                 </div>`;
-            }
+             }
 
-            if (stepData.type === 'text-input') {
+            if (stepData.type === 'clothing-builder') {
+                contentContainer.innerHTML = `
+                    <button class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors text-lg mb-6" data-action="select-nude">Totalmente Nua</button>
+                    <div class="my-6 border-t border-gray-700"></div>
+                    
+                    <div id="clothing-selection-area">
+                        <p class="text-gray-400 mb-4">Descreva o que deseja gerar (ex: "biquíni", "roupa íntima", "calcinha", "sutiã").</p>
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="ai-input-${stepId}" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Digite aqui...">
+                            <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors" data-action="generate-options" data-step-id="${stepId}">Gerar</button>
+                        </div>
+                        <div id="ai-options-container-${stepId}" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6"></div>
+                    </div>
+
+                    <div id="clothing-details-area" class="hidden mt-6"></div>
+                    
+                    <div id="clothing-message-area" class="text-center text-amber-400 font-semibold p-4 mt-4 rounded-lg bg-amber-400/10 border border-amber-400/30 hidden"></div>
+
+                    <div id="selected-clothing-display" class="mt-6 space-y-4"></div>
+                `;
+            } else if (stepData.type === 'ai-generated-choice') {
+                const baseCategoryKey = promptData.baseCategory?.value || 'photo';
+                const tags = stepData.exampleTags[baseCategoryKey] || stepData.exampleTags.all || [];
+                const tagsHtml = tags.map(tag => `<button class="example-tag" data-action="use-tag" data-step-id="${stepId}">${tag}</button>`).join('');
+
+                contentContainer.innerHTML = `
+                    <div class="mb-4">
+                        <p class="text-gray-400 mb-3">Sugestões (clique para usar):</p>
+                        <div class="flex flex-wrap gap-2">${tagsHtml}</div>
+                    </div>
+                    <p class="text-gray-400 mb-4 mt-6">Ou gere novas opções. Digite um estilo (ex: Cinematográfico) para ver variações, ou um número (ex: 5) para obter estilos variados.</p>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="ai-input-${stepId}" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Digite um estilo ou quantidade...">
+                        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors" data-action="generate-options" data-step-id="${stepId}">Gerar Opções</button>
+                    </div>
+                    <div id="ai-options-container-${stepId}" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6"></div>
+                `;
+                 if (aiGeneratedOptionsCache[stepId]) {
+                    const container = contentContainer.querySelector(`#ai-options-container-${stepId}`);
+                    aiGeneratedOptionsCache[stepId].forEach(opt => container.appendChild(createOptionCard(opt, { ...stepData })));
+                }
+            } else if (stepData.type === 'text-input') {
                 const inputsHtml = stepData.inputs.map(input =>
                     `<input type="${input.type}" id="${input.id}" data-key="${input.key}" placeholder="${input.placeholder}" class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">`
                 ).join('<div class="h-4"></div>');
                 contentContainer.innerHTML = `<div class="space-y-4">${inputsHtml}</div>`;
-            } else if (stepData.type === 'color-picker') {
-                let colorHtml = `<div class="grid grid-cols-6 md:grid-cols-9 gap-3 mb-4">`;
-                colorHtml += colors.map(color =>
-                    `<div class="color-swatch" style="background-color: ${color.hex};" title="${color.name}" data-key="${stepData.key}" data-label="${color.name}" data-value="${color.value}" data-single="true"></div>`
-                ).join('');
-                colorHtml += `</div>`;
-                contentContainer.innerHTML = colorHtml;
             } else if (stepData.type.includes('choice') || stepData.type === 'category') {
                 const grid = document.createElement('div');
                 grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-4';
+                if (stepId === 1) grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
 
-                if (stepId === 1) {
-                    grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
-                }
-
-                if (stepData.type === 'conditional-choice') {
-                    const conditionResult = stepData.condition(promptData);
-                    const choiceData = conditionResult ? stepData.true : stepData.false;
-                    
-                    if (choiceData.key === 'paperTexture') {
-                        const styleKey = promptData.baseStyle?.styleKey;
-                        if (styleKey && paperOptions[styleKey]) {
-                            choiceData.options = [paperOptions[styleKey], { label: "Nenhum", value: "" }];
-                        } else {
-                            choiceData.options = [{ label: "Papel de Esboço", value: "on sketchbook paper" }, { label: "Nenhum", value: "" }];
-                        }
-                    }
-                    
-                    const titleElement = mainContainer.querySelector(`#step-${stepId} h2`);
-                    if (titleElement) titleElement.textContent = choiceData.title;
-
-                    choiceData.options.forEach(opt => grid.appendChild(createOptionCard(opt, choiceData)));
-                } else if (stepData.type === 'single-choice-category') {
-                    const categoryKey = promptData.baseCategory?.value;
-                    if (categoryKey && stepData.categories[categoryKey]) {
-                        stepData.categories[categoryKey].forEach(opt => grid.appendChild(createOptionCard(opt, stepData)));
-                    } else {
-                        console.error("Cannot render step 2: baseCategory not set. Returning to step 1.");
-                        goToStep(1);
-                        return;
-                    }
-                } else if (stepData.type === 'single-choice-filtered') {
-                    const filterValue = promptData[stepData.filterOn]?.filterKey || 'all';
-                    stepData.options.forEach(opt => {
-                        if (opt.filterKey === 'all' || opt.filterKey === filterValue) {
-                            grid.appendChild(createOptionCard(opt, stepData));
-                        }
-                    });
-                } else if (stepData.type.includes('sections')) {
+                if (stepData.type === 'multi-choice-sections') {
                     grid.className = 'space-y-6';
                     stepData.sections.forEach(section => {
                         const sectionDiv = document.createElement('div');
-                        let sectionTitle = `<h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">${section.title}</h3>`;
-                        
-                        if (stepData.type === 'multi-choice-sections-toggle') {
-                            sectionTitle = `<div class="option-card p-4 rounded-lg cursor-pointer" data-action="toggle-section" data-target="section-${section.title.replace(/\s+/g, '')}"><h3 class="font-bold text-lg">${section.title}</h3></div>`;
-                        }
-
+                        sectionDiv.innerHTML = `<h3 class="text-xl font-semibold mb-4 text-indigo-400 border-b border-gray-700 pb-2">${section.title}</h3>`;
                         const sectionGrid = document.createElement('div');
                         sectionGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4';
-                        if (stepData.type === 'multi-choice-sections-toggle') {
-                            sectionGrid.id = `section-${section.title.replace(/\s+/g, '')}`;
-                            sectionGrid.className += ' mt-4 hidden';
-                        }
-
                         section.options.forEach(opt => {
-                            const cardKey = section.key || stepData.key;
-                            let cardType = section.type || 'multi';
-                            if (stepData.type === 'single-choice-sections') {
-                                cardType = 'single';
-                            }
-                            const card = createOptionCard(opt, { key: cardKey, type: cardType });
-                            sectionGrid.appendChild(card);
+                            sectionGrid.appendChild(createOptionCard(opt, { key: section.key, type: section.type }));
                         });
-                        sectionDiv.innerHTML = sectionTitle;
                         sectionDiv.appendChild(sectionGrid);
                         grid.appendChild(sectionDiv);
                     });
-                    if(stepData.finalOption) {
-                        grid.appendChild(createOptionCard(stepData.finalOption, { ...stepData, type: 'single' }));
-                    }
+                } else if (stepId === 101) {
+                    const styleKey = promptData.baseStyle?.value;
+                    const options = styleKey && paperOptions[styleKey] ? [paperOptions[styleKey]] : [{ label: "Papel de Esboço", value: "on sketchbook paper" }];
+                    options.push({ label: "Nenhum", value: "" });
+                    options.forEach(opt => grid.appendChild(createOptionCard(opt, stepData)));
                 } else {
                     stepData.options.forEach(opt => grid.appendChild(createOptionCard(opt, stepData)));
                 }
@@ -918,58 +858,34 @@
         stepHtml += `</div>`;
         mainContainer.innerHTML = stepHtml;
 
-        updateSelectionUI(stepId);
+        if(stepData.type === 'final-display' && isFinalPromptGenerated) {
+            document.getElementById('finalPrompt').value = lastPositivePrompt;
+            document.getElementById('negativePrompt').value = lastNegativePrompt;
+        }
+
+        if (stepData.type === 'clothing-builder') {
+            updateClothingDisplay();
+        } else {
+            updateSelectionUI(stepId);
+        }
     }
 
     function updateSelectionUI(stepId) {
         const stepContent = document.getElementById(`step-${stepId}`);
         if (!stepContent) return;
 
-        stepContent.querySelectorAll('.option-card').forEach(card => {
+        stepContent.querySelectorAll('.option-card, .color-swatch').forEach(card => {
             const { key, value } = card.dataset;
             const data = promptData[key];
             let isSelected = false;
-            let currentWeight = 1.0;
 
             if (Array.isArray(data)) {
-                const item = data.find(item => item.value === value);
-                if (item) {
-                    isSelected = true;
-                    currentWeight = item.weight;
-                }
+                isSelected = data.some(item => item.value === value);
             } else if (data && data.value === value) {
                 isSelected = true;
-                currentWeight = data.weight;
             }
             
-            const weightControls = card.querySelector('.weight-controls');
-
-            if (isSelected) {
-                card.classList.add('selected');
-                const weightValueEl = card.querySelector('.weight-value');
-                if (weightValueEl) weightValueEl.textContent = currentWeight.toFixed(1);
-                
-                if (isEditingFromTechSheet && weightControls) {
-                    weightControls.style.display = 'flex';
-                } else if (weightControls) {
-                    weightControls.style.display = 'none';
-                }
-
-            } else {
-                card.classList.remove('selected');
-                if (weightControls) {
-                    weightControls.style.display = 'none';
-                }
-            }
-        });
-
-        stepContent.querySelectorAll('.color-swatch').forEach(swatch => {
-            const { key, value } = swatch.dataset;
-            if (promptData[key]?.value === value) {
-                swatch.classList.add('selected');
-            } else {
-                swatch.classList.remove('selected');
-            }
+            card.classList.toggle('selected', isSelected);
         });
 
         stepContent.querySelectorAll('input, textarea').forEach(input => {
@@ -998,24 +914,32 @@
     }
 
     function goToStep(stepId) {
-        if (stepId > totalStepsBeforeFinal + 1 || stepId < 0) return;
+        if (stepId > 200 || stepId < 0) return; // Allow higher step numbers
+        
+        if (stepId < currentStep && !isEditingFromTechSheet) {
+            // Do not clear cache when going back
+        }
+
         showStep(stepId);
     }
     
     function getPreviousStep(stepId) {
-        if (stepId <= 1) return 0;
-        if (stepId === 5 && promptData.ageIsNumeric) return 3;
-        if (stepId === 26) {
-            const clothingChoice = promptData.clothing?.value;
-            if (clothingChoice === 'nude' || clothingChoice === 'clothed') return 19;
-            if (promptData.braType?.value === 'topless') return 23;
-            return 25;
+        const currentPath = promptData.baseCategory?.value === 'illustration' ? illustrationPath : photoPath;
+        const currentIndex = currentPath.indexOf(stepId);
+        if (currentIndex > 0) {
+            return currentPath[currentIndex - 1];
         }
-        return stepId - 1;
+        return 0;
     }
 
     function updateProgressBar() {
-        const progress = (Math.max(0, currentStep - 1) / totalStepsBeforeFinal) * 100;
+        const currentPath = promptData.baseCategory?.value === 'illustration' ? illustrationPath : photoPath;
+        const total = currentPath.length - 2; // Exclude start (0) and end (23) steps
+        const currentIndex = currentPath.indexOf(currentStep);
+
+        if (currentIndex === -1) return;
+
+        const progress = (currentIndex / total) * 100;
         progressBar.style.width = `${Math.min(progress, 100)}%`;
     }
     
@@ -1023,12 +947,17 @@
         isEditingFromTechSheet = false;
         const stepData = stepsData[currentStep];
         if (!stepData) return;
+        
+        if (stepData.isFinalStep) {
+            triggerFinalGeneration();
+            return;
+        }
 
         document.querySelectorAll(`#step-${currentStep} input, #step-${currentStep} textarea`).forEach(input => {
             const { key } = input.dataset;
             const value = input.value.trim();
             if (value) {
-                promptData[key] = { label: value, value: value, weight: 1.0 };
+                promptData[key] = { label: value, value: value };
                 if (key === 'age') {
                     promptData.ageIsNumeric = true;
                     promptData.age.value = getAgeDescription(parseInt(value, 10));
@@ -1041,39 +970,30 @@
         
         updateTechSheet();
 
-        let nextStep;
-        if (typeof stepData.nextLogic === 'function') {
-            nextStep = stepData.nextLogic(promptData);
-        } else {
-            nextStep = stepData.nextStep || currentStep + 1;
-        }
+        let nextStep = (typeof stepData.nextLogic === 'function') ? stepData.nextLogic(promptData) : (stepData.nextStep || currentStep + 1);
         goToStep(nextStep);
     }
     
     function handleCardSelection(card) {
-        const { key, label, value, styleKey, filterKey, multi, single, nextStep: cardNextStep } = card.dataset;
-        
+        const { key, label, value, multi, singleNav } = card.dataset;
+        const stepData = stepsData[currentStep];
+
         if (multi === 'true') {
             if (!promptData[key]) promptData[key] = [];
             const index = promptData[key].findIndex(item => item.value === value);
             if (index > -1) {
                 promptData[key].splice(index, 1);
             } else {
-                promptData[key].push({ label, value, weight: 1.0 });
+                promptData[key].push({ label, value });
             }
-        } else if (single === 'true') {
-            const isAlreadySelected = card.classList.contains('selected');
-            
-            const stepContent = card.closest('.step');
-            if (stepContent) {
-                stepContent.querySelectorAll(`[data-key="${key}"]`).forEach(c => c.classList.remove('selected'));
-            }
+        } else { // Single choice
+             const isAlreadySelected = card.classList.contains('selected');
+             card.closest('.step').querySelectorAll(`[data-key="${key}"]`).forEach(c => c.classList.remove('selected'));
 
             if (!isAlreadySelected) {
-                const data = { label, value, weight: 1.0 };
-                if (styleKey) data.styleKey = styleKey;
-                if (filterKey) data.filterKey = filterKey;
-                promptData[key] = data;
+                const option = findOption(key, value);
+                promptData[key] = { label, value, description: option?.description || '' };
+                card.classList.add('selected');
             } else {
                 delete promptData[key];
             }
@@ -1082,185 +1002,340 @@
         updateTechSheet();
         updateSelectionUI(currentStep);
 
-        if (!isEditingFromTechSheet && single === 'true' && !promptData[key]) {
-            // Do nothing, allow deselection without auto-advancing
-        } else if (!isEditingFromTechSheet && single === 'true') {
-            setTimeout(() => {
-                const stepData = stepsData[currentStep];
-                let next;
-                if (cardNextStep) {
-                    next = parseInt(cardNextStep, 10);
-                } else if (typeof stepData.nextLogic === 'function') {
-                    next = stepData.nextLogic(promptData);
-                } else {
-                    next = stepData.nextStep || currentStep + 1;
-                }
-                goToStep(next);
-            }, 250);
+        // Navigation Logic
+        const shouldNavigate = !isEditingFromTechSheet && promptData[key];
+        if (shouldNavigate && (singleNav === 'true' || (!multi && stepData.type !== 'clothing-builder'))) {
+            setTimeout(handleNextAction, 250);
         }
     }
 
-    function adjustWeight(key, value, amount) {
-        const data = promptData[key];
-        let item;
-        if (Array.isArray(data)) {
-            item = data.find(i => i.value === value);
-        } else if (data && data.value === value) {
-            item = data;
+    function findOption(key, value) {
+        for (const stepId in stepsData) {
+            const step = stepsData[stepId];
+            if (step.key === key && step.options) {
+                return step.options.find(opt => opt.value === value);
+            }
+            if (step.true?.key === key && step.true.options) {
+                 return step.true.options.find(opt => opt.value === value);
+            }
+             if (step.false?.key === key && step.false.options) {
+                 return step.false.options.find(opt => opt.value === value);
+            }
         }
-
-        if (item) {
-            item.weight = Math.max(0.1, Math.round((item.weight + amount) * 10) / 10);
-            updateSelectionUI(currentStep);
-            updateTechSheet();
-        }
+        return null;
     }
     
-    function triggerFinalGeneration(closeTechSheet = false) {
-        if (closeTechSheet) {
-            techSheetBar.classList.remove('visible');
-        }
+    async function triggerFinalGeneration(closeTechSheet = false) {
+        if (closeTechSheet) techSheetBar.classList.remove('visible');
         
-        if (promptData.ai_generated_input && promptData.ai_generated_input.value) {
-            handleAutoGenerate(promptData.ai_generated_input.value);
+        if (promptData.ai_generated_input?.value && Object.keys(promptData).length === 1) {
+            await handleAutoGenerate(promptData.ai_generated_input.value);
         } else {
             const manualInputAction = document.getElementById('actionManual');
             if (manualInputAction) {
                 const value = manualInputAction.value.trim();
-                const key = manualInputAction.dataset.key;
-                if (value) {
-                    promptData[key] = { label: value, value: value, weight: 1.0 };
-                } else {
-                    delete promptData[key];
-                }
+                if (value) promptData.manualAction = { label: value, value: value };
+                else delete promptData.manualAction;
             }
             updateTechSheet();
-            generateAndDisplayManualPrompt();
+            await generateAndDisplayManualPrompt();
         }
     }
 
-    mainContainer.addEventListener('click', (e) => {
-        const target = e.target;
-        const card = target.closest('.option-card');
-        
-        if (target.closest('[data-action="increase-weight"]')) {
-            e.stopPropagation();
-            const btn = target.closest('[data-action="increase-weight"]');
-            adjustWeight(btn.dataset.key, btn.dataset.value, 0.1);
-            return;
-        }
-        if (target.closest('[data-action="decrease-weight"]')) {
-            e.stopPropagation();
-            const btn = target.closest('[data-action="decrease-weight"]');
-            adjustWeight(btn.dataset.key, btn.dataset.value, -0.1);
-            return;
-        }
+    // =================================================================================
+    // CLOTHING BUILDER LOGIC (STEP 19)
+    // =================================================================================
 
-        const actionTarget = target.closest('button, [data-action="toggle-section"], .color-swatch');
-        if (card && !actionTarget) {
-             handleCardSelection(card);
-        } else if (actionTarget) {
-            const { action, step, target: dataTarget } = actionTarget.dataset;
-            if (action === 'prev') {
-                isEditingFromTechSheet = false;
-                goToStep(parseInt(step, 10));
+    function resetClothingStep() {
+        clothingStepState = {
+            currentSelection: null, // { label, value, type }
+            panty: null,
+            bra: null,
+            set: null
+        };
+        promptData.clothing = {};
+        if (document.getElementById('nextButton')) {
+            document.getElementById('nextButton').disabled = true;
+        }
+    }
+
+    function handleClothingSelection(card) {
+        const { label, value, type } = card.dataset;
+        clothingStepState.currentSelection = { label, value, type };
+        
+        document.getElementById('clothing-selection-area').classList.add('hidden');
+        const detailsArea = document.getElementById('clothing-details-area');
+
+        const sizeOptionsHtml = clothingSizes.map(size => 
+            `<button class="option-card p-3" data-action="select-clothing-detail" data-type="size" data-label="${size.label}" data-value="${size.value}">${size.label}</button>`
+        ).join('');
+
+        const colorOptionsHtml = colors.map(color => 
+            `<div class="color-swatch" style="background-color: ${color.hex};" title="${color.name}" data-action="select-clothing-detail" data-type="color" data-label="${color.name}" data-value="${color.value}"></div>`
+        ).join('');
+
+        detailsArea.innerHTML = `
+            <div class="clothing-details-section">
+                <h3 class="font-semibold text-lg mb-3">Tamanho:</h3>
+                <div id="clothing-size-selector" class="grid grid-cols-3 gap-2">${sizeOptionsHtml}</div>
+            </div>
+            <div class="clothing-details-section">
+                <h3 class="font-semibold text-lg mb-3">Cor:</h3>
+                <div id="clothing-color-selector" class="grid grid-cols-6 md:grid-cols-9 gap-2">${colorOptionsHtml}</div>
+            </div>
+            <div class="clothing-details-section">
+                <h3 class="font-semibold text-lg mb-3">Detalhes (Opcional):</h3>
+                <textarea id="clothing-details-input" class="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg" placeholder="Ex: renda, transparente, cetim..."></textarea>
+            </div>
+            <button class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg" data-action="confirm-clothing-piece">Confirmar Peça</button>
+        `;
+        detailsArea.classList.remove('hidden');
+    }
+
+    function handleClothingDetailSelection(target) {
+        const { type, value, label } = target.dataset;
+        const selectorId = `#clothing-${type}-selector`;
+        const container = document.querySelector(selectorId);
+
+        // For single-choice like size
+        if (type === 'size') {
+            container.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            target.classList.add('selected');
+            clothingStepState.currentSelection.size = { label, value };
+        }
+        // For multi-choice like color
+        if (type === 'color') {
+            target.classList.toggle('selected');
+            if (!clothingStepState.currentSelection.colors) clothingStepState.currentSelection.colors = [];
+            
+            const index = clothingStepState.currentSelection.colors.findIndex(c => c.value === value);
+            if (index > -1) {
+                clothingStepState.currentSelection.colors.splice(index, 1);
+            } else {
+                clothingStepState.currentSelection.colors.push({ label, value });
             }
-            else if (action === 'next') handleNextAction();
-            else if (action === 'generate') triggerFinalGeneration();
-            else if (action === 'restart') restart();
-            else if (action === 'start-manual') goToStep(1);
-            else if (action === 'generate-auto') handleAutoGenerate();
-            else if (action === 'copy') copyToClipboard(dataTarget, actionTarget.querySelector('.copy-text'));
-            else if (action === 'add-consistency') addConsistencyText();
-            else if (action === 'remove-consistency') removeConsistencyText();
-            else if (action === 'toggle-section') {
-                document.getElementById(dataTarget).classList.toggle('hidden');
-                actionTarget.classList.toggle('selected');
-            } else if (actionTarget.matches('.color-swatch')) {
-                handleCardSelection(actionTarget);
+        }
+    }
+
+    function confirmClothingPiece() {
+        const selection = clothingStepState.currentSelection;
+        if (!selection.size) {
+            showToast("Por favor, selecione um tamanho.", 3000, true);
+            return;
+        }
+        if (!selection.colors || selection.colors.length === 0) {
+            showToast("Por favor, selecione pelo menos uma cor.", 3000, true);
+            return;
+        }
+        selection.details = document.getElementById('clothing-details-input').value.trim();
+
+        if (selection.type === 'set') {
+            clothingStepState.set = { ...selection };
+            clothingStepState.panty = null;
+            clothingStepState.bra = null;
+        } else if (selection.type === 'panty') {
+            clothingStepState.panty = { ...selection };
+            clothingStepState.set = null;
+        } else if (selection.type === 'bra') {
+            clothingStepState.bra = { ...selection };
+            clothingStepState.set = null;
+        }
+        
+        clothingStepState.currentSelection = null;
+        document.getElementById('clothing-details-area').classList.add('hidden');
+        document.getElementById('clothing-selection-area').classList.remove('hidden');
+        document.getElementById(`ai-options-container-19`).innerHTML = '';
+        
+        updateClothingDisplay();
+        checkClothingCompletion();
+    }
+    
+    function updateClothingDisplay() {
+        const displayArea = document.getElementById('selected-clothing-display');
+        displayArea.innerHTML = '';
+        
+        const createDisplayCard = (item, type) => {
+            const colors = item.colors.map(c => c.label).join(', ');
+            return `
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <h4 class="font-bold text-indigo-400 capitalize">${type}</h4>
+                    <p class="text-lg">${item.label}</p>
+                    <p class="text-sm text-gray-400">Tamanho: ${item.size.label}</p>
+                    <p class="text-sm text-gray-400">Cor: ${colors}</p>
+                    ${item.details ? `<p class="text-sm text-gray-400">Detalhes: ${item.details}</p>` : ''}
+                </div>
+            `;
+        };
+
+        if (clothingStepState.set) {
+            displayArea.innerHTML = createDisplayCard(clothingStepState.set, 'Conjunto');
+        } else {
+            if (clothingStepState.panty) displayArea.innerHTML += createDisplayCard(clothingStepState.panty, 'Calcinha');
+            if (clothingStepState.bra) displayArea.innerHTML += createDisplayCard(clothingStepState.bra, 'Sutiã');
+        }
+    }
+
+    function checkClothingCompletion() {
+        const messageArea = document.getElementById('clothing-message-area');
+        const nextButton = document.getElementById('nextButton');
+        messageArea.classList.add('hidden');
+        
+        if (clothingStepState.set) {
+            nextButton.disabled = false;
+        } else if (clothingStepState.panty && clothingStepState.bra) {
+            nextButton.disabled = false;
+        } else if (clothingStepState.panty) {
+            messageArea.textContent = "Ótimo! Agora gere e escolha um sutiã para combinar.";
+            messageArea.classList.remove('hidden');
+            nextButton.disabled = true;
+        } else if (clothingStepState.bra) {
+            messageArea.textContent = "Ótimo! Agora gere e escolha uma calcinha para combinar.";
+            messageArea.classList.remove('hidden');
+            nextButton.disabled = true;
+        } else {
+            nextButton.disabled = true;
+        }
+        
+        // Finalize data for prompt generation
+        promptData.clothing = { ...clothingStepState };
+        updateTechSheet();
+    }
+
+
+    // =================================================================================
+    // EVENT LISTENERS & INITIALIZATION
+    // =================================================================================
+    mainContainer.addEventListener('click', (e) => {
+        const card = e.target.closest('.option-card');
+        const actionTarget = e.target.closest('[data-action]');
+
+        if (actionTarget) {
+            const { action, step, target: dataTarget, stepId } = actionTarget.dataset;
+            switch(action) {
+                case 'prev':
+                    isEditingFromTechSheet = false;
+                    goToStep(parseInt(step, 10));
+                    break;
+                case 'next':
+                    handleNextAction();
+                    break;
+                case 'restart':
+                    restart();
+                    break;
+                case 'start-manual':
+                    goToStep(1);
+                    break;
+                case 'generate-auto':
+                    handleAutoGenerate();
+                    break;
+                case 'generate-options':
+                    generateOptionsWithAI(parseInt(stepId, 10));
+                    break;
+                case 'use-tag':
+                    document.getElementById(`ai-input-${stepId}`).value = actionTarget.textContent;
+                    generateOptionsWithAI(parseInt(stepId, 10));
+                    break;
+                case 'copy':
+                    copyToClipboard(dataTarget, actionTarget.querySelector('.copy-text'));
+                    break;
+                case 'add-consistency':
+                    addConsistencyText();
+                    break;
+                case 'remove-consistency':
+                    removeConsistencyText();
+                    break;
+                case 'regenerate-negative':
+                    handleRegenerateNegative();
+                    break;
+                case 'select-nude':
+                    promptData.clothing = { nude: { label: 'Totalmente Nua', value: 'completely nude' }};
+                    handleNextAction();
+                    break;
+                case 'select-clothing-item':
+                    handleClothingSelection(actionTarget);
+                    break;
+                case 'select-clothing-detail':
+                    handleClothingDetailSelection(actionTarget);
+                    break;
+                case 'confirm-clothing-piece':
+                    confirmClothingPiece();
+                    break;
+                case 'regenerate':
+                    triggerFinalGeneration(false);
+                    break;
             }
+        } else if (card) {
+            handleCardSelection(card);
         }
     });
-    
-    // =================================================================================
-    // TECH SHEET & UI HELPERS
-    // =================================================================================
-    const TECH_SHEET_REDIRECT_MAP = { 8: 9, 1: 2 };
 
-    function handleTechSheetClick(stepId) {
-        isEditingFromTechSheet = true;
-        let targetStep = TECH_SHEET_REDIRECT_MAP[stepId] || stepId;
-        if (isFinalPromptGenerated) targetStep = stepId;
-        goToStep(targetStep);
-    }
-
-    function toggleTechSheet() {
-        techSheetBar.classList.toggle('visible');
-    }
-
-    function updateTechSheet() {
-        const hasData = Object.keys(promptData).length > 0;
-        if (!hasData) {
-            techSheetBar.classList.remove('visible');
-            return;
-        }
-
-        techSheetContent.innerHTML = '';
-        const displayOrder = ['ai_generated_input', ...Object.keys(sidebarLabels).filter(k => k !== 'ai_generated_input')];
-
-        displayOrder.forEach(key => {
-            const data = promptData[key];
-            if (!data) return;
-
-            if (key === 'ai_generated_input') {
-                const item = promptData[key];
-                const entry = document.createElement('div');
-                entry.className = 'w-full px-1';
-                entry.innerHTML = `
-                    <label class="font-semibold text-indigo-400 text-sm">${sidebarLabels[key]}:</label>
-                    <textarea class="w-full p-2 bg-gray-800 border border-gray-600 rounded-md mt-1 text-sm leading-tight" rows="2">${item.value}</textarea>
-                `;
-                entry.querySelector('textarea').addEventListener('input', (e) => {
-                    promptData.ai_generated_input.value = e.target.value;
-                    promptData.ai_generated_input.label = e.target.value;
-                });
-                techSheetContent.appendChild(entry);
-                return;
-            }
-
-            const processEntry = (item) => {
-                const weight = item.weight ? item.weight.toFixed(1) : '1.0';
-                const label = sidebarLabels[key] || 'Gerado por IA';
-                const valueText = weight !== '1.0' ? `${item.label} (${weight})` : item.label;
-                const entry = document.createElement('div');
-                entry.className = 'tech-sheet-entry';
-                if (isFinalPromptGenerated && !promptData.ai_generated_input) {
-                    entry.classList.add('clickable');
-                    const stepId = Object.keys(stepsData).find(id => {
-                        const s = stepsData[id];
-                        if (s.key === key || s.manualInput?.key === key || s.sections?.some(sec => sec.key === key)) return true;
-                        return false;
-                    });
-                    if(stepId) entry.dataset.step = stepId;
-                }
-                entry.innerHTML = `<span class="font-semibold text-indigo-400">${label}:</span> ${valueText}`;
-                techSheetContent.appendChild(entry);
-            };
-
-            if (Array.isArray(data)) data.forEach(processEntry);
-            else if (typeof data === 'object' && data.label) processEntry(data);
-        });
-
-        regenerateButton.style.display = isFinalPromptGenerated ? 'flex' : 'none';
-    }
-    
     techSheetContent.addEventListener('click', (e) => {
         const entry = e.target.closest('.tech-sheet-entry');
-        if (entry && entry.dataset.step) {
+        if (!entry) return;
+
+        const actionTarget = e.target.closest('[data-action]');
+
+        if (actionTarget) {
+            const { action } = actionTarget.dataset;
+            if (action === 'save-edited-prompt') {
+                const key = entry.dataset.key;
+                const input = entry.querySelector('input');
+                const newText = input.value.trim();
+                
+                if (newText) {
+                    promptData[key] = { label: newText, value: newText };
+                    showToast("Ideia original atualizada. Clique em 'Gerar Novo Prompt'.");
+                } else {
+                    delete promptData[key];
+                    showToast("Item removido.");
+                }
+                updateTechSheet();
+                return;
+            }
+            
+            if (action === 'cancel-edit-prompt') {
+                updateTechSheet();
+                return;
+            }
+        }
+
+        if (entry.dataset.step) {
             handleTechSheetClick(parseInt(entry.dataset.step, 10));
+        } else if (entry.classList.contains('clickable')) {
+            makeTechSheetEntryEditable(entry);
         }
     });
 
+    function makeTechSheetEntryEditable(entry) {
+        if (techSheetContent.querySelector('input')) {
+            showToast("Salve ou cancele a edição atual primeiro.", 3000, true);
+            return;
+        }
+
+        const key = entry.dataset.key;
+        const data = promptData[key];
+        if (!data) return;
+
+        const currentValueText = data.label || '';
+
+        entry.classList.remove('clickable');
+        entry.classList.add('is-editing'); // Add class for styling
+
+        entry.innerHTML = `
+            <div class="flex items-center gap-2 w-full">
+                <span class="font-semibold text-indigo-400">${sidebarLabels[key]}:</span>
+                <input type="text" value="${currentValueText.replace(/"/g, '&quot;')}" class="flex-grow bg-gray-700 text-white p-1 rounded outline-none focus:ring-2 focus:ring-indigo-500">
+                <button data-action="save-edited-prompt" class="bg-green-600 hover:bg-green-700 p-1 rounded-full flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                </button>
+                <button data-action="cancel-edit-prompt" class="bg-red-600 hover:bg-red-700 p-1 rounded-full flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.697a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+        `;
+        entry.querySelector('input').focus();
+    }
+    
     function getAgeDescription(age) {
         if (age >= 46) return `a mature woman, approximately ${age} years old`;
         if (age >= 31) return `a woman, approximately ${age} years old`;
@@ -1305,81 +1380,139 @@
     
     function restart() {
         promptData = {};
+        aiGeneratedOptionsCache = {};
         isFinalPromptGenerated = false;
         isEditingFromTechSheet = false;
+        resetClothingStep();
         techSheetBar.classList.remove('visible');
         updateTechSheet();
         goToStep(0);
+    }
+
+    function toggleTechSheet() {
+        const techSheetBar = document.getElementById('tech-sheet-bar');
+        techSheetBar.classList.toggle('visible');
+        if (techSheetBar.classList.contains('visible')) {
+            updateTechSheet();
+        }
+    }
+
+    function handleTechSheetClick(stepId) {
+        promptDataBeforeEdit = JSON.parse(JSON.stringify(promptData));
+        isEditingFromTechSheet = true;
+        goToStep(stepId);
+    }
+    
+    function cancelEditAndReturn() {
+        if (promptDataBeforeEdit) {
+            promptData = JSON.parse(JSON.stringify(promptDataBeforeEdit));
+            promptDataBeforeEdit = null; // Clear the backup
+        }
+        isEditingFromTechSheet = false;
+        updateTechSheet(); // Update the sheet with restored data
+        goToStep(23); // Go to final prompt display
+        toggleTechSheet(); // Close the sheet
     }
     
     // =================================================================================
     // PROMPT GENERATION LOGIC
     // =================================================================================
-    function formatValue(item) {
-        if (!item || !item.value) return '';
-        const weight = item.weight || 1.0;
-        return weight !== 1.0 ? `(${item.value}:${weight.toFixed(1)})` : item.value;
+    
+    function summarizeChoices(data) {
+        const summaryParts = [];
+        const displayOrder = Object.keys(sidebarLabels);
+
+        const formatClothing = (clothingData) => {
+            if (clothingData.nude) return "Vestimenta: Totalmente Nua";
+            if (clothingData.set) {
+                const { label, size, colors, details, description } = clothingData.set;
+                const colorStr = colors.map(c => c.label).join(', ');
+                return `Vestimenta: Conjunto ${label} (Descrição: ${description}), Tamanho ${size.label}, Cor ${colorStr}${details ? `, Detalhes: ${details}` : ''}`;
+            }
+            let pieceSummary = [];
+            if (clothingData.panty) {
+                const { label, size, colors, details, description } = clothingData.panty;
+                const colorStr = colors.map(c => c.label).join(', ');
+                pieceSummary.push(`Calcinha ${label} (Descrição: ${description}), Tamanho ${size.label}, Cor ${colorStr}${details ? `, Detalhes: ${details}` : ''}`);
+            }
+            if (clothingData.bra) {
+                const { label, size, colors, details, description } = clothingData.bra;
+                const colorStr = colors.map(c => c.label).join(', ');
+                pieceSummary.push(`Sutiã ${label} (Descrição: ${description}), Tamanho ${size.label}, Cor ${colorStr}${details ? `, Detalhes: ${details}` : ''}`);
+            }
+            return `Vestimenta: ${pieceSummary.join(' e ')}`;
+        };
+
+        displayOrder.forEach(key => {
+            const item = data[key];
+            if (!item) return;
+
+            if (key === 'clothing') {
+                const clothingSummary = formatClothing(item);
+                if(clothingSummary) summaryParts.push(clothingSummary);
+                return;
+            }
+            
+            if (key === 'age' && item.value) {
+                summaryParts.push(`Idade: ${item.value}`); // Use the direct English value for clarity
+                return; 
+            }
+
+            const label = sidebarLabels[key] || key;
+            let valueText = '';
+            if (Array.isArray(item)) {
+                valueText = item.map(i => `${i.label}${i.description ? ` (Descrição: ${i.description})` : ''}`).join(', ');
+            } else if (item.label) {
+                valueText = `${item.label}${item.description ? ` (Descrição: ${item.description})` : ''}`;
+            }
+
+            if (valueText) {
+                summaryParts.push(`${label}: ${valueText}`);
+            }
+        });
+
+        return summaryParts.join('\n');
     }
 
-    function buildManualPrompt() {
-        const p = promptData;
-        const segments = [];
+    async function generateManualPromptWithAPI(choicesSummary) {
+        loadingOverlay.classList.remove('hidden');
+        loadingText.textContent = "Gerando prompt otimizado com IA...";
 
-        if (p.baseStyle) segments.push(formatValue(p.baseStyle) + ',');
-        
-        let charDesc = p.baseCategory?.value === 'illustration' ? `an illustration of` : `a portrait of`;
-        const charParts = [p.name?.value, p.age?.value, p.ethnicity?.value, p.characterStyle ? `with a ${formatValue(p.characterStyle)}` : null].filter(Boolean);
-        if (charParts.length > 0) charDesc += ` ${charParts.join(', ')}`;
-        segments.push(`${charDesc}.`);
+        const systemPrompt = `Você é um engenheiro de prompt de IA e diretor de arte de classe mundial, com a tarefa de criar o prompt de imagem perfeito. Você receberá uma ficha técnica com as escolhas do usuário. Sua missão é usar esta ficha como base para **expandir e elaborar** uma cena visualmente rica, cinematográfica e hiperdetalhada em INGLÊS.
 
-        const hairColorDesc = [formatValue(p.hairColor), formatValue(p.hairColorDetails)].filter(Boolean).join(' ');
-        const hairStyleDesc = p.hairStyle ? formatValue(p.hairStyle) : formatValue(p.hairLength);
-        const physicalFeatures = [formatValue(p.bodyType), formatValue(p.skinColor), formatValue(p.breasts), hairStyleDesc, hairColorDesc, formatValue(p.eyeColor)].filter(Boolean);
-        if (physicalFeatures.length > 0) segments.push(`She has ${physicalFeatures.join(', ')}.`);
+**INSTRUÇÕES CRÍTICAS E OBRIGATÓRIAS:**
+1.  **EXPANDA, NÃO APENAS LISTE:** As escolhas do usuário são o esqueleto. Sua função é adicionar os músculos, a pele e a alma. Elabore os detalhes, adicione elementos sensoriais (texturas, sons, temperaturas) e crie uma atmosfera envolvente. Use as descrições fornecidas para adicionar profundidade.
+2.  **CRIE UMA NARRATIVA VISUAL:** Não liste as características. Construa uma cena coesa que conte uma pequena história. Descreva a personagem, o que ela está a fazer, a sua expressão, e como ela interage com o ambiente de forma cinematográfica. Pinte um quadro com palavras.
+3.  **SEJA HIPERDETALHADO:** Adicione detalhes técnicos e artísticos. Fale sobre a textura dos tecidos, o brilho nos olhos, a qualidade da luz (ex: 'luz dourada do final da tarde a filtrar-se pelas árvores'), o tipo de lente da câmara (mesmo que seja uma ilustração). O objetivo é um prompt rico que não deixa espaço para ambiguidades.
+4.  **FORMATO:** O prompt final deve ser um único parágrafo em INGLÊS, sem asteriscos (\`*\`) ou qualquer outra formatação markdown.
+5.  **ATENÇÃO À IDADE:** Preste atenção estrita à descrição da idade. Se a entrada for 'a girl', use o termo 'girl'. Se for 'a young woman', use 'young woman'. Não confunda essas faixas etárias distintas.
 
-        if (p.clothing) {
-            if (p.clothing.value === 'nude') segments.push('She is completely nude.');
-            else if (p.clothing.value === 'underwear') {
-                const underwearParts = [];
-                if (p.braType?.value === 'topless') underwearParts.push('topless');
-                else if (p.braType) {
-                    const braDesc = formatValue(p.braType);
-                    const braDetails = [formatValue(p.braColor), formatValue(p.braDetails), braDesc, formatValue(p.braSize)].filter(Boolean).join(' ');
-                    underwearParts.push(`wearing a ${braDetails}`);
-                }
-                if (p.pantiesType) {
-                    const pantiesDesc = formatValue(p.pantiesType);
-                    const pantiesDetails = [formatValue(p.pantiesColor), formatValue(p.pantiesDetails), pantiesDesc, formatValue(p.pantiesSize)].filter(Boolean).join(' ');
-                    underwearParts.push(underwearParts.length > 0 ? `and a pair of ${pantiesDetails}` : `wearing a pair of ${pantiesDetails}`);
-                }
-                if (underwearParts.length > 0) segments.push(`She is ${underwearParts.join(' ')}.`);
-            } else if (p.clothing.value === 'clothed') segments.push('She is fully clothed.');
+Abaixo está a ficha técnica do usuário:
+---
+${choicesSummary}
+---
+
+Agora, com base nesta ficha, crie o prompt positivo perfeito, seguindo TODAS as regras acima.`;
+
+        const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
+
+        try {
+            const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
+            const response = await fetchWithRetry(baseUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const result = await response.json();
+            const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) throw new Error("Resposta da API vazia para o prompt positivo.");
+            return text.trim().replace(/\*/g, ''); // Remove any lingering asterisks just in case
+        } catch (error) {
+            console.error("Falha ao gerar prompt positivo com API:", error);
+            showToast("Falha ao gerar o prompt otimizado com IA. Tente novamente.", 4000, true);
+            return null;
         }
-        
-        const extraDetails = [];
-        if (p.accessories?.length > 0) extraDetails.push(`accessorized with ${p.accessories.map(formatValue).join(', ')}`);
-        if (p.makeup) extraDetails.push(`wearing ${formatValue(p.makeup)}`);
-        if (extraDetails.length > 0) segments.push(`She is ${extraDetails.join(' and ')}.`);
-
-        const poseParts = [];
-        if (p.characterView?.length > 0) poseParts.push(...p.characterView.map(formatValue));
-        const allPoses = [...(p.bodyPose?.map(formatValue) || []), formatValue(p.manualPose)].filter(Boolean);
-        if (allPoses.length > 0) poseParts.push(`in a ${allPoses.join(', ')} pose`);
-        if (p.facialExpression?.length > 0) poseParts.push(`with a ${p.facialExpression.map(formatValue).join(', ')} expression`);
-        if (poseParts.length > 0) segments.push(`Posed ${poseParts.join(', ')}.`);
-        
-        const allActions = [...(p.action?.map(formatValue) || []), formatValue(p.manualAction)].filter(Boolean);
-        const environment = [formatValue(p.background), allActions.length > 0 ? `while ${allActions.join(', ')}` : null].filter(Boolean);
-        if (environment.length > 0) segments.push(`The scene is ${environment.join(' ')}.`);
-        
-        const finalDetails = [
-            p.baseCategory?.value === 'photo' ? formatValue(p.lighting) : formatValue(p.paperTexture),
-            ...(p.sceneComposition?.map(formatValue) || []),
-            p.baseCategory?.value === 'photo' ? 'realistic photography, photorealistic, 8k, ultra-detailed' : null
-        ].filter(Boolean);
-        if(finalDetails.length > 0) segments.push(finalDetails.join(', ') + '.');
-        
-        return segments.join(' ').replace(/\s+/g, ' ').replace(/ \./g, '.').replace(/ ,/g, ',').trim();
     }
     
     async function generateConsistencyWithAPI(positivePrompt) {
@@ -1393,9 +1526,8 @@
         const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
 
         try {
-            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const response = await fetch(apiUrl, {
+            const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
+            const response = await fetchWithRetry(baseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1414,13 +1546,19 @@
     }
 
     async function addConsistencyText() {
-        const promptTextarea = document.getElementById('finalPrompt');
-        const consistencyText = await generateConsistencyWithAPI(promptTextarea.value);
-        if (consistencyText && !promptTextarea.value.includes("character sheet for consistency")) {
-            promptTextarea.value += ` ${consistencyText}`;
-            showToast("Texto de consistência adicionado!");
-        } else if (!consistencyText) {
-            showToast("Não foi possível gerar texto de consistência.", 3000, true);
+        const button = document.getElementById('addConsistencyButton');
+        if (button) button.disabled = true;
+        try {
+            const promptTextarea = document.getElementById('finalPrompt');
+            const consistencyText = await generateConsistencyWithAPI(promptTextarea.value);
+            if (consistencyText && !promptTextarea.value.includes("character sheet for consistency")) {
+                promptTextarea.value += ` ${consistencyText}`;
+                showToast("Texto de consistência adicionado!");
+            } else if (!consistencyText) {
+                showToast("Não foi possível gerar texto de consistência.", 3000, true);
+            }
+        } finally {
+            if (button) button.disabled = false;
         }
     }
 
@@ -1438,7 +1576,9 @@
     }
     
     async function generateNegativePromptWithAPI(positivePrompt) {
-        const systemPrompt = `Based on the following positive prompt for an AI image generator, create a concise, comma-separated, all-lowercase negative prompt in English. The negative prompt should include common negative terms (like bad anatomy, ugly, deformed, blurry, watermark, text, signature) and also include specific terms that contradict the positive prompt's style and subject (e.g., if the positive prompt is 'photorealistic', the negative should include 'painting, illustration, 3d render').
+        const systemPrompt = `You are an expert prompt engineer. Based on the user's positive prompt, create a standard but effective negative prompt in English. The goal is to prevent common image generation issues and reinforce the positive prompt's style. The negative prompt should be a comma-separated list of keywords. 
+1. Include standard terms to prevent deformities: ugly, tiling, poorly drawn hands, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face.
+2. Analyze the positive prompt for key styles (e.g., 'photorealistic', 'anime', 'painting') and add contradictory terms to the negative prompt (e.g., if positive is 'photorealistic', add 'painting, drawing, illustration, anime').
 
 Positive Prompt: "${positivePrompt}"
 
@@ -1447,10 +1587,9 @@ Respond with ONLY the comma-separated list of negative keywords.`;
         const payload = { contents: [{ role: "user", parts: [{ text: systemPrompt }] }] };
 
         try {
-            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
 
-            const response = await fetch(apiUrl, {
+            const response = await fetchWithRetry(baseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1464,94 +1603,124 @@ Respond with ONLY the comma-separated list of negative keywords.`;
         } catch (error) {
             console.error("Failed to generate negative prompt with API:", error);
             showToast("Falha ao gerar prompt negativo com IA. Usando padrão.", 4000, true);
-            const baseNegative = "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), watermark, watermarked, oversaturated, censored, distorted hands, amputation, missing hands, obese, doubled face, doubled hands, text, signature";
-            return baseNegative;
+            return "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), watermark, watermarked, oversaturated, censored, distorted hands, amputation, missing hands, obese, doubled face, doubled hands, text, signature";
+        }
+    }
+
+    async function handleRegenerateNegative() {
+        const button = document.querySelector('[data-action="regenerate-negative"]');
+        const positivePromptTextarea = document.getElementById('finalPrompt');
+        const negativePromptTextarea = document.getElementById('negativePrompt');
+
+        if (!positivePromptTextarea.value) {
+            showToast("O prompt positivo está vazio. Não é possível gerar um negativo.", 4000, true);
+            return;
+        }
+
+        if (button) button.disabled = true;
+        loadingOverlay.classList.remove('hidden');
+        loadingText.textContent = "Gerando novo prompt negativo...";
+
+        try {
+            const newNegativePrompt = await generateNegativePromptWithAPI(positivePromptTextarea.value);
+            negativePromptTextarea.value = newNegativePrompt;
+            lastNegativePrompt = newNegativePrompt; // Update the state
+            showToast("Novo prompt negativo gerado com sucesso!");
+        } catch (error) {
+            console.error("Error regenerating negative prompt:", error);
+            showToast("Falha ao gerar o novo prompt negativo.", 4000, true);
+        } finally {
+            loadingOverlay.classList.add('hidden');
+            if (button) button.disabled = false;
         }
     }
 
     async function generateAndDisplayManualPrompt() {
-        goToStep(29);
-        isFinalPromptGenerated = true;
-        isEditingFromTechSheet = false;
-        delete promptData.ai_generated_input;
+        const generateButton = document.getElementById('nextButton');
+        if (generateButton) generateButton.disabled = true;
 
-        await new Promise(resolve => setTimeout(resolve, 0));
-        
-        const finalPromptTextarea = document.getElementById('finalPrompt');
-        const negativePromptTextarea = document.getElementById('negativePrompt');
-        
-        finalPromptTextarea.value = "";
-        negativePromptTextarea.value = "";
-        
-        loadingOverlay.classList.remove('hidden');
-        loadingText.textContent = "Gerando prompt positivo...";
+        try {
+            goToStep(23);
+            isFinalPromptGenerated = true;
+            isEditingFromTechSheet = false;
+            
+            // Clear the auto-generated idea if we are in a manual flow
+            delete promptData.ai_generated_input;
 
-        const positivePrompt = buildManualPrompt();
-        finalPromptTextarea.value = positivePrompt;
-        
-        loadingText.textContent = "Gerando prompt negativo com IA...";
+            await new Promise(resolve => setTimeout(resolve, 0));
+            
+            const finalPromptTextarea = document.getElementById('finalPrompt');
+            const negativePromptTextarea = document.getElementById('negativePrompt');
+            
+            finalPromptTextarea.value = "";
+            negativePromptTextarea.value = "";
+            
+            loadingOverlay.classList.remove('hidden');
+            loadingText.textContent = "Analisando suas escolhas...";
 
-        const negativePrompt = await generateNegativePromptWithAPI(positivePrompt);
-        negativePromptTextarea.value = negativePrompt;
+            const choicesSummary = summarizeChoices(promptData);
+            const positivePrompt = await generateManualPromptWithAPI(choicesSummary);
 
-        document.getElementById('consistencySeed').textContent = Math.floor(Math.random() * 999999999999999);
-        
-        loadingOverlay.classList.add('hidden');
-        updateTechSheet();
+            if (!positivePrompt) {
+                if (generateButton) generateButton.disabled = false;
+                return;
+            }
+
+            lastPositivePrompt = positivePrompt;
+            finalPromptTextarea.value = positivePrompt;
+            
+            loadingText.textContent = "Gerando prompt negativo com IA...";
+
+            const negativePrompt = await generateNegativePromptWithAPI(positivePrompt);
+            lastNegativePrompt = negativePrompt;
+            negativePromptTextarea.value = negativePrompt;
+
+            document.getElementById('consistencySeed').textContent = Math.floor(Math.random() * 999999999999999);
+        } catch (error) {
+             console.error("Error during final prompt generation:", error);
+             showToast("Um erro ocorreu ao gerar o prompt final.", 4000, true);
+             if (generateButton) generateButton.disabled = false;
+        } finally {
+            loadingOverlay.classList.add('hidden');
+        }
     }
 
-    // =================================================================================
-    // Intelligent Auto-Prompt Generation Logic (API Driven)
-    // =================================================================================
     async function handleAutoGenerate(textOverride) {
+        const generateButton = document.querySelector('[data-action="generate-auto"]');
+        if(generateButton) generateButton.disabled = true;
+        
         const userText = textOverride || document.getElementById('autoPromptManual').value.trim();
         if (!userText) {
             showToast("Por favor, descreva sua ideia no campo de texto.", 3000, true);
+            if(generateButton) generateButton.disabled = false;
             return;
         }
 
         loadingOverlay.classList.remove('hidden');
         loadingText.textContent = "Analisando sua ideia...";
         
-        promptData = {}; // Clear previous manual data
+        promptData = {};
         isFinalPromptGenerated = false;
 
-        const systemPrompt = `Você é um engenheiro de prompt profissional para modelos avançados de IA de texto para imagem. Sua tarefa é pegar a ideia simples de um usuário, escrita em português, e expandi-la para um **prompt positivo** e um **prompt negativo** altamente detalhados e descritivos.
+        const systemPrompt = `Você é um engenheiro de prompt profissional. Sua tarefa é pegar a ideia de um usuário e expandi-la para um prompt positivo e um negativo, ambos em inglês.
 
 **Ideia do Usuário:** "${userText}"
 
 **Instruções:**
-1.  **Analise a Ideia:** Identifique os assuntos, ações, ambiente e estilo desejado.
-2.  **Expanda o Prompt Positivo:** Elabore a ideia do usuário com detalhes ricos e evocativos. Inclua especificidades sobre:
-    * **Assunto:** Aparência, roupas, expressão, pose.
-    * **Estilo:** Estilo de arte (ex: fotorrealista, cinematográfico, anime, pintura a óleo), iluminação (ex: luz suave, neon, golden hour), composição (ex: close-up, plano geral, regra dos terços) e humor geral.
-    * **Ambiente:** Fundo detalhado, clima, hora do dia.
-    * **Qualidade:** Adicione termos que melhoram a qualidade da imagem (ex: obra-prima, 8k, ultra detalhado, foco nítido).
-3.  **Crie o Prompt Negativo:** Gere uma lista de termos negativos comuns e termos específicos a serem evitados com base no prompt positivo. Inclua coisas como: deformado, má anatomia, feio, membros extras, marca d'água, borrado, texto, assinatura e estilos que contradizem o prompt positivo (ex: se o positivo é 'fotorrealista', o negativo deve incluir 'pintura, ilustração, desenho animado').
-4.  **Formato de Saída:** Ambos os prompts devem estar em **inglês**. Retorne o resultado como um objeto JSON com a seguinte estrutura: \`{"positive_prompt": "...", "negative_prompt": "..."}\`.`;
+1.  **Expanda o Prompt Positivo:** Elabore a ideia com detalhes sobre assunto, estilo, ambiente e qualidade.
+2.  **Crie o Prompt Negativo:** Gere uma lista de termos para evitar problemas comuns (deformidades, má qualidade, etc.).
+3.  **Formato de Saída:** Sua resposta DEVE SER APENAS um objeto JSON válido, sem nenhum texto ou formatação adicional antes ou depois. O JSON deve ter a seguinte estrutura: \`{"positive_prompt": "...", "negative_prompt": "..."}\`.`;
 
         const payload = {
-            contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: "OBJECT",
-                    properties: {
-                        "positive_prompt": { "type": "STRING" },
-                        "negative_prompt": { "type": "STRING" }
-                    },
-                    required: ["positive_prompt", "negative_prompt"]
-                }
-            }
+            contents: [{ role: "user", parts: [{ text: systemPrompt }] }]
         };
 
         loadingText.textContent = "Gerando prompts detalhados...";
         
         try {
-            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
             
-            const response = await fetch(apiUrl, {
+            const response = await fetchWithRetry(baseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1563,30 +1732,194 @@ Respond with ONLY the comma-separated list of negative keywords.`;
             const contentPart = result?.candidates?.[0]?.content?.parts?.[0];
             
             if (contentPart && contentPart.text) {
-                const parsedJson = JSON.parse(contentPart.text);
-                goToStep(29);
-                document.getElementById('finalPrompt').value = parsedJson.positive_prompt || "Falha ao gerar o prompt positivo.";
-                document.getElementById('negativePrompt').value = parsedJson.negative_prompt || "Falha ao gerar o prompt negativo.";
-                document.getElementById('consistencySeed').textContent = Math.floor(Math.random() * 999999999999999);
-                isFinalPromptGenerated = true;
-                promptData['ai_generated_input'] = {label: userText, value: userText, isEditable: true};
-                updateTechSheet();
+                let jsonString = contentPart.text;
+                const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    jsonString = jsonMatch[0];
+                }
+
+                try {
+                    const parsedJson = JSON.parse(jsonString);
+                    goToStep(23);
+                    document.getElementById('finalPrompt').value = parsedJson.positive_prompt || "Falha ao extrair prompt positivo.";
+                    document.getElementById('negativePrompt').value = parsedJson.negative_prompt || "Falha ao extrair prompt negativo.";
+                    document.getElementById('consistencySeed').textContent = Math.floor(Math.random() * 999999999999999);
+                    isFinalPromptGenerated = true;
+                    promptData['ai_generated_input'] = {label: userText, value: userText};
+                    updateTechSheet();
+                } catch (e) {
+                    console.error("Failed to parse JSON from API response:", contentPart.text, e);
+                    throw new Error("A API retornou uma resposta em formato inesperado.");
+                }
             } else {
+                const blockReason = result?.promptFeedback?.blockReason;
+                if (blockReason) {
+                    console.error("API call blocked. Reason:", blockReason, result.promptFeedback);
+                    throw new Error(`A solicitação foi bloqueada pela API. Motivo: ${blockReason}`);
+                }
                 throw new Error("Resposta da API malformada ou vazia.");
             }
 
         } catch (error) {
             console.error("Falha na geração automática de prompt:", error);
-            showToast("Ocorreu um erro ao gerar o prompt com a IA. Tente novamente.", 5000, true);
-            goToStep(0); // Return to start
+            showToast(error.message || "Ocorreu um erro ao gerar o prompt com a IA. Tente novamente.", 5000, true);
+            goToStep(0);
         } finally {
             loadingOverlay.classList.add('hidden');
+            if(generateButton) generateButton.disabled = false;
+        }
+    }
+    
+    async function generateOptionsWithAI(stepId) {
+        const stepData = stepsData[stepId];
+        const generateButton = document.querySelector(`button[data-action="generate-options"][data-step-id="${stepId}"]`);
+        if(generateButton) generateButton.disabled = true;
+
+        const input = document.getElementById(`ai-input-${stepId}`);
+        const container = document.getElementById(`ai-options-container-${stepId}`);
+        const userInput = input.value.trim();
+
+        if (!userInput) {
+            showToast("Por favor, digite uma opção ou quantidade.", 3000, true);
+            if(generateButton) generateButton.disabled = false;
+            return;
+        }
+
+        loadingOverlay.classList.remove('hidden');
+        loadingText.textContent = "Gerando opções com IA...";
+        container.innerHTML = '';
+        input.value = '';
+
+        const baseCategory = promptData.baseCategory?.value === 'illustration' ? 'ilustração' : 'fotografia';
+        const systemPrompt = stepData.aiPrompt(userInput, baseCategory);
+
+        const payload = {
+            contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            "label": { "type": "STRING" },
+                            "description": { "type": "STRING" },
+                            "value": { "type": "STRING" },
+                            "type": { "type": "STRING" }
+                        },
+                        required: ["label", "value"]
+                    }
+                }
+            }
+        };
+
+        try {
+            const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
+            const response = await fetchWithRetry(baseUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            
+            const result = await response.json();
+            const contentPart = result?.candidates?.[0]?.content?.parts?.[0];
+
+            if (contentPart && contentPart.text) {
+                const options = JSON.parse(contentPart.text);
+                aiGeneratedOptionsCache[stepId] = options;
+
+                if (stepData.type === 'clothing-builder') {
+                    options.forEach(opt => {
+                        const card = document.createElement('div');
+                        card.className = 'option-card p-4 rounded-lg cursor-pointer';
+                        card.dataset.action = 'select-clothing-item';
+                        card.dataset.label = opt.label;
+                        card.dataset.value = opt.value;
+                        card.dataset.type = opt.type;
+                        card.innerHTML = `<h3 class="font-bold text-lg">${opt.label}</h3><p class="text-sm text-gray-400 mt-1">${opt.description}</p>`;
+                        container.appendChild(card);
+                    });
+                } else {
+                    options.forEach(opt => {
+                        const card = createOptionCard(opt, stepData);
+                        container.appendChild(card);
+                    });
+                }
+            } else {
+                 throw new Error("Resposta da API malformada ou vazia.");
+            }
+        } catch (error) {
+            console.error("Falha ao gerar opções com IA:", error);
+            showToast("Ocorreu um erro ao gerar as opções. Tente novamente.", 5000, true);
+        } finally {
+            loadingOverlay.classList.add('hidden');
+            if(generateButton) generateButton.disabled = false;
         }
     }
 
-    // =================================================================================
-    // INITIALIZATION
-    // =================================================================================
+    function updateTechSheet() {
+        const hasData = Object.keys(promptData).length > 0;
+        if (!hasData) {
+            techSheetBar.classList.remove('visible');
+            return;
+        }
+
+        techSheetContent.innerHTML = '';
+        const isAutoFlow = !!promptData.ai_generated_input;
+        const displayOrder = ['ai_generated_input', ...Object.keys(sidebarLabels).filter(k => k !== 'ai_generated_input')];
+
+        displayOrder.forEach(key => {
+            const data = promptData[key];
+            if (!data) return;
+            
+            const label = sidebarLabels[key] || 'Gerado por IA';
+            let valueText = '';
+
+            if (key === 'clothing') {
+                valueText = summarizeChoices({clothing: data}).replace('Vestimenta: ', '');
+            } else {
+                valueText = Array.isArray(data) ? data.map(i => i.label).join(', ') : data.label;
+            }
+            
+            if (!valueText) return;
+
+            const entry = document.createElement('div');
+            entry.dataset.key = key;
+            
+            if (isAutoFlow) {
+                entry.className = (key === 'ai_generated_input') ? 'tech-sheet-entry clickable' : 'tech-sheet-entry';
+            } else {
+                entry.className = 'tech-sheet-entry clickable';
+                let stepId;
+                if (key === 'lighting') {
+                    stepId = promptData.baseCategory?.value === 'illustration' ? 100 : 20;
+                } else {
+                    stepId = Object.keys(stepsData).find(id => {
+                        const s = stepsData[id];
+                        if (s.key === key) return true;
+                        if (s.inputs?.some(input => input.key === key)) return true;
+                        if (s.manualInput?.key === key) return true;
+                        if (s.sections?.some(sec => sec.key === key)) return true;
+                        if (s.type === 'conditional-choice') {
+                            return s.true?.key === key || s.false?.key === key;
+                        }
+                        return false;
+                    });
+                }
+                if (stepId) entry.dataset.step = stepId;
+            }
+            
+            entry.innerHTML = `<span class="font-semibold text-indigo-400 mr-2">${label}:</span> <span class="truncate">${valueText}</span>`;
+            techSheetContent.appendChild(entry);
+        });
+
+        regenerateButton.style.display = isFinalPromptGenerated ? 'flex' : 'none';
+        returnToPromptButton.style.display = isFinalPromptGenerated ? 'flex' : 'none';
+    }
+
+
     document.addEventListener('DOMContentLoaded', () => {
         restart();
     });
