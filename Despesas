@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Despesas Mensais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .remove-expense-item-btn {
+            cursor: pointer;
+            font-weight: bold;
+            color: #ef4444; /* red-500 */
+            transition: color 0.2s;
+            padding: 0 0.5rem;
+        }
+        .remove-expense-item-btn:hover {
+            color: #b91c1c; /* red-700 */
+        }
+        .payer-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .payer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Controle de Despesas</h1>
+            <p class="text-gray-600 mt-2">Gerencie gastos individuais e compartilhados com facilidade.</p>
+        </header>
+
+        <main class="space-y-8">
+            <!-- Seção de Pessoas -->
+            <section id="people-section" class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Pessoas</h2>
+                <div id="people-list" class="flex flex-wrap gap-4 mb-4">
+                    <!-- Pessoas serão adicionadas aqui via JS -->
+                </div>
+                <form id="add-person-form" class="flex items-center gap-4">
+                    <input type="text" id="person-name" placeholder="Nome da pessoa" class="flex-grow p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <button type="submit" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-700 transition-colors shadow">Adicionar</button>
+                </form>
+            </section>
+
+            <!-- Seção para Adicionar Despesa -->
+            <section id="add-expense-section" class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Adicionar Nova Despesa</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Descrição</label>
+                        <input type="text" id="description" placeholder="Ex: Almoço, Supermercado" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200">
+                    </div>
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-gray-700">Valor (R$)</label>
+                        <input type="text" id="amount" inputmode="decimal" placeholder="Digite o valor" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200">
+                    </div>
+                    
+                    <!-- MODO BOTÕES (para <= 2 pessoas) -->
+                    <div id="buttons-mode" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700">Pago por</label>
+                        <div id="payer-buttons" class="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+                    </div>
+
+                    <!-- MODO FORMULÁRIO (para > 2 pessoas) -->
+                    <form id="form-mode" class="hidden space-y-4">
+                         <div>
+                            <label for="paid-by" class="block text-sm font-medium text-gray-700">Pago por</label>
+                            <select id="paid-by" required class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select>
+                        </div>
+                        <div>
+                            <span class="block text-sm font-medium text-gray-700">Dividir com</span>
+                            <div id="split-with" class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-md hover:bg-indigo-700 transition-colors shadow-lg">Adicionar Despesa</button>
+                    </form>
+                    
+                    <p id="error-message" class="text-red-500 text-sm text-center hidden"></p>
+                </div>
+            </section>
+
+            <!-- Seção de Resumo -->
+            <section id="summary-section" class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Resumo Financeiro</h2>
+                <div id="summary-details" class="space-y-6">
+                    <!-- Detalhes do resumo serão preenchidos via JS -->
+                </div>
+                <div class="mt-6 pt-4 border-t-2 border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900">Total Geral de Despesas</h3>
+                    <p id="grand-total" class="text-3xl font-extrabold text-indigo-600">R$ 0,00</p>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>Criado para facilitar o controle de suas finanças.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- ESTADO DA APLICAÇÃO ---
+            let people = [];
+            let expenses = [];
+            let nextExpenseId = 0;
+
+            // --- SELETORES DE ELEMENTOS DO DOM ---
+            const addPersonForm = document.getElementById('add-person-form');
+            const personNameInput = document.getElementById('person-name');
+            const peopleList = document.getElementById('people-list');
+            
+            const descriptionInput = document.getElementById('description');
+            const amountInput = document.getElementById('amount');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Seletores para os dois modos de input
+            const buttonsModeDiv = document.getElementById('buttons-mode');
+            const formModeForm = document.getElementById('form-mode');
+            const payerButtonsContainer = document.getElementById('payer-buttons');
+            const paidBySelect = document.getElementById('paid-by');
+            const splitWithDiv = document.getElementById('split-with');
+            
+            const summaryDetails = document.getElementById('summary-details');
+            const grandTotalEl = document.getElementById('grand-total');
+
+            // --- FUNÇÕES UTILITÁRIAS ---
+            const formatCurrency = (value) => {
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+            };
+            
+            const capitalizeText = (text) => {
+                return text.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+            };
+
+            // --- FUNÇÕES DE RENDERIZAÇÃO ---
+            const renderPeople = () => {
+                peopleList.innerHTML = '';
+                people.forEach(person => {
+                    const personTag = document.createElement('div');
+                    personTag.className = 'flex items-center bg-gray-200 text-gray-800 text-sm font-medium px-3 py-1 rounded-full';
+                    personTag.innerHTML = `
+                        <span>${person}</span>
+                        <button data-person="${person}" class="remove-person-btn ml-2 text-red-500 hover:text-red-700 font-bold">×</button>
+                    `;
+                    peopleList.appendChild(personTag);
+                });
+            };
+
+            const renderExpenseInput = () => {
+                // Limpa ambos os containers
+                payerButtonsContainer.innerHTML = '';
+                paidBySelect.innerHTML = '';
+                splitWithDiv.innerHTML = '';
+
+                if (people.length === 0) {
+                    buttonsModeDiv.classList.add('hidden');
+                    formModeForm.classList.add('hidden');
+                    return;
+                }
+
+                if (people.length > 0 && people.length <= 2) {
+                    // MODO BOTÕES
+                    buttonsModeDiv.classList.remove('hidden');
+                    formModeForm.classList.add('hidden');
+
+                    const jointBtn = document.createElement('button');
+                    jointBtn.className = 'payer-btn w-full bg-green-600 text-white font-bold py-3 px-2 rounded-md hover:bg-green-700 shadow-md';
+                    jointBtn.textContent = 'Conta Conjunta';
+                    jointBtn.dataset.payer = 'Conta Conjunta';
+                    payerButtonsContainer.appendChild(jointBtn);
+
+                    people.forEach(person => {
+                        const payerBtn = document.createElement('button');
+                        payerBtn.className = 'payer-btn w-full bg-indigo-600 text-white font-bold py-3 px-2 rounded-md hover:bg-indigo-700 shadow-md';
+                        payerBtn.textContent = person;
+                        payerBtn.dataset.payer = person;
+                        payerButtonsContainer.appendChild(payerBtn);
+                    });
+
+                } else { // MODO FORMULÁRIO
+                    buttonsModeDiv.classList.add('hidden');
+                    formModeForm.classList.remove('hidden');
+                    
+                    const jointAccountOption = new Option('Conta Conjunta', 'Conta Conjunta');
+                    paidBySelect.appendChild(jointAccountOption);
+
+                    people.forEach(person => {
+                        const option = new Option(person, person);
+                        paidBySelect.appendChild(option);
+
+                        const checkboxDiv = document.createElement('div');
+                        checkboxDiv.className = 'flex items-center';
+                        checkboxDiv.innerHTML = `
+                            <input type="checkbox" id="split-${person}" name="split" value="${person}" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                            <label for="split-${person}" class="ml-2 block text-sm text-gray-900">${person}</label>
+                        `;
+                        splitWithDiv.appendChild(checkboxDiv);
+                    });
+                    handlePayerChange();
+                }
+            };
+
+            const renderSummary = () => {
+                summaryDetails.innerHTML = '';
+                if (people.length === 0) {
+                    grandTotalEl.textContent = formatCurrency(0);
+                    summaryDetails.innerHTML = `<p class="text-gray-500 text-center">Nenhuma pessoa adicionada.</p>`;
+                    return;
+                }
+                const totals = calculateTotals();
+                people.forEach(person => {
+                    const personExpenses = expenses.filter(exp => exp.splitWith.includes(person));
+                    const personContainer = document.createElement('div');
+                    personContainer.className = 'p-4 bg-gray-50 rounded-lg border border-gray-200';
+                    let expensesHtml = '<ul class="space-y-2 mt-2 max-h-40 overflow-y-auto pr-2">';
+                    if (personExpenses.length === 0) {
+                        expensesHtml += `<li class="text-sm text-gray-500">Nenhum gasto para esta pessoa.</li>`;
+                    } else {
+                        personExpenses.forEach(exp => {
+                            const shareValue = exp.amount / exp.splitWith.length;
+                            expensesHtml += `
+                                <li class="flex justify-between items-center text-sm">
+                                    <span>${exp.description}</span>
+                                    <div>
+                                        <span>${formatCurrency(shareValue)}</span>
+                                        <button class="remove-expense-item-btn" data-id="${exp.id}" title="Remover esta despesa">&times;</button>
+                                    </div>
+                                </li>`;
+                        });
+                    }
+                    expensesHtml += '</ul>';
+                    personContainer.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-lg">${person}</h4>
+                            <span class="font-semibold text-lg">${formatCurrency(totals.byPerson[person].share)}</span>
+                        </div>
+                        ${expensesHtml}`;
+                    summaryDetails.appendChild(personContainer);
+                });
+                grandTotalEl.textContent = formatCurrency(totals.grandTotal);
+            };
+            
+            const updateUI = () => {
+                renderPeople();
+                renderExpenseInput();
+                renderSummary();
+            };
+
+            // --- FUNÇÕES DE LÓGICA ---
+            const calculateTotals = () => {
+                const totals = { grandTotal: 0, byPerson: {} };
+                people.forEach(person => { totals.byPerson[person] = { share: 0 }; });
+                expenses.forEach(expense => {
+                    totals.grandTotal += expense.amount;
+                    const shareValue = expense.amount / expense.splitWith.length;
+                    expense.splitWith.forEach(person => {
+                        if (totals.byPerson[person]) {
+                            totals.byPerson[person].share += shareValue;
+                        }
+                    });
+                });
+                return totals;
+            };
+
+            const handlePayerChange = () => {
+                const selectedPayer = paidBySelect.value;
+                const checkboxes = splitWithDiv.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => {
+                    if (selectedPayer === 'Conta Conjunta') {
+                        cb.disabled = false;
+                        cb.checked = true;
+                    } else {
+                        cb.checked = (cb.value === selectedPayer);
+                        cb.disabled = (cb.value === selectedPayer);
+                    }
+                });
+            };
+
+            const addExpense = (description, amount, paidBy, splitWith) => {
+                if (!description || !amount || amount <= 0 || !paidBy || splitWith.length === 0) {
+                    errorMessage.textContent = 'Por favor, preencha todos os campos corretamente.';
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+                const newExpense = { id: nextExpenseId++, description, amount, paidBy, splitWith };
+                expenses.push(newExpense);
+                descriptionInput.value = '';
+                amountInput.value = '';
+                updateUI();
+            };
+            
+            const parseAmount = (inputValue) => {
+                if (inputValue.includes(',') || inputValue.includes('.')) {
+                    return parseFloat(inputValue.replace(',', '.'));
+                }
+                const rawAmount = inputValue.replace(/\D/g, '');
+                if (rawAmount.length === 0) return 0;
+                if (rawAmount.length <= 3) return parseInt(rawAmount, 10);
+                return parseInt(rawAmount, 10) / 100;
+            };
+
+            // --- MANIPULADORES DE EVENTOS ---
+            addPersonForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const rawName = personNameInput.value.trim();
+                if (rawName) {
+                    const name = capitalizeText(rawName);
+                    if (!people.includes(name)) {
+                        people.push(name);
+                        personNameInput.value = '';
+                        updateUI();
+                    }
+                }
+            });
+
+            peopleList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-person-btn')) {
+                    const personToRemove = e.target.dataset.person;
+                    people = people.filter(p => p !== personToRemove);
+                    expenses = expenses.filter(expense => !expense.splitWith.includes(personToRemove));
+                    updateUI();
+                }
+            });
+
+            // Handler para MODO BOTÕES
+            payerButtonsContainer.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON') return;
+                const rawDescription = descriptionInput.value.trim();
+                const description = capitalizeText(rawDescription);
+                const amount = parseAmount(amountInput.value);
+                const paidBy = e.target.dataset.payer;
+                const splitWith = (paidBy === 'Conta Conjunta') ? [...people] : [paidBy];
+                addExpense(description, amount, paidBy, splitWith);
+            });
+
+            // Handler para MODO FORMULÁRIO
+            formModeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const rawDescription = descriptionInput.value.trim();
+                const description = capitalizeText(rawDescription);
+                const amount = parseAmount(amountInput.value);
+                const paidBy = paidBySelect.value;
+                const splitWithCheckboxes = document.querySelectorAll('#split-with input[type="checkbox"]:checked');
+                const splitWith = Array.from(splitWithCheckboxes).map(cb => cb.value);
+                addExpense(description, amount, paidBy, splitWith);
+            });
+            
+            summaryDetails.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-expense-item-btn')) {
+                    const expenseId = parseInt(e.target.dataset.id, 10);
+                    expenses = expenses.filter(exp => exp.id !== expenseId);
+                    updateUI();
+                }
+            });
+
+            paidBySelect.addEventListener('change', handlePayerChange);
+            
+            const clearErrorOnChange = () => {
+                if (!errorMessage.classList.contains('hidden')) {
+                    errorMessage.classList.add('hidden');
+                }
+            };
+
+            descriptionInput.addEventListener('input', clearErrorOnChange);
+            amountInput.addEventListener('input', clearErrorOnChange);
+
+            descriptionInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); amountInput.focus(); }
+            });
+
+            amountInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (people.length > 2) {
+                        paidBySelect.focus();
+                    } else {
+                        payerButtonsContainer.querySelector('button')?.focus();
+                    }
+                }
+            });
+
+            // --- INICIALIZAÇÃO ---
+            updateUI();
+        });
+    </script>
+</body>
+</html>
