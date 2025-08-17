@@ -1,263 +1,243 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CirosBlack</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
+    /* Estilos personalizados e animações */
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Fundo gradiente animado */
+      background: linear-gradient(-45deg, #000000, #1a0000, #00001a, #1a1a00);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Esconde a barra de rolagem */
     * {
-      scrollbar-width: none;
+      scrollbar-width: none; /* Firefox */
     }
 
     *::-webkit-scrollbar {
-      display: none;
+      display: none; /* Chrome, Safari, and Opera */
     }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: white;
-      overflow-y: scroll;
-    }
-
-    header {
-      background-color: black;
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-    }
-
-    .logo {
-      font-weight: bold;
-      color: white;
-      font-size: 24px;
-    }
-
-    .logo span {
-      color: red;
-    }
-
-    nav {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin-left: 20px;
-    }
-
-    nav a.active {
-      color: red;
-      font-weight: bold;
-    }
-
-    nav input {
-      padding: 6px;
-      border-radius: 5px;
-      border: none;
-      margin-left: 20px;
-    }
-
-    main {
-      padding: 120px 20px 20px;
-    }
-
-    .welcome h1 {
-      font-size: 36px;
-    }
-
-    .welcome p {
-      font-size: 18px;
-      margin-top: 5px;
-    }
-
-    .destaques h2 {
-      margin-top: 40px;
-      margin-bottom: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 20px;
-    }
-
-    .grid a {
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-      cursor: default;
-    }
-
-    .grid a.hidden {
+    
+    /* Estilo para animação de fade-in */
+    .fade-in-section {
       opacity: 0;
-      visibility: hidden;
-      height: 0;
-      padding: 0;
-      margin: 0;
-      overflow: hidden;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
     }
 
-    .card {
-      background-color: #222;
-      overflow: hidden;
-      text-align: center;
-      border-radius: 10px;
-      height: 100%;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      z-index: 1;
-      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
-    }
-
-    .card img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 10px;
-    }
-
-    .label {
-      padding: 10px;
-    }
-
-    .label span {
-      display: block;
-      font-size: 12px;
-      color: gray;
-    }
-
-    @media screen and (max-width: 1200px) {
-      .grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media screen and (max-width: 768px) {
-      .grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media screen and (max-width: 480px) {
-      .grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .fade-in-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
-<body oncontextmenu="return false">
-  <header>
-    <div class="logo">CIROS<span>BLACK</span></div>
-    <nav>
-      <a href="https://cirosblack.github.io/public/">Início</a>
-      <a href="#"class="active">Animes</a>
-      <a href="#" class="active">Filmes</a>
-      <a href="#" class="active">Séries</a>
-      <a href="https://cirosblack.github.io/public/Cursos/" class="active">Cursos</a>
-      <input type="text" placeholder="Pesquisar..." />
-    </nav>
+<body class="bg-black text-gray-100" oncontextmenu="return false">
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm shadow-lg shadow-red-500/10">
+    <div class="container mx-auto flex items-center justify-between p-4 flex-wrap">
+      <!-- Logo -->
+      <div class="text-3xl font-extrabold tracking-wider">
+        CIROS<span class="text-red-500">BLACK</span>
+      </div>
+      <!-- Navegação -->
+      <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
+        <a href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block">Início</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Animes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Filmes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Séries</a>
+        <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
+        <input id="searchInput" type="text" placeholder="Pesquisar..." class="bg-gray-800/50 border border-gray-700 rounded-full py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 w-32 sm:w-auto" />
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <section class="welcome">
-      <h1>Bem-vindo CirosBlack</h1>
-      <p>Todos os seus conteúdos em um só lugar!</p>
+  <!-- Conteúdo Principal -->
+  <main class="container mx-auto px-4 pt-28 sm:pt-32 pb-16">
+    <!-- Seção de Boas-vindas -->
+    <section class="welcome text-center mb-16 fade-in-section">
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-2">Bem-vindo, CirosBlack</h1>
+      <p class="text-lg sm:text-xl text-gray-400">Todos os seus conteúdos em um só lugar!</p>
     </section>
 
-    <section class="destaques">
-      <h2>Destaques</h2>
-      <div class="grid" id="grid-container">
-        <a data-link="https://cirosblack.github.io/CirosBlack/Courses/Cinema4D/">
-          <div class="card">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Cinema4D/c4.png" alt="Cinema 4D" />
-            <div class="label">Cinema 4D<span>3D</span></div>
+    <!-- Seção de Destaques -->
+    <section class="destaques fade-in-section">
+      <h2 class="text-3xl font-bold mb-8 border-l-4 border-red-500 pl-4">Destaques</h2>
+      <!-- Grid de Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6" id="grid-container">
+        
+        <!-- ESTRUTURA DO CARD ATUALIZADA -->
+        <a data-link="https://cirosblack.github.io/CirosBlack/Courses/Cinema4D" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Cinema4D/c4.png" alt="Cinema 4D" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Cinema 4D';">
+            <div class="p-3 mt-auto">
+              <h3 class="font-bold text-white text-base truncate">Cinema 4D</h3>
+              <span class="text-sm text-red-400">3D</span>
+            </div>
           </div>
-           <a data-link="https://cirosblack.github.io/CirosBlack/Courses/AdobeIlustrator/">
-          <div class="card">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/AdobeIlustrator/capa.png" alt="Adobe Ilustrator" />
-            <div class="label">Adobe Ilustrator - Design <span>3D</span></div>
+        </a>
+        
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/Jaspion/" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+            <img src="https://placehold.co/300x450/111827/FFFFFF?text=Jaspion" alt="Jaspion" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Jaspion';">
+            <div class="p-3 mt-auto">
+              <h3 class="font-bold text-white text-base truncate">Jaspion</h3>
+              <span class="text-sm text-red-400">Séries - Tokusatsu</span>
+            </div>
           </div>
-             <a data-link="https://cirosblack.github.io/CirosBlack/Courses/AnimeMaster/">
-          <div class="card">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/AnimeMaster/capa.png" alt="Anime Master" />
-            <div class="label">Anime Master<span>Desenho</span></div>
+        </a>
+
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/Changeman" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+            <img src="https://placehold.co/300x450/111827/FFFFFF?text=Changeman" alt="Changeman" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Changeman';">
+            <div class="p-3 mt-auto">
+                <h3 class="font-bold text-white text-base truncate">Changeman</h3>
+                <span class="text-sm text-red-400">Séries - Tokusatsu</span>
+            </div>
           </div>
-             <a data-link="https://cirosblack.github.io/CirosBlack/Courses/Selos3DLW/">
-          <div class="card">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Selos3DLW/capa.png" alt="Selos 3D LW" />
-            <div class="label">Selos 3D<span>3D</span></div>
+        </a>
+
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/Flashman" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+            <img src="https://placehold.co/300x450/111827/FFFFFF?text=Flashman" alt="Flashman" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Flashman';">
+            <div class="p-3 mt-auto">
+                <h3 class="font-bold text-white text-base truncate">Flashman</h3>
+                <span class="text-sm text-red-400">Séries - Tokusatsu</span>
+            </div>
           </div>
-        <!-- Adicione novas capas abaixo -->
+        </a>
+
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/Jiraiya" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+            <img src="https://placehold.co/300x450/111827/FFFFFF?text=Jiraiya" alt="Jiraiya" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Jiraiya';">
+            <div class="p-3 mt-auto">
+                <h3 class="font-bold text-white text-base truncate">Jiraiya</h3>
+                <span class="text-sm text-red-400">Séries - Tokusatsu</span>
+            </div>
+          </div>
+        </a>
+
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/DeathNote" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+            <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/DEATH.png" alt="Death Note" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Death+Note';">
+            <div class="p-3 mt-auto">
+                <h3 class="font-bold text-white text-base truncate">Death Note</h3>
+                <span class="text-sm text-red-400">Anime</span>
+            </div>
+          </div>
+        </a>
+
+        <a data-link="https://cirosblack.github.io/CirosBlack/Series/Bleach/" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+            <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/Bleach.png" alt="Bleach" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Bleach';">
+            <div class="p-3 mt-auto">
+                <h3 class="font-bold text-white text-base truncate">Bleach</h3>
+                <span class="text-sm text-red-400">Anime</span>
+            </div>
+          </div>
+        </a>
+        
       </div>
     </section>
   </main>
 
   <script>
-    const searchInput = document.querySelector('nav input');
-    const grid = document.getElementById('grid-container');
-    const originalOrder = Array.from(grid.children);
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const gridContainer = document.getElementById('grid-container');
+      const allCards = Array.from(gridContainer.children);
+      // Mapa para rastrear timeouts de "esconder" para cada card
+      const hideTimeouts = new Map();
 
-    document.addEventListener('contextmenu', e => e.preventDefault());
+      // Desativa o menu de contexto
+      document.addEventListener('contextmenu', e => e.preventDefault());
 
-    grid.addEventListener('click', function (e) {
-      const target = e.target.closest('a[data-link]');
-      if (target) {
-        const link = target.getAttribute('data-link');
-        if (link && link !== '#') {
-          window.location.href = link;
-        }
-      }
-    });
-
-    searchInput.addEventListener('input', function () {
-      const search = this.value.toLowerCase();
-
-      if (search.trim() === '') {
-        grid.innerHTML = '';
-        originalOrder.forEach(card => {
-          card.classList.remove('hidden');
-          grid.appendChild(card);
-        });
-        return;
-      }
-
-      const matching = [];
-      const notMatching = [];
-
-      originalOrder.forEach(card => {
-        const title = card.querySelector('.label').textContent.toLowerCase();
-        const category = card.querySelector('.label span').textContent.toLowerCase();
-
-        if (title.includes(search) || category.includes(search)) {
-          card.classList.remove('hidden');
-          matching.push(card);
-        } else {
-          card.classList.add('hidden');
-          notMatching.push(card);
+      // Navegação ao clicar no card
+      gridContainer.addEventListener('click', function (e) {
+        const target = e.target.closest('a[data-link]');
+        if (target) {
+          e.preventDefault(); // Previne a navegação padrão para controlar via JS
+          const link = target.getAttribute('data-link');
+          if (link && link !== '#') {
+            window.location.href = link;
+          }
         }
       });
 
-      grid.innerHTML = '';
-      matching.forEach(card => grid.appendChild(card));
-      notMatching.forEach(card => grid.appendChild(card));
+      // --- LÓGICA DE PESQUISA CORRIGIDA ---
+      searchInput.addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase().trim();
+
+        allCards.forEach(card => {
+          // Cancela qualquer timeout pendente para esconder este card
+          if (hideTimeouts.has(card)) {
+            clearTimeout(hideTimeouts.get(card));
+            hideTimeouts.delete(card);
+          }
+
+          const title = card.querySelector('h3').textContent.toLowerCase();
+          const category = card.querySelector('span').textContent.toLowerCase();
+          const isMatch = title.includes(searchTerm) || category.includes(searchTerm);
+
+          if (isMatch) {
+            // Mostra o card
+            card.style.display = 'block';
+            // Garante que a transição de opacidade aconteça corretamente
+            // após a propriedade 'display' ser atualizada pelo navegador.
+            queueMicrotask(() => {
+              card.style.opacity = '1';
+            });
+          } else {
+            // Esconde o card
+            card.style.opacity = '0';
+            // Agenda a remoção do card do layout após a transição de opacidade
+            const timeoutId = setTimeout(() => {
+              card.style.display = 'none';
+              hideTimeouts.delete(card); // Limpa o mapa
+            }, 300); // Duração deve ser igual à da transição CSS
+            hideTimeouts.set(card, timeoutId);
+          }
+        });
+      });
+      
+      // Animação de fade-in ao rolar a página
+      const faders = document.querySelectorAll('.fade-in-section');
+      const appearOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
+      };
+
+      const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) {
+            return;
+          } else {
+            entry.target.classList.add('is-visible');
+            appearOnScroll.unobserve(entry.target);
+          }
+        });
+      }, appearOptions);
+
+      faders.forEach(fader => {
+        appearOnScroll.observe(fader);
+      });
     });
   </script>
 </body>
