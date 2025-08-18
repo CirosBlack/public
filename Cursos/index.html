@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CirosBlack</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -46,18 +44,23 @@
       opacity: 1;
       transform: translateY(0);
     }
+    
+    /* REGRA ADICIONADA PARA MODO RETRATO */
+    @media (orientation: portrait) {
+      #grid-container {
+        /* Força 4 colunas especificamente no modo retrato */
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
   </style>
 </head>
 <body class="bg-black text-gray-100" oncontextmenu="return false">
 
-  <!-- Header -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm shadow-lg shadow-red-500/10">
     <div class="container mx-auto flex items-center justify-between p-4 flex-wrap">
-      <!-- Logo -->
       <div class="text-3xl font-extrabold tracking-wider">
         CIROS<span class="text-red-500">BLACK</span>
       </div>
-      <!-- Navegação -->
       <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
         <a href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block">Início</a>
         <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Animes</a>
@@ -69,21 +72,16 @@
     </div>
   </header>
 
-  <!-- Conteúdo Principal -->
   <main class="container mx-auto px-4 pt-28 sm:pt-32 pb-16">
-    <!-- Seção de Boas-vindas -->
     <section class="welcome text-center mb-16 fade-in-section">
       <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-2">Bem-vindo, CirosBlack</h1>
       <p class="text-lg sm:text-xl text-gray-400">Todos os seus conteúdos em um só lugar!</p>
     </section>
 
-    <!-- Seção de Destaques -->
     <section class="destaques fade-in-section">
       <h2 class="text-3xl font-bold mb-8 border-l-4 border-red-500 pl-4">Destaques</h2>
-      <!-- Grid de Cards -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6" id="grid-container">
         
-        <!-- ESTRUTURA DO CARD ATUALIZADA -->
         <a data-link="https://cirosblack.github.io/CirosBlack/Courses/Cinema4D" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
           <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
             <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Cinema4D/c4.png" alt="Cinema 4D" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Cinema 4D';">
@@ -123,8 +121,6 @@
             </div>
           </div>
         </a>
-
-        
         
       </div>
     </section>
@@ -214,4 +210,3 @@
   </script>
 </body>
 </html>
-
