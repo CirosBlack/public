@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Yu Yu Hakusho",
+    "category": "Animes",
+    "image": "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/yuyuhakusho.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho"
+  },
+  {
+    "title": "Jaspion",
+    "category": "Séries - Tokusatsu",
+    "image": "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/jaspion.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Series/Jaspion/"
+  },
+  {
+    "title": "Changeman",
+    "category": "Séries - Tokusatsu",
+    "image": "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/Changeman.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Series/Changeman"
+  },
+  {
+    "title": "Flashman",
+    "category": "Séries - Tokusatsu",
+    "image": "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/Flashman.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Series/Flashman"
+  },
+  {
+    "title": "Jiraiya",
+    "category": "Séries - Tokusatsu",
+    "image": "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/Jiraiya.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Series/Jiraiya"
+  },
+  {
+    "title": "Death Note",
+    "category": "Anime",
+    "image": "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/DEATH.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Series/DeathNote"
+  },
+  {
+    "title": "Bleach",
+    "category": "Anime",
+    "image": "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/Bleach.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Series/Bleach/"
+  }
+]
