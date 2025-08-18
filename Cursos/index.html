@@ -44,7 +44,7 @@
       opacity: 1;
       transform: translateY(0);
     }
-    
+
     /* REGRA ADICIONADA PARA MODO RETRATO */
     @media (orientation: portrait) {
       #grid-container {
@@ -81,131 +81,119 @@
     <section class="destaques fade-in-section">
       <h2 class="text-3xl font-bold mb-8 border-l-4 border-red-500 pl-4">Destaques</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6" id="grid-container">
-        
-        <a data-link="https://cirosblack.github.io/CirosBlack/Courses/Cinema4D" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
-          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Cinema4D/c4.png" alt="Cinema 4D" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Cinema 4D';">
-            <div class="p-3 mt-auto">
-              <h3 class="font-bold text-white text-base truncate">Cinema 4D</h3>
-              <span class="text-sm text-red-400">3D</span>
-            </div>
-          </div>
-        </a>
-        
-        <a data-link="https://cirosblack.github.io/CirosBlack/Courses/AdobeIlustrator" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
-          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/AdobeIlustrator/capa.png" alt="AdobeIlustrator" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=AdobeIlustrator';">
-            <div class="p-3 mt-auto">
-              <h3 class="font-bold text-white text-base truncate">AdobeIlustrator</h3>
-              <span class="text-sm text-red-400">3D</span>
-            </div>
-          </div>
-        </a>
-
-        <a data-link="https://cirosblack.github.io/CirosBlack/Courses/AnimeMaster" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
-          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/AnimeMaster/capa.png" alt="AnimeMaster" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=AnimeMaster';">
-            <div class="p-3 mt-auto">
-                <h3 class="font-bold text-white text-base truncate">AnimeMaster</h3>
-                <span class="text-sm text-red-400">3D</span>
-            </div>
-          </div>
-        </a>
-
-        <a data-link="https://cirosblack.github.io/CirosBlack/Courses/Selos3DLW" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
-          <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
-            <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Selos3DLW/capa.png" alt="Selos3DLW" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=Selos3DLW';">
-            <div class="p-3 mt-auto">
-                <h3 class="font-bold text-white text-base truncate">Selos3DLW</h3>
-                <span class="text-sm text-red-400">3D</span>
-            </div>
-          </div>
-        </a>
-        
-      </div>
+        </div>
     </section>
   </main>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const searchInput = document.getElementById('searchInput');
+      
       const gridContainer = document.getElementById('grid-container');
-      const allCards = Array.from(gridContainer.children);
-      // Mapa para rastrear timeouts de "esconder" para cada card
-      const hideTimeouts = new Map();
+      const searchInput = document.getElementById('searchInput');
 
-      // Desativa o menu de contexto
-      document.addEventListener('contextmenu', e => e.preventDefault());
+      // Função para gerar o HTML de um único card
+      function createCardHTML(card) {
+        return `
+          <a data-link="${card.link}" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
+            <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
+              <img src="${card.image}" alt="${card.title}" class="w-full h-auto object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/111827/FFFFFF?text=${encodeURIComponent(card.title)}';">
+              <div class="p-3 mt-auto">
+                <h3 class="font-bold text-white text-base truncate">${card.title}</h3>
+                <span class="text-sm text-red-400">${card.category}</span>
+              </div>
+            </div>
+          </a>
+        `;
+      }
 
-      // Navegação ao clicar no card
-      gridContainer.addEventListener('click', function (e) {
-        const target = e.target.closest('a[data-link]');
-        if (target) {
-          e.preventDefault(); // Previne a navegação padrão para controlar via JS
-          const link = target.getAttribute('data-link');
-          if (link && link !== '#') {
-            window.location.href = link;
-          }
+      // Função principal para carregar e exibir os cards
+      async function loadCards() {
+        try {
+          const response = await fetch('dados/cards.json');
+          const cardsData = await response.json();
+          
+          gridContainer.innerHTML = cardsData.map(createCardHTML).join('');
+          
+          // Após os cards serem carregados, inicializa as funcionalidades
+          initializePageFunctions();
+
+        } catch (error) {
+          console.error('Erro ao carregar os dados dos cards:', error);
+          gridContainer.innerHTML = '<p class="text-center text-red-500 col-span-full">Não foi possível carregar os conteúdos.</p>';
         }
-      });
+      }
 
-      // --- LÓGICA DE PESQUISA CORRIGIDA ---
-      searchInput.addEventListener('input', function () {
-        const searchTerm = this.value.toLowerCase().trim();
+      // Função para inicializar o restante do JavaScript (pesquisa, cliques, etc.)
+      function initializePageFunctions() {
+        const allCards = Array.from(gridContainer.children);
+        const hideTimeouts = new Map();
 
-        allCards.forEach(card => {
-          // Cancela qualquer timeout pendente para esconder este card
-          if (hideTimeouts.has(card)) {
-            clearTimeout(hideTimeouts.get(card));
-            hideTimeouts.delete(card);
-          }
+        // Desativa o menu de contexto
+        document.addEventListener('contextmenu', e => e.preventDefault());
 
-          const title = card.querySelector('h3').textContent.toLowerCase();
-          const category = card.querySelector('span').textContent.toLowerCase();
-          const isMatch = title.includes(searchTerm) || category.includes(searchTerm);
-
-          if (isMatch) {
-            // Mostra o card
-            card.style.display = 'block';
-            // Garante que a transição de opacidade aconteça corretamente
-            // após a propriedade 'display' ser atualizada pelo navegador.
-            queueMicrotask(() => {
-              card.style.opacity = '1';
-            });
-          } else {
-            // Esconde o card
-            card.style.opacity = '0';
-            // Agenda a remoção do card do layout após a transição de opacidade
-            const timeoutId = setTimeout(() => {
-              card.style.display = 'none';
-              hideTimeouts.delete(card); // Limpa o mapa
-            }, 300); // Duração deve ser igual à da transição CSS
-            hideTimeouts.set(card, timeoutId);
+        // Navegação ao clicar no card
+        gridContainer.addEventListener('click', function (e) {
+          const target = e.target.closest('a[data-link]');
+          if (target) {
+            e.preventDefault();
+            const link = target.getAttribute('data-link');
+            if (link && link !== '#') {
+              window.location.href = link;
+            }
           }
         });
-      });
-      
-      // Animação de fade-in ao rolar a página
+
+        // Lógica de pesquisa
+        searchInput.addEventListener('input', function () {
+          const searchTerm = this.value.toLowerCase().trim();
+
+          allCards.forEach(card => {
+            if (hideTimeouts.has(card)) {
+              clearTimeout(hideTimeouts.get(card));
+              hideTimeouts.delete(card);
+            }
+
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const category = card.querySelector('span').textContent.toLowerCase();
+            const isMatch = title.includes(searchTerm) || category.includes(searchTerm);
+
+            if (isMatch) {
+              card.style.display = 'block';
+              queueMicrotask(() => {
+                card.style.opacity = '1';
+              });
+            } else {
+              card.style.opacity = '0';
+              const timeoutId = setTimeout(() => {
+                card.style.display = 'none';
+                hideTimeouts.delete(card);
+              }, 300);
+              hideTimeouts.set(card, timeoutId);
+            }
+          });
+        });
+      }
+
+      // Animação de fade-in ao rolar a página (pode ser executada independentemente)
       const faders = document.querySelectorAll('.fade-in-section');
       const appearOptions = {
         threshold: 0.1,
         rootMargin: "0px 0px -50px 0px"
       };
-
       const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
         entries.forEach(entry => {
-          if (!entry.isIntersecting) {
-            return;
-          } else {
+          if (entry.isIntersecting) {
             entry.target.classList.add('is-visible');
             appearOnScroll.unobserve(entry.target);
           }
         });
       }, appearOptions);
-
       faders.forEach(fader => {
         appearOnScroll.observe(fader);
       });
+
+      // Inicia o carregamento dos cards
+      loadCards();
     });
   </script>
 </body>
