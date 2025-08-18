@@ -44,6 +44,14 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* NOVA REGRA PARA MODO RETRATO */
+    @media (orientation: portrait) {
+      #grid-container {
+        /* Força 4 colunas especificamente no modo retrato */
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
   </style>
 </head>
 <body class="bg-black text-gray-100" oncontextmenu="return false">
@@ -72,7 +80,7 @@
 
     <section class="destaques fade-in-section">
       <h2 class="text-3xl font-bold mb-8 border-l-4 border-red-500 pl-4">Destaques</h2>
-      <div class="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6" id="grid-container">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6" id="grid-container">
         
         <a data-link="https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
           <div class="bg-gray-900/50 rounded-lg shadow-md group-hover:shadow-red-500/40 overflow-hidden h-full flex flex-col">
