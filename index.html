@@ -12,6 +12,7 @@
     /* Estilos personalizados e animações */
     body {
       font-family: 'Inter', sans-serif;
+      /* Fundo gradiente animado */
       background: linear-gradient(-45deg, #000000, #1a0000, #00001a, #1a1a00);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
@@ -24,38 +25,32 @@
     }
 
     /* Esconde a barra de rolagem */
-    * { scrollbar-width: none; }
-    *::-webkit-scrollbar { display: none; }
+    * {
+      scrollbar-width: none; /* Firefox */
+    }
+
+    *::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, and Opera */
+    }
     
+    /* Estilo para animação de fade-in */
     .fade-in-section {
       opacity: 0;
       transform: translateY(20px);
       transition: opacity 0.6s ease-out, transform 0.6s ease-out;
     }
+
     .fade-in-section.is-visible {
       opacity: 1;
       transform: translateY(0);
     }
 
+    /* REGRA ADICIONADA PARA MODO RETRATO */
     @media (orientation: portrait) {
       #grid-container {
+        /* Força 4 colunas especificamente no modo retrato */
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
-    }
-
-    /* Estilos para a animação dos cards */
-    #grid-container > a {
-      /* A transição suave agora se aplica à mudança de posição (order) também */
-      transition: transform 0.4s ease, opacity 0.4s ease;
-    }
-
-    /* Classe para o estado oculto dos cards */
-    .card-hidden {
-      opacity: 0;
-      /* Move o card 30px para a direita, fazendo-o "entrar" da direita */
-      transform: translateX(30px);
-      /* Impede que o card seja clicado enquanto estiver oculto */
-      pointer-events: none;
     }
   </style>
 </head>
@@ -86,7 +81,7 @@
     <section class="destaques fade-in-section">
       <h2 class="text-3xl font-bold mb-8 border-l-4 border-red-500 pl-4">Destaques</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6" id="grid-container">
-          </div>
+        </div>
     </section>
   </main>
 
@@ -96,6 +91,7 @@
       const gridContainer = document.getElementById('grid-container');
       const searchInput = document.getElementById('searchInput');
 
+      // Função para gerar o HTML de um único card
       function createCardHTML(card) {
         return `
           <a data-link="${card.link}" class="group relative block transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 hover:z-20 cursor-pointer">
@@ -110,6 +106,7 @@
         `;
       }
 
+      // Função principal para carregar e exibir os cards
       async function loadCards() {
         try {
           const response = await fetch('dados/cards.json');
@@ -117,6 +114,7 @@
           
           gridContainer.innerHTML = cardsData.map(createCardHTML).join('');
           
+          // Após os cards serem carregados, inicializa as funcionalidades
           initializePageFunctions();
 
         } catch (error) {
@@ -125,11 +123,15 @@
         }
       }
 
+      // Função para inicializar o restante do JavaScript (pesquisa, cliques, etc.)
       function initializePageFunctions() {
         const allCards = Array.from(gridContainer.children);
+        const hideTimeouts = new Map();
 
+        // Desativa o menu de contexto
         document.addEventListener('contextmenu', e => e.preventDefault());
 
+        // Navegação ao clicar no card
         gridContainer.addEventListener('click', function (e) {
           const target = e.target.closest('a[data-link]');
           if (target) {
@@ -141,35 +143,38 @@
           }
         });
 
-        // --- LÓGICA DE PESQUISA ATUALIZADA COM REORDENAÇÃO ---
+        // Lógica de pesquisa
         searchInput.addEventListener('input', function () {
           const searchTerm = this.value.toLowerCase().trim();
-          const animationDelay = 50; // Atraso de 50ms entre cada card
 
-          allCards.forEach((card, index) => {
+          allCards.forEach(card => {
+            if (hideTimeouts.has(card)) {
+              clearTimeout(hideTimeouts.get(card));
+              hideTimeouts.delete(card);
+            }
+
             const title = card.querySelector('h3').textContent.toLowerCase();
             const category = card.querySelector('span').textContent.toLowerCase();
-            const isMatch = searchTerm === '' || title.includes(searchTerm) || category.includes(searchTerm);
+            const isMatch = title.includes(searchTerm) || category.includes(searchTerm);
 
-            // Aplica um atraso de transição para criar o efeito cascata em toda a reorganização
-            card.style.transitionDelay = `${index * animationDelay}ms`;
-            
-            // Define a ordem para que os cards correspondentes apareçam primeiro
-            card.style.order = isMatch ? '0' : '1';
-            
-            // Adiciona/remove a classe para ocultar/mostrar o card
-            card.classList.toggle('card-hidden', !isMatch);
+            if (isMatch) {
+              card.style.display = 'block';
+              queueMicrotask(() => {
+                card.style.opacity = '1';
+              });
+            } else {
+              card.style.opacity = '0';
+              const timeoutId = setTimeout(() => {
+                card.style.display = 'none';
+                hideTimeouts.delete(card);
+              }, 300);
+              hideTimeouts.set(card, timeoutId);
+            }
           });
-          
-          // Limpa o delay após a animação para que o hover e outras interações sejam instantâneas
-          const totalAnimationTime = allCards.length * animationDelay + 400; // 400ms é a duração da transição
-          setTimeout(() => {
-              allCards.forEach(card => card.style.transitionDelay = '0ms');
-          }, totalAnimationTime);
         });
       }
 
-      // Animação de fade-in ao rolar a página
+      // Animação de fade-in ao rolar a página (pode ser executada independentemente)
       const faders = document.querySelectorAll('.fade-in-section');
       const appearOptions = {
         threshold: 0.1,
@@ -187,6 +192,7 @@
         appearOnScroll.observe(fader);
       });
 
+      // Inicia o carregamento dos cards
       loadCards();
     });
   </script>
