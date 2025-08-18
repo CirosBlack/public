@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Cinema 4D",
+    "category": "3D",
+    "image": "https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Cinema4D/c4.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Courses/Cinema4D"
+  },
+  {
+    "title": "AdobeIlustrator",
+    "category": "3D",
+    "image": "https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/AdobeIlustrator/capa.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Courses/AdobeIlustrator"
+  },
+  {
+    "title": "AnimeMaster",
+    "category": "3D",
+    "image": "https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/AnimeMaster/capa.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Courses/AnimeMaster"
+  },
+  {
+    "title": "Selos3DLW",
+    "category": "3D",
+    "image": "https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Selos3DLW/capa.png",
+    "link": "https://cirosblack.github.io/CirosBlack/Courses/Selos3DLW"
+  }
+]
