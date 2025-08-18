@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Prompts para Selos 3D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .prompt-card, .history-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .prompt-card:hover, .history-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .copy-btn, .reuse-btn {
+             transition: background-color 0.3s ease;
+        }
+        .copy-btn:hover {
+            background-color: #4f46e5;
+        }
+        .reuse-btn:hover {
+            background-color: #10b981;
+        }
+        input[type="radio"]:checked {
+            box-shadow: 0 0 0 2px #4f46e5;
+        }
+        .btn-secondary {
+            background-color: #4b5563;
+        }
+        .btn-secondary:hover {
+            background-color: #6b7280;
+        }
+        
+        /* Estilos para o scroll vertical */
+        #prompts-container {
+            max-height: 80vh; /* Altura aumentada para aproveitar o espaço extra */
+            overflow-y: auto; /* Adiciona o scroll vertical quando necessário */
+            padding-right: 12px; /* Espaço para a barra de rolagem não sobrepor o conteúdo */
+        }
+
+        /* Estilização da barra de rolagem para navegadores Webkit (Chrome, Safari) */
+        #prompts-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #prompts-container::-webkit-scrollbar-track {
+            background: #1f2937; /* Cor de fundo da trilha (cinza escuro) */
+            border-radius: 10px;
+        }
+        #prompts-container::-webkit-scrollbar-thumb {
+            background: #4b5563; /* Cor da barra de rolagem (cinza médio) */
+            border-radius: 10px;
+        }
+        #prompts-container::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* Cor da barra ao passar o mouse */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-7xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-600">Gerador de Prompts para Selos 3D</h1>
+            <p class="text-gray-400 mt-2">Crie prompts profissionais para selos e emblemas 3D com a IA Gemini.</p>
+        </div>
+
+        <div id="content-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-x-12">
+            <!-- Coluna da Esquerda: Formulário -->
+            <div id="form-column" class="lg:col-span-2">
+                <div class="max-w-2xl mx-auto">
+                    <!-- Formulário de Entrada -->
+                    <div class="space-y-6 mb-8">
+                        <div>
+                            <label for="text-input" class="block text-sm font-medium text-gray-300 mb-2">Texto Principal</label>
+                            <input type="text" id="text-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Ex: Feliz Aniversário">
+                        </div>
+                        <div>
+                            <label for="theme-input" class="block text-sm font-medium text-gray-300 mb-2">Tema</label>
+                            <input type="text" id="theme-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Ex: Aniversário">
+                        </div>
+                        <!-- Estilos Pré-definidos -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Estilo Artístico</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <label for="style-illustration" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-illustration" name="style-option" type="radio" value="illustration" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Ilustração</span></label>
+                                <label for="style-cartoon" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-cartoon" name="style-option" type="radio" value="cartoon" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Cartoon</span></label>
+                                <label for="style-realistic" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-realistic" name="style-option" type="radio" value="realistic" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm text-gray-300">Realista</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="details-input" class="block text-sm font-medium text-gray-300">Detalhes Adicionais (Opcional)</label>
+                                <button id="generate-ideas-btn" class="text-sm bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-1 px-3 rounded-lg flex items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg id="idea-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                                    <svg id="idea-loader" class="animate-spin h-4 w-4 mr-1 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <svg id="idea-check" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 hidden text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                    <span id="idea-btn-text">Gerar Ideias</span>
+                                </button>
+                            </div>
+                            <textarea id="details-input" rows="3" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Ex: usar paleta neon, com brilhos dourados..."></textarea>
+                        </div>
+                        <!-- Opções de Fundo e Ângulo -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Opções de Fundo</label>
+                                <div class="flex items-center space-x-4">
+                                    <label for="bg-black" class="flex items-center cursor-pointer"><input id="bg-black" name="background-option" type="radio" value="solid black background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Preto</span></label>
+                                    <label for="bg-white" class="flex items-center cursor-pointer"><input id="bg-white" name="background-option" type="radio" value="solid white background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Branco</span></label>
+                                    <label for="bg-transparent" class="flex items-center cursor-pointer"><input id="bg-transparent" name="background-option" type="radio" value="transparent background (.png)" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Transp.</span></label>
+                                </div>
+                            </div>
+                             <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Ângulo da Câmera</label>
+                                <div class="flex items-center space-x-4">
+                                    <label for="angle-none" class="flex items-center cursor-pointer"><input id="angle-none" name="angle-option" type="radio" value="none" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-2 text-sm text-gray-300">Nenhum</span></label>
+                                    <label for="angle-front" class="flex items-center cursor-pointer"><input id="angle-front" name="angle-option" type="radio" value="front view" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Frontal</span></label>
+                                    <label for="angle-profile" class="flex items-center cursor-pointer"><input id="angle-profile" name="angle-option" type="radio" value="profile view" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Perfil</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botões de Ação -->
+                    <div class="flex justify-center space-x-4">
+                        <button id="clear-btn" class="btn-secondary text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50">Limpar</button>
+                        <button id="generate-btn" class="bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">Gerar Prompts</button>
+                    </div>
+                    <!-- Botões de Filtro de Renderizador -->
+                    <div id="renderer-buttons-wrapper" class="hidden mt-8">
+                         <h3 class="text-center text-lg font-semibold text-gray-300 mb-4">Navegar para:</h3>
+                         <div id="renderer-buttons" class="flex flex-wrap justify-center gap-3"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Coluna da Direita: Saída -->
+            <div id="output-column" class="hidden mt-10 lg:mt-0">
+                <!-- Seção de Saída -->
+                <div id="output-section">
+                    <div id="loader" class="text-center hidden"><svg class="animate-spin h-8 w-8 text-indigo-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="mt-2 text-gray-400">Gerando prompts ultra realistas...</p></div>
+                    <div id="prompts-container" class="space-y-6"></div>
+                    <div id="error-message" class="text-center text-red-400 mt-4 hidden"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seção de Histórico (abaixo das colunas) -->
+        <div id="history-section" class="mt-12 hidden">
+            <div class="flex justify-center items-center mb-6">
+                 <h2 class="text-2xl font-bold text-gray-300">Histórico de Prompts</h2>
+            </div>
+            <div id="history-container" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // Elementos do DOM
+        const generateBtn = document.getElementById('generate-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const generateIdeasBtn = document.getElementById('generate-ideas-btn');
+        const ideaIcon = document.getElementById('idea-icon');
+        const ideaLoader = document.getElementById('idea-loader');
+        const ideaCheck = document.getElementById('idea-check');
+        const ideaBtnText = document.getElementById('idea-btn-text');
+        const loader = document.getElementById('loader');
+        const promptsContainer = document.getElementById('prompts-container');
+        const rendererButtonsContainer = document.getElementById('renderer-buttons');
+        const rendererButtonsWrapper = document.getElementById('renderer-buttons-wrapper');
+        const errorMessage = document.getElementById('error-message');
+        const historySection = document.getElementById('history-section');
+        const historyContainer = document.getElementById('history-container');
+        const formColumn = document.getElementById('form-column');
+        const outputColumn = document.getElementById('output-column');
+        
+        // Inputs
+        const textInput = document.getElementById('text-input');
+        const themeInput = document.getElementById('theme-input');
+        const detailsInput = document.getElementById('details-input');
+        
+        const HISTORY_KEY = 'promptHistory3D';
+        
+        // Funções de Histórico
+        const getHistory = () => JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        
+        const saveToHistory = (entry) => {
+            let history = getHistory();
+            history.unshift(entry);
+            history = history.slice(0, 5); // Manter apenas os últimos 5
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            displayHistory();
+        };
+
+        const displayHistory = () => {
+            const history = getHistory();
+            if (history.length === 0) {
+                historySection.classList.add('hidden');
+                return;
+            }
+            historySection.classList.remove('hidden');
+            historyContainer.innerHTML = '';
+            history.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'history-card bg-gray-700 p-4 rounded-lg shadow-md flex justify-between items-center';
+                let angleText = 'Nenhum';
+                if (item.angle === 'front view') angleText = 'Frontal';
+                if (item.angle === 'profile view') angleText = 'Perfil';
+                
+                card.innerHTML = `
+                    <div class="flex-grow">
+                        <p class="font-semibold text-indigo-400">${item.text} - ${item.theme}</p>
+                        <p class="text-xs text-gray-400">Estilo: ${item.style} | Fundo: ${item.background.split(' ')[1] || 'N/A'} | Ângulo: ${angleText}</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="reuse-btn bg-green-600 text-white text-sm font-medium py-2 px-3 rounded-md" data-index="${index}">Reusar</button>
+                        <button class="delete-prompt-btn bg-red-600 text-white p-2 rounded-md hover:bg-red-700" data-index="${index}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                `;
+                historyContainer.appendChild(card);
+            });
+        };
+        
+        const deleteHistoryItem = (index) => {
+            let history = getHistory();
+            history.splice(index, 1);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            displayHistory();
+        };
+
+        const reuseHistoryItem = (index) => {
+            const history = getHistory();
+            const item = history[index];
+            if (!item) return;
+
+            textInput.value = item.text;
+            themeInput.value = item.theme;
+            detailsInput.value = item.details;
+            
+            document.querySelector(`input[name="style-option"][value="${item.style}"]`).checked = true;
+            
+            const bgRadio = document.querySelector(`input[name="background-option"][value="${item.background}"]`);
+            if (bgRadio) bgRadio.checked = true;
+            else {
+                 document.querySelectorAll('input[name="background-option"]').forEach(r => r.checked = false);
+            }
+
+            const angleRadio = document.querySelector(`input[name="angle-option"][value="${item.angle}"]`);
+            if (angleRadio) angleRadio.checked = true;
+        };
+
+        historyContainer.addEventListener('click', (e) => {
+            const targetButton = e.target.closest('button');
+            if (!targetButton) return;
+
+            const index = targetButton.dataset.index;
+            if (targetButton.classList.contains('reuse-btn')) {
+                reuseHistoryItem(index);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (targetButton.classList.contains('delete-prompt-btn')) {
+                deleteHistoryItem(index);
+            }
+        });
+
+        // Limpar Formulário
+        const clearForm = () => {
+            textInput.value = '';
+            themeInput.value = '';
+            detailsInput.value = '';
+            document.querySelectorAll('input[name="background-option"]').forEach(radio => radio.checked = false);
+            document.querySelector('#style-realistic').checked = true;
+            document.querySelector('#angle-none').checked = true;
+            promptsContainer.innerHTML = '';
+            rendererButtonsContainer.innerHTML = '';
+            rendererButtonsWrapper.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            
+            // Reverte o layout para uma coluna
+            outputColumn.classList.add('hidden');
+            formColumn.classList.add('lg:col-span-2');
+            formColumn.classList.remove('lg:col-span-1');
+        };
+
+        clearBtn.addEventListener('click', clearForm);
+        
+        // Gerar Ideias para Detalhes
+        generateIdeasBtn.addEventListener('click', async () => {
+            const theme = themeInput.value;
+            const selectedStyle = document.querySelector('input[name="style-option"]:checked');
+            const style = selectedStyle ? selectedStyle.value : 'realistic';
+
+            if (!theme) {
+                alert('Por favor, preencha o campo "Tema" para gerar ideias.');
+                return;
+            }
+            
+            generateIdeasBtn.disabled = true;
+            ideaIcon.classList.add('hidden');
+            ideaCheck.classList.add('hidden');
+            ideaLoader.classList.remove('hidden');
+            ideaBtnText.textContent = 'Gerando...';
+
+            const ideasPrompt = `Generate a comma-separated list of creative and visual ideas for a 3D sticker with the theme of "${theme}" and an artistic style of "${style}". The ideas should be about elements, materials, colors, and atmosphere. The output must be in English. Example: "glowing neon signs, chrome details, vibrant confetti, bokeh background, intricate filigree".`;
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: ideasPrompt }] }] };
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                const ideasText = result.candidates[0].content.parts[0].text;
+                detailsInput.value = ideasText.trim();
+                ideaCheck.classList.remove('hidden');
+                ideaBtnText.textContent = 'Ideias Geradas!';
+            } catch (error) {
+                console.error("Erro ao gerar ideias:", error);
+                alert("Não foi possível gerar ideias. Tente novamente.");
+                ideaIcon.classList.remove('hidden');
+                ideaBtnText.textContent = 'Gerar Ideias';
+            } finally {
+                generateIdeasBtn.disabled = false;
+                ideaLoader.classList.add('hidden');
+            }
+        });
+
+        // Geração de Prompts
+        generateBtn.addEventListener('click', async () => {
+            // Esconde o ícone de check ao iniciar a geração principal
+            ideaCheck.classList.add('hidden');
+            ideaIcon.classList.remove('hidden');
+            ideaBtnText.textContent = 'Gerar Ideias';
+
+            const text = textInput.value;
+            const theme = themeInput.value;
+            const details = detailsInput.value;
+            const selectedStyle = document.querySelector('input[name="style-option"]:checked');
+            const style = selectedStyle ? selectedStyle.value : 'realistic';
+            const selectedBg = document.querySelector('input[name="background-option"]:checked');
+            const background = selectedBg ? selectedBg.value : 'designer\'s choice';
+            const selectedAngle = document.querySelector('input[name="angle-option"]:checked');
+            const angle = selectedAngle ? selectedAngle.value : 'none';
+
+            if (!text || !theme) {
+                errorMessage.textContent = 'Por favor, preencha os campos "Texto Principal" e "Tema".';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            
+            // Ajusta o layout para duas colunas
+            formColumn.classList.remove('lg:col-span-2');
+            formColumn.classList.add('lg:col-span-1');
+            outputColumn.classList.remove('hidden');
+
+            loader.classList.remove('hidden');
+            promptsContainer.innerHTML = '';
+            rendererButtonsContainer.innerHTML = '';
+            rendererButtonsWrapper.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            
+            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
+            
+            const cameraAngleRule = angle !== 'none' 
+                ? `4.  **Camera Angle:** The composition must strictly adhere to the specified camera angle: **${angle}**. 'front view' should be a direct, head-on shot. 'profile view' should be a side-on shot. This must be clearly stated in the prompt.`
+                : '';
+            
+            const backgroundRule = selectedBg
+                ? `8. **Background Implementation:** This is a mandatory rule. The final image MUST be rendered on the specified background: "${background}". No other background is acceptable.`
+                : `8. **Background Implementation:** The user did not specify a background, so you have creative freedom to choose one that best complements the theme and style.`;
+
+
+            const masterPrompt = `
+                Objective: Generate 6 professional, photorealistic, and highly detailed prompts in ENGLISH for creating festive 3D typographic digital seals/stickers. The goal is to achieve maximum realism suitable for high-end digital art.
+
+                User Request:
+                - Main Text: "${text}"
+                - Theme: "${theme}"
+                - Artistic Style: "${style}"
+                - Camera Angle: "${angle}"
+                - Additional Details: "${details || 'No additional details provided.'}"
+                - Background: "${background}"
+
+                Strict Rules for Prompt Generation:
+                1.  **Language & Details Interpretation:** Generate the entire descriptive prompt in English. The user's main text ("${text}") MUST remain exactly as provided, without translation. If the user provides "Additional Details" in Portuguese, you must interpret their meaning and incorporate the concepts into the English prompt. Do not include the original Portuguese text from the details in your final output.
+                2.  **Artistic Style:** The overall aesthetic MUST conform to the chosen "${style}". This is a primary directive. 
+                    - If 'realistic', aim for photorealism with hyper-detailed textures, complex materials, and physically accurate lighting.
+                    - If 'cartoon', the style must be simplified, stylized, and caricatured, with strong outlines, vibrant solid colors, and exaggerated features to convey humor and emotion, typical of animations and comic strips.
+                    - If 'illustration', treat it as a broad artistic interpretation. The style can vary from playful to detailed, aiming to complement an idea or create a specific atmosphere, as seen in book art or concept designs, using varied techniques.
+                3.  **Thematic Typography:** The typography for the text "${text}" MUST be highly stylized and consistent with the "${theme}" theme AND the chosen "${style}". This is a critical requirement.
+                ${cameraAngleRule}
+                5.  **Creative Variations:** Create 6 distinct prompts. Each should be a creative variation of the same concept, exploring different materials, lighting, composition, and finishes, all within the requested style. They must not be repetitive.
+                6.  **High-End Renderers:** Assign each of the 6 prompts to one of these specific high-end renderers, in this order: **V-Ray, Lumion, Twinmotion, Enscape, D5 Render, and Unreal Engine 5**. Explicitly mention the assigned renderer at the end of each prompt.
+                7.  **Seal/Sticker Style:** The visual should be that of a premium 3D digital sticker, with depth, defined edges, realistic reflections, and soft shadows.
+                ${backgroundRule}
+                9.  **Thematic Elements:** Incorporate decorative elements that match the theme "${theme}". The concepts from the "Additional Details" (interpreted from Portuguese if necessary, as per rule #1) must be creatively incorporated into all 6 variations.
+                10. **Richness of Detail:** Accurately describe materials (e.g., subsurface scattering for plastics, PBR materials, anisotropic reflections), textures (e.g., 4K textures, micro-scratches, dust), and finishes according to the "${style}".
+                11. **Professional Rendering:** Include advanced rendering specifications like "physically-based rendering (PBR)", "HDRI studio lighting", "global illumination (GI)", "ray tracing", "soft cast shadows", "caustics", "ambient occlusion", and "cinematic depth of field (DoF) with bokeh".
+                12. **Output Format:** Respond with a JSON object containing a single key "prompts" which is an array of 6 strings. Each string is a complete prompt.
+            `;
+            
+            const apiKey = ""; // Deixe em branco, a chave será fornecida pelo ambiente
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const payload = { contents: [{ parts: [{ text: masterPrompt }] }], generationConfig: { responseMimeType: "application/json" } };
+            
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                const responseText = result.candidates[0].content.parts[0].text;
+                const generatedPrompts = JSON.parse(responseText).prompts;
+
+                if (generatedPrompts.length !== 6) {
+                    throw new Error("A IA não retornou o número esperado de 6 prompts.");
+                }
+
+                generatedPrompts.forEach((promptText, index) => {
+                    const rendererName = renderers[index];
+                    const card = document.createElement('div');
+                    card.className = 'prompt-card bg-gray-700 p-6 rounded-lg shadow-md flex flex-col';
+                    card.dataset.renderer = rendererName; // Adiciona data attribute para o filtro
+                    card.innerHTML = `<h3 class="text-xl font-semibold text-indigo-400 mb-3">${rendererName}</h3><p class="text-gray-300 flex-grow">${promptText}</p><button class="copy-btn mt-4 bg-indigo-500 text-white text-sm font-medium py-2 px-4 rounded-md self-start">Copiar</button>`;
+                    promptsContainer.appendChild(card);
+                    
+                    // Cria botão de filtro
+                    const filterButton = document.createElement('button');
+                    filterButton.className = 'bg-gray-600 text-gray-200 text-sm font-semibold py-2 px-4 rounded-full hover:bg-indigo-500 transition-colors';
+                    filterButton.textContent = rendererName;
+                    filterButton.dataset.targetRenderer = rendererName;
+                    rendererButtonsContainer.appendChild(filterButton);
+                });
+                
+                rendererButtonsWrapper.classList.remove('hidden');
+
+                document.querySelectorAll('.copy-btn').forEach((button, index) => {
+                    button.addEventListener('click', () => {
+                        const textToCopy = generatedPrompts[index];
+                        const textarea = document.createElement('textarea');
+                        textarea.value = textToCopy;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        try {
+                            document.execCommand('copy');
+                            button.textContent = 'Copiado!';
+                            setTimeout(() => { button.textContent = 'Copiar'; }, 2000);
+                        } catch (err) {
+                            console.error('Falha ao copiar texto: ', err);
+                            button.textContent = 'Erro!';
+                            setTimeout(() => { button.textContent = 'Copiar'; }, 2000);
+                        }
+                        document.body.removeChild(textarea);
+                    });
+                });
+                
+                saveToHistory({ text, theme, details, style, background, angle, prompts: generatedPrompts });
+
+            } catch (error) {
+                console.error("Erro ao gerar prompts:", error);
+                errorMessage.textContent = 'Ocorreu um erro ao gerar os prompts. Tente novamente.';
+                errorMessage.classList.remove('hidden');
+            } finally {
+                loader.classList.add('hidden');
+            }
+        });
+
+        rendererButtonsContainer.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const targetRenderer = e.target.dataset.targetRenderer;
+                const targetCard = promptsContainer.querySelector(`.prompt-card[data-renderer="${targetRenderer}"]`);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', displayHistory);
+    </script>
+</body>
+</html>
