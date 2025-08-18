@@ -403,7 +403,7 @@
                 12. **Output Format:** Respond with a JSON object containing a single key "prompts" which is an array of 6 strings. Each string is a complete prompt.
             `;
             
-            const apiKey = ""; // Deixe em branco, a chave será fornecida pelo ambiente
+            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM"; // Deixe em branco, a chave será fornecida pelo ambiente
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             const payload = { contents: [{ parts: [{ text: masterPrompt }] }], generationConfig: { responseMimeType: "application/json" } };
