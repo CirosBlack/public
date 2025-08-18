@@ -43,9 +43,9 @@
       }
     }
 
-    /* NOVOS ESTILOS PARA ANIMAÇÃO DE PESQUISA */
+    /* Estilos para a animação dos cards */
     #grid-container > a {
-      /* Define a transição suave para as propriedades de transformação e opacidade */
+      /* A transição suave agora se aplica à mudança de posição (order) também */
       transition: transform 0.4s ease, opacity 0.4s ease;
     }
 
@@ -141,32 +141,28 @@
           }
         });
 
-        // --- NOVA LÓGICA DE PESQUISA COM ANIMAÇÃO ---
+        // --- LÓGICA DE PESQUISA ATUALIZADA COM REORDENAÇÃO ---
         searchInput.addEventListener('input', function () {
           const searchTerm = this.value.toLowerCase().trim();
-          let visibleCardIndex = 0;
           const animationDelay = 50; // Atraso de 50ms entre cada card
 
-          allCards.forEach(card => {
+          allCards.forEach((card, index) => {
             const title = card.querySelector('h3').textContent.toLowerCase();
             const category = card.querySelector('span').textContent.toLowerCase();
-            const isMatch = title.includes(searchTerm) || category.includes(searchTerm);
+            const isMatch = searchTerm === '' || title.includes(searchTerm) || category.includes(searchTerm);
 
-            // Aplica um atraso de transição para criar o efeito cascata
-            card.style.transitionDelay = `${visibleCardIndex * animationDelay}ms`;
-
-            if (isMatch) {
-              // Se corresponde, remove a classe 'card-hidden' para mostrar
-              card.classList.remove('card-hidden');
-              visibleCardIndex++;
-            } else {
-              // Se não corresponde, adiciona a classe para ocultar
-              card.classList.add('card-hidden');
-            }
+            // Aplica um atraso de transição para criar o efeito cascata em toda a reorganização
+            card.style.transitionDelay = `${index * animationDelay}ms`;
+            
+            // Define a ordem para que os cards correspondentes apareçam primeiro
+            card.style.order = isMatch ? '0' : '1';
+            
+            // Adiciona/remove a classe para ocultar/mostrar o card
+            card.classList.toggle('card-hidden', !isMatch);
           });
           
           // Limpa o delay após a animação para que o hover e outras interações sejam instantâneas
-          const totalAnimationTime = visibleCardIndex * animationDelay + 400; // 400ms é a duração da transição
+          const totalAnimationTime = allCards.length * animationDelay + 400; // 400ms é a duração da transição
           setTimeout(() => {
               allCards.forEach(card => card.style.transitionDelay = '0ms');
           }, totalAnimationTime);
