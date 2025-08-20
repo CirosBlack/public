@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Prompts para Selos 3D</title>
+    <title>Gerador de Prompts para Selos 3D & 2D</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            height: 100vh; /* Define a altura total da viewport */
+            overflow: hidden; /* Impede a rolagem da página principal */
+        }
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -15,9 +19,6 @@
         }
         .prompt-card:hover, .history-card:hover {
             transform: translateY(-5px);
-        }
-        .copy-btn:hover {
-            background-color: #3b82f6; /* Azul mais claro */
         }
         .reuse-btn:hover {
             background-color: #3b82f6; /* Azul mais claro */
@@ -32,145 +33,166 @@
             background-color: #6b7280;
         }
         
-        /* Estilos para o scroll vertical */
-        #prompts-container {
-            height: calc(100vh - 220px); /* Altura aumentada para mostrar um prompt por vez */
-            min-height: 500px;
-            overflow-y: auto;
-            padding-right: 12px;
-        }
-        #form-scroll-container {
-            height: calc(100vh - 120px);
-            max-height: 800px;
+        /* Estilos para o scroll vertical das colunas */
+        #form-column, #output-column {
             overflow-y: auto;
             padding-right: 12px;
         }
 
         /* Estilização da barra de rolagem */
-        #prompts-container::-webkit-scrollbar, #form-scroll-container::-webkit-scrollbar {
+        #form-column::-webkit-scrollbar, #output-column::-webkit-scrollbar {
             width: 8px;
         }
-        #prompts-container::-webkit-scrollbar-track, #form-scroll-container::-webkit-scrollbar-track {
-            background: #1f2977;
+        #form-column::-webkit-scrollbar-track, #output-column::-webkit-scrollbar-track {
+            background: #1f2937;
             border-radius: 10px;
         }
-        #prompts-container::-webkit-scrollbar-thumb, #form-scroll-container::-webkit-scrollbar-thumb {
+        #form-column::-webkit-scrollbar-thumb, #output-column::-webkit-scrollbar-thumb {
             background: #4b5563;
             border-radius: 10px;
         }
-        #prompts-container::-webkit-scrollbar-thumb:hover, #form-scroll-container::-webkit-scrollbar-thumb:hover {
+        #form-column::-webkit-scrollbar-thumb:hover, #output-column::-webkit-scrollbar-thumb:hover {
             background: #6b7280;
         }
-        .renderer-btn.active {
+        .filter-btn.active {
             background-color: #4f46e5;
             color: white;
         }
+        textarea {
+            resize: none; /* Impede que o usuário redimensione manualmente */
+        }
+        /* Oculta a barra de rolagem do textarea de detalhes */
+        #details-input::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        #details-input {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-900 text-white p-4">
 
-    <div class="w-full max-w-7xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10">
+    <div class="w-full max-w-7xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 h-full flex flex-col">
         
-        <div id="content-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-x-12">
+        <div id="content-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 flex-grow overflow-hidden">
             
-            <!-- Coluna da Esquerda: Formulário e Histórico -->
-            <div id="form-column" class="flex flex-col">
-                <div id="form-scroll-container">
-                    <!-- Formulário de Entrada -->
-                    <div class="space-y-6 mb-8">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="text-input" class="block text-sm font-bold text-gray-300 mb-2">TEXTO PRINCIPAL</label>
-                                <input type="text" id="text-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label for="theme-input" class="block text-sm font-bold text-gray-300 mb-2">TEMA</label>
-                                <input type="text" id="theme-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            </div>
-                        </div>
-
-                        <!-- Seção de Upload de Imagem -->
+            <!-- Coluna da Esquerda: Formulário e Histórico (com scroll) -->
+            <div id="form-column">
+                <!-- Formulário de Entrada -->
+                <div class="space-y-6 mb-8">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">OU ENVIE UMA IMAGEM DE REFERÊNCIA</label>
-                            <label for="image-upload" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center transition-colors hover:bg-blue-700 cursor-pointer">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                                ESCOLHER ARQUIVO
-                            </label>
-                            <input type="file" id="image-upload" accept="image/*" class="hidden">
-                            <div id="image-preview-container" class="mt-4 hidden text-center">
-                                <img id="image-preview" src="#" alt="Pré-visualização da Imagem" class="max-h-40 rounded-lg inline-block"/>
-                            </div>
+                            <label for="text-input" class="block text-sm font-bold text-gray-300 mb-2">TEXTO PRINCIPAL</label>
+                            <input type="text" id="text-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         </div>
-                        
-                        <!-- Detalhes Adicionais e Botões de IA -->
                         <div>
-                            <label for="details-input" class="block text-sm font-bold text-gray-300 mb-2">DETALHES ADICIONAIS (OPCIONAL)</label>
-                            <div class="flex items-center space-x-4 mb-3">
-                                <button id="describe-image-btn" class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
-                                    <svg id="describe-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
-                                    <svg id="describe-loader" class="animate-spin h-5 w-5 mr-2 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    <span id="describe-btn-text">DESCREVER TEMA</span>
-                                </button>
-                                <button id="generate-ideas-btn" class="flex-1 text-sm bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-2 px-4 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <svg id="idea-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                                    <svg id="idea-loader" class="animate-spin h-4 w-4 mr-1 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    <svg id="idea-check" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 hidden text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                    <span id="idea-btn-text">GERAR IDEIAS</span>
-                                </button>
-                            </div>
-                            <textarea id="details-input" rows="2" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                            <label for="theme-input" class="block text-sm font-bold text-gray-300 mb-2">TEMA</label>
+                            <input type="text" id="theme-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         </div>
+                    </div>
+                    
+                    <!-- Controles de Dimensão -->
+                    <div class="grid grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">DIMENSÃO DO TEXTO</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="text-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="text-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">DIMENSÃO DA COMPOSIÇÃO</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="comp-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="comp-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
+                            </div>
+                        </div>
+                    </div>
 
-                        <!-- Estilos Artísticos e Fundo -->
-                        <div class="grid grid-cols-2 gap-4">
+                    <!-- Estilos Artísticos e Fundo -->
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">ESTILO ARTÍSTICO</label>
                             <div class="space-y-2">
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="illustration" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Ilustração</span></label>
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="cartoon" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Cartoon</span></label>
                                 <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="realistic" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm text-gray-300">Realista</span></label>
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="cartoon" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Cartoon</span></label>
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="illustration" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Ilustração</span></label>
                             </div>
-                             <div class="space-y-2">
+                        </div>
+                         <div>
+                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">FUNDO</label>
+                            <div class="space-y-2">
                                 <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="background-option" type="radio" value="solid black background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Preto</span></label>
                                 <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="background-option" type="radio" value="solid white background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Branco</span></label>
                                 <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="background-option" type="radio" value="transparent background (.png)" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Transparente</span></label>
                             </div>
                         </div>
                     </div>
-                    <!-- Botões de Ação -->
-                    <div class="flex justify-center space-x-4 mb-10">
-                        <button id="clear-btn" class="btn-secondary text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50">LIMPAR</button>
-                        <button id="generate-btn" class="bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">GERAR PROMPTS</button>
+
+                    <!-- Seção de Upload de Imagem -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-300 mb-2">ENVIE UMA IMAGEM DE REFERÊNCIA</label>
+                        <label for="image-upload" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center transition-colors hover:bg-blue-700 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                            ESCOLHER ARQUIVO
+                        </label>
+                        <input type="file" id="image-upload" accept="image/*" class="hidden">
+                        <div id="image-preview-container" class="mt-4 hidden">
+                            <img id="image-preview" src="#" alt="Pré-visualização da Imagem" class="w-full h-auto rounded-lg"/>
+                        </div>
                     </div>
                     
-                    <!-- Botões de Filtro de Renderizador -->
-                    <div id="renderer-buttons-wrapper" class="hidden mb-10">
-                        <h3 class="text-left text-xl font-bold text-gray-300 mb-4">NAVEGAR PARA:</h3>
-                        <div id="renderer-buttons" class="flex flex-wrap justify-start gap-3"></div>
-                    </div>
-
-                    <!-- Seção de Histórico -->
-                    <div id="history-section" class="hidden">
-                        <div class="flex justify-start items-center mb-4">
-                             <h2 class="text-xl font-bold text-gray-300">HISTÓRICO DE PROMPTS</h2>
+                    <!-- Detalhes Adicionais e Botões de IA -->
+                    <div>
+                        <label for="details-input" class="block text-sm font-bold text-gray-300 mb-2">DETALHES ADICIONAIS (OPCIONAL)</label>
+                        <div class="flex items-center space-x-4 mb-3">
+                            <button id="describe-image-btn" class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+                                <svg id="describe-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
+                                <svg id="describe-loader" class="animate-spin h-5 w-5 mr-2 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <span id="describe-btn-text">DESCREVER IMAGEM</span>
+                            </button>
+                            <button id="generate-ideas-btn" class="flex-1 text-sm bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 rounded-lg flex items-center justify-center transition-colors">
+                                <svg id="idea-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                                <svg id="idea-loader" class="animate-spin h-4 w-4 mr-1 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <svg id="idea-check" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 hidden text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                <span id="idea-btn-text">GERAR IDEIAS</span>
+                            </button>
                         </div>
-                        <div id="history-container" class="space-y-4"></div>
+                        
+                        <!-- Botões de Ação Movidos -->
+                        <div class="flex space-x-4 my-4">
+                            <button id="clear-btn" class="flex-1 btn-secondary text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50">LIMPAR</button>
+                            <button id="generate-btn" class="flex-1 bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">GERAR PROMPTS</button>
+                        </div>
+
+                        <textarea id="details-input" rows="2" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
                     </div>
+                </div>
+
+                <!-- Seção de Histórico -->
+                <div id="history-section" class="hidden">
+                    <div class="flex justify-start items-center mb-4">
+                         <h2 class="text-xl font-bold text-gray-300">HISTÓRICO DE PROMPTS</h2>
+                    </div>
+                    <div id="history-container" class="space-y-4"></div>
                 </div>
             </div>
             
-            <!-- Coluna da Direita: Saída -->
+            <!-- Coluna da Direita: Saída (com scroll) -->
             <div id="output-column">
-                <!-- Cabeçalho da Coluna Direita -->
-                <div class="text-left mb-6">
-                    <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-600">GERADOR DE PROMPTS PARA SELOS 3D</h1>
-                    <p class="text-gray-400 mt-1 text-sm">CRIE PROMPTS PROFISSIONAIS PARA SELOS E EMBLEMAS 3D COM A IA GEMINI.</p>
+                <!-- Botões de Filtro -->
+                <div id="filter-buttons-wrapper" class="hidden mb-6">
+                    <h3 id="filter-title" class="text-left text-xl font-bold text-gray-300 mb-4">NAVEGAR PARA:</h3>
+                    <div id="filter-buttons" class="flex flex-wrap justify-start gap-3"></div>
                 </div>
-                
+
                 <!-- Seção de Saída -->
                 <div id="output-section">
                     <div id="initial-message" class="text-center text-gray-500 mt-20">
                         <p>Seus prompts aparecerão aqui...</p>
                     </div>
-                    <div id="loader" class="text-center hidden"><svg class="animate-spin h-8 w-8 text-indigo-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="mt-2 text-gray-400">Gerando prompts ultra realistas...</p></div>
+                    <div id="loader" class="text-center hidden"><svg class="animate-spin h-8 w-8 text-indigo-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p id="loader-text" class="mt-2 text-gray-400">Gerando prompts...</p></div>
                     <h2 id="prompts-label" class="hidden text-xl font-bold text-gray-300 mb-4">PROMPTS</h2>
                     <div id="prompts-container" class="space-y-6"></div>
                     <div id="error-message" class="text-center text-red-400 mt-4 hidden"></div>
@@ -189,10 +211,12 @@
         const ideaCheck = document.getElementById('idea-check');
         const ideaBtnText = document.getElementById('idea-btn-text');
         const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loader-text');
         const promptsContainer = document.getElementById('prompts-container');
         const promptsLabel = document.getElementById('prompts-label');
-        const rendererButtonsContainer = document.getElementById('renderer-buttons');
-        const rendererButtonsWrapper = document.getElementById('renderer-buttons-wrapper');
+        const filterButtonsContainer = document.getElementById('filter-buttons');
+        const filterButtonsWrapper = document.getElementById('filter-buttons-wrapper');
+        const filterTitle = document.getElementById('filter-title');
         const errorMessage = document.getElementById('error-message');
         const historySection = document.getElementById('history-section');
         const historyContainer = document.getElementById('history-container');
@@ -237,9 +261,11 @@
                 const card = document.createElement('div');
                 card.className = 'history-card bg-gray-700 p-4 rounded-lg shadow-md flex justify-between items-center';
                 
+                const dimensionLabel = `Texto ${item.textDimension.toUpperCase()} / Comp ${item.compDimension.toUpperCase()}`;
+
                 card.innerHTML = `
                     <div class="flex-grow">
-                        <p class="font-semibold text-indigo-400">${item.text} - ${item.theme}</p>
+                        <p class="font-semibold text-indigo-400">${item.text} - ${item.theme} <span class="text-xs font-normal text-gray-400">(${dimensionLabel})</span></p>
                         <p class="text-xs text-gray-400">Estilo: ${item.style} | Fundo: ${item.background.split(' ')[1] || 'N/A'}</p>
                     </div>
                     <div class="flex items-center space-x-3">
@@ -269,6 +295,8 @@
             themeInput.value = item.theme;
             detailsInput.value = item.details;
             
+            document.querySelector(`input[name="text-dimension"][value="${item.textDimension}"]`).checked = true;
+            document.querySelector(`input[name="comp-dimension"][value="${item.compDimension}"]`).checked = true;
             document.querySelector(`input[name="style-option"][value="${item.style}"]`).checked = true;
             
             const bgRadio = document.querySelector(`input[name="background-option"][value="${item.background}"]`);
@@ -276,6 +304,7 @@
             else {
                  document.querySelectorAll('input[name="background-option"]').forEach(r => r.checked = false);
             }
+            updateIdeaButtonText();
         };
 
         historyContainer.addEventListener('click', (e) => {
@@ -295,52 +324,58 @@
             textInput.value = '';
             themeInput.value = '';
             detailsInput.value = '';
+            detailsInput.style.height = '';
             document.querySelectorAll('input[name="background-option"]').forEach(radio => radio.checked = false);
+            document.querySelector('input[value="3d"][name="text-dimension"]').checked = true;
+            document.querySelector('input[value="3d"][name="comp-dimension"]').checked = true;
             document.querySelector('input[value="realistic"]').checked = true;
             promptsContainer.innerHTML = '';
-            rendererButtonsContainer.innerHTML = '';
-            rendererButtonsWrapper.classList.add('hidden');
+            filterButtonsContainer.innerHTML = '';
+            filterButtonsWrapper.classList.add('hidden');
             promptsLabel.classList.add('hidden');
             errorMessage.classList.add('hidden');
             initialMessage.classList.remove('hidden');
             
             imagePreviewContainer.classList.add('hidden');
-            imagePreview.setAttribute('src', '#');
             imageUpload.value = '';
+            updateIdeaButtonText();
         };
 
         clearBtn.addEventListener('click', clearForm);
 
-        // Função para converter arquivo para Base64
         function getBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => {
-                    const base64Data = reader.result.split(',')[1];
-                    resolve(base64Data);
-                };
-                reader.onerror = error => reject(error);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = (error) => {
+                    console.error("FileReader error object:", error);
+                    reject(new Error('Não foi possível ler o arquivo. Pode estar corrompido ou o navegador bloqueou a leitura.'));
+                }
             });
         }
 
-        // Event listener para mostrar a pré-visualização da imagem
         imageUpload.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     imagePreview.setAttribute('src', e.target.result);
                     imagePreviewContainer.classList.remove('hidden');
                 }
                 reader.readAsDataURL(this.files[0]);
             }
         });
+        
+        const adjustTextareaHeight = (element) => {
+            element.style.height = 'auto';
+            element.style.height = (element.scrollHeight) + 'px';
+        };
 
-        // Descrever Imagem com IA
         describeImageBtn.addEventListener('click', async () => {
             const file = imageUpload.files[0];
             if (!file) {
-                alert('Por favor, selecione uma imagem primeiro.');
+                errorMessage.textContent = 'Por favor, selecione uma imagem primeiro.';
+                errorMessage.classList.remove('hidden');
                 return;
             }
 
@@ -348,87 +383,152 @@
             describeIcon.classList.add('hidden');
             describeLoader.classList.remove('hidden');
             describeBtnText.textContent = 'ANALISANDO...';
+            errorMessage.classList.add('hidden');
 
+            const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
+            let visionPrompt = '';
+            
+            if (compDimension === '2d') {
+                visionPrompt = `
+                    As a senior art director, perform an exhaustive analysis of the provided image to create a detailed creative brief for recreating it as a 2D sticker.
+                    The output MUST be a valid JSON object with three keys: "text", "theme", and "details".
+
+                    1.  **"text"**: Analyze the image to identify the most prominent text. Extract this text *exactly* as it appears, including capitalization and punctuation. If no text is present, return an empty string.
+                    2.  **"theme"**: Based on the overall visual style, characters, and elements, define a concise, two-to-three-word theme in Portuguese.
+                    3.  **"details"**: Provide a comprehensive, comma-separated list in English describing every visual aspect for a master illustrator. This is a professional design brief. Be specific and cover these points:
+                        * **Typography Analysis:** Describe the font style (e.g., bold sans-serif, playful script, hand-drawn). Describe its visual treatment: thick outlines, drop shadows, gradients, textures within the letters.
+                        * **Composition & Structure:** Describe the layout. Is it centered, asymmetrical? How do the elements frame the text? What is the overall shape of the sticker?
+                        * **Characters & Mascots:** Identify any characters. Describe their style (e.g., chibi, cartoon, realistic), pose, expression, and interaction with the text.
+                        * **Supporting Elements:** List all other decorative elements (e.g., flowers, stars, splash effects, background patterns).
+                        * **Color Palette & Line Art:** List the dominant colors. Describe the line art style (e.g., clean vector lines, rough sketchy outlines, no outlines).
+                `;
+            } else { // 3D
+                visionPrompt = `
+                    As a senior 3D art director, perform an exhaustive analysis of the provided image to create a detailed creative brief for recreating it as a photorealistic 3D emblem.
+                    The output MUST be a valid JSON object with three keys: "text", "theme", and "details".
+
+                    1.  **"text"**: Analyze the image to identify the most prominent text. Extract this text *exactly* as it appears, including capitalization and punctuation. If no text is present, return an empty string.
+                    2.  **"theme"**: Based on the overall visual style, characters, and elements, define a concise, two-to-three-word theme in Portuguese.
+                    3.  **"details"**: Provide an exhaustive, comma-separated list in English describing every visual aspect. This is a creative brief for a master 3D artist. Be specific and cover these points:
+                        * **Typography Analysis (CRITICAL):** Describe the font of the extracted text. Is it serif, sans-serif, script? What is its weight (bold, light)? Describe its 3D properties: extrusion depth, bevel style (rounded, sharp), outlines, inlays.
+                        * **Composition & Structure:** Describe the overall shape of the emblem. How are the elements layered? What forms the backplate or container for the text?
+                        * **Characters & Mascots:** Identify any characters. Describe their pose, expression, and interaction with the text.
+                        * **Supporting Elements:** List all other decorative elements (shapes, swirls, icons, etc.) and their materials.
+                        * **Color Palette:** List the primary, secondary, and accent colors.
+                        * **Lighting & Materials:** Describe the lighting setup (e.g., dramatic top-down key light, soft ambient occlusion, colored rim lights) and the textures of all surfaces (PBR materials like glossy, matte, metallic).
+                `;
+            }
+            
             try {
                 const base64ImageData = await getBase64(file);
-                const visionPrompt = `Analyze this image and describe its main theme and key visual elements in a way that can be used to generate a 3D sticker. The output must be a valid JSON object with two keys: "theme" (a short, one or two-word theme in Portuguese) and "details" (a comma-separated list of visual details, colors, and materials in English).`;
-                
                 const apiKey = ""; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                
                 const payload = {
-                    contents: [{
-                        parts: [
-                            { text: visionPrompt },
-                            { inlineData: { mimeType: file.type, data: base64ImageData } }
-                        ]
-                    }],
+                    contents: [{ parts: [{ text: visionPrompt }, { inlineData: { mimeType: file.type, data: base64ImageData } }] }],
                     generationConfig: { responseMimeType: "application/json" }
                 };
-
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
                 const result = await response.json();
                 const descriptionText = result.candidates[0].content.parts[0].text;
                 const descriptionJson = JSON.parse(descriptionText);
-
+                textInput.value = descriptionJson.text || '';
                 themeInput.value = descriptionJson.theme || '';
                 detailsInput.value = descriptionJson.details || '';
-
+                adjustTextareaHeight(detailsInput);
+                updateIdeaButtonText();
+                generateBtn.click(); // Ativa o botão de gerar prompts
             } catch (error) {
                 console.error("Erro ao descrever a imagem:", error);
-                alert("Não foi possível analisar a imagem. Tente novamente com outra imagem.");
+                errorMessage.textContent = error.message || "Não foi possível analisar a imagem. Tente um arquivo diferente.";
+                errorMessage.classList.remove('hidden');
             } finally {
                 describeImageBtn.disabled = false;
                 describeIcon.classList.remove('hidden');
                 describeLoader.classList.add('hidden');
-                describeBtnText.textContent = 'DESCREVER TEMA';
+                describeBtnText.textContent = 'DESCREVER IMAGEM';
             }
         });
         
-        // Gerar Ideias para Detalhes
+        const updateIdeaButtonText = () => {
+            if (detailsInput.value.trim() !== '') {
+                ideaBtnText.textContent = 'MELHORAR IDEIAS';
+            } else {
+                ideaBtnText.textContent = 'GERAR IDEIAS';
+            }
+        };
+
+        detailsInput.addEventListener('input', updateIdeaButtonText);
+
         generateIdeasBtn.addEventListener('click', async () => {
             const theme = themeInput.value;
-            const selectedStyle = document.querySelector('input[name="style-option"]:checked');
-            const style = selectedStyle ? selectedStyle.value : 'realistic';
+            const existingDetails = detailsInput.value.trim();
+            const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
+            const style = document.querySelector('input[name="style-option"]:checked').value;
 
-            if (!theme) {
-                alert('Por favor, preencha o campo "Tema" para gerar ideias.');
+            if (!theme && !existingDetails) {
+                errorMessage.textContent = 'Preencha o campo "Tema" ou digite uma ideia para melhorar.';
+                errorMessage.classList.remove('hidden');
                 return;
             }
             
             generateIdeasBtn.disabled = true;
+            ideaLoader.classList.remove('hidden');
             ideaIcon.classList.add('hidden');
             ideaCheck.classList.add('hidden');
-            ideaLoader.classList.remove('hidden');
-            ideaBtnText.textContent = 'GERANDO...';
+            ideaBtnText.textContent = existingDetails ? 'MELHORANDO...' : 'GERANDO...';
+            errorMessage.classList.add('hidden');
 
-            const ideasPrompt = `Generate a comma-separated list of creative and visual ideas for a 3D sticker with the theme of "${theme}" and an artistic style of "${style}". The ideas should be about elements, materials, colors, and atmosphere. The output must be in English. Example: "glowing neon signs, chrome details, vibrant confetti, bokeh background, intricate filigree".`;
+            let ideasPrompt = '';
+            
+            if (existingDetails) {
+                ideasPrompt = `
+                    As an elite-level creative director, your task is to take the user's initial concept and expand upon it, transforming it into a rich, detailed, and highly creative design brief. Do not replace the core idea; your job is to enhance and detail it, creating a miniature universe within the concept.
+
+                    User's Initial Idea:
+                    "${existingDetails}"
+
+                    Your Task:
+                    1.  **Analyze the Core Concept:** Identify the main subject, theme, and mood from the user's text.
+                    2.  **Enrich the Typography:** If the user described a font, make it more specific and imaginative. If not, invent a thematic font style that fits the concept perfectly. Describe its materials, textures, and style in great detail.
+                    3.  **Add/Detail Characters & Mascots:** If the user's idea lacks a character, introduce one that fits the theme. If a character exists, describe its interaction with the typography and other elements more dynamically.
+                    4.  **Build the Composition:** Expand on the user's composition. Add more thematic supporting elements, describe the layering, and define the overall shape of the emblem/seal to make it a complete, self-contained design.
+                    5.  **Refine the Details:** Add specifics about color palettes, lighting (for 3D), or line art (for 2D) that elevate the concept to a professional level.
+
+                    Final Output:
+                    Produce a single, cohesive, and highly detailed paragraph in ENGLISH that represents the improved and expanded creative brief.
+                `;
+            } else {
+                ideasPrompt = (compDimension === '2d') ? 
+                `As a creative director for 2D illustration, conceptualize a design for a 2D sticker... Theme: "${theme}", Style: "${style}"...` :
+                `As an elite-level creative director for 3D branding, conceptualize a design for a 3D seal... Theme: "${theme}", Style: "${style}"...`;
+            }
+            
+            const payload = { contents: [{ parts: [{ text: ideasPrompt }] }] };
             const apiKey = ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: ideasPrompt }] }] };
 
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const result = await response.json();
-                const ideasText = result.candidates[0].content.parts[0].text;
-                detailsInput.value = ideasText.trim();
+                detailsInput.value = result.candidates[0].content.parts[0].text.trim();
+                adjustTextareaHeight(detailsInput);
                 ideaCheck.classList.remove('hidden');
-                ideaBtnText.textContent = 'IDEIAS GERADAS!';
+                ideaBtnText.textContent = existingDetails ? 'IDEIA MELHORADA!' : 'IDEIAS GERADAS!';
+                updateIdeaButtonText();
+                generateBtn.click(); // Ativa o botão de gerar prompts
             } catch (error) {
-                console.error("Erro ao gerar ideias:", error);
-                alert("Não foi possível gerar ideias. Tente novamente.");
-                ideaIcon.classList.remove('hidden');
-                ideaBtnText.textContent = 'GERAR IDEIAS';
+                console.error("Erro ao gerar/melhorar ideias:", error);
+                errorMessage.textContent = "Não foi possível processar as ideias. Tente novamente.";
+                errorMessage.classList.remove('hidden');
+                updateIdeaButtonText();
             } finally {
                 generateIdeasBtn.disabled = false;
                 ideaLoader.classList.add('hidden');
             }
         });
-
-        // Função para copiar texto
+        
         const copyToClipboard = (text, buttonElement) => {
             const textarea = document.createElement('textarea');
             textarea.value = text;
@@ -437,32 +537,33 @@
             try {
                 document.execCommand('copy');
                 if (buttonElement) {
+                    const originalText = buttonElement.textContent;
                     buttonElement.textContent = 'COPIADO!';
-                    setTimeout(() => { buttonElement.textContent = 'COPIAR'; }, 2000);
+                    setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
                 }
             } catch (err) {
                 console.error('Falha ao copiar texto: ', err);
                 if (buttonElement) {
+                    const originalText = buttonElement.textContent;
                     buttonElement.textContent = 'ERRO!';
-                    setTimeout(() => { buttonElement.textContent = 'COPIAR'; }, 2000);
+                    setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
                 }
             }
             document.body.removeChild(textarea);
         };
 
-        // Geração de Prompts
         generateBtn.addEventListener('click', async () => {
             ideaCheck.classList.add('hidden');
             ideaIcon.classList.remove('hidden');
-            ideaBtnText.textContent = 'GERAR IDEIAS';
+            updateIdeaButtonText();
 
             const text = textInput.value;
             const theme = themeInput.value;
             const details = detailsInput.value;
-            const selectedStyle = document.querySelector('input[name="style-option"]:checked');
-            const style = selectedStyle ? selectedStyle.value : 'realistic';
-            const selectedBg = document.querySelector('input[name="background-option"]:checked');
-            const background = selectedBg ? selectedBg.value : 'designer\'s choice';
+            const textDimension = document.querySelector('input[name="text-dimension"]:checked').value;
+            const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
+            const style = document.querySelector('input[name="style-option"]:checked').value;
+            const background = document.querySelector('input[name="background-option"]:checked')?.value || 'designer\'s choice';
 
             if (!text || !theme) {
                 errorMessage.textContent = 'Por favor, preencha os campos "Texto Principal" e "Tema".';
@@ -473,48 +574,28 @@
             initialMessage.classList.add('hidden');
             loader.classList.remove('hidden');
             promptsContainer.innerHTML = '';
-            rendererButtonsContainer.innerHTML = '';
-            rendererButtonsWrapper.classList.add('hidden');
+            filterButtonsContainer.innerHTML = '';
+            filterButtonsWrapper.classList.add('hidden');
             promptsLabel.classList.add('hidden');
             errorMessage.classList.add('hidden');
             
-            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
-            
-            const backgroundRule = selectedBg
-                ? `8. **Background Implementation:** This is a mandatory rule. The final image MUST be rendered on the specified background: "${background}". No other background is acceptable.`
-                : `8. **Background Implementation:** The user did not specify a background, so you have creative freedom to choose one that best complements the theme and style.`;
-
-
-            const masterPrompt = `
-                Objective: Generate 6 professional, photorealistic, and highly detailed prompts in ENGLISH for creating festive 3D typographic digital seals/stickers. The goal is to achieve maximum realism suitable for high-end digital art.
-
-                User Request:
-                - Main Text: "${text}"
-                - Theme: "${theme}"
-                - Artistic Style: "${style}"
-                - Additional Details: "${details || 'No additional details provided.'}"
-                - Background: "${background}"
-
-                Strict Rules for Prompt Generation:
-                1.  **Language & Details Interpretation:** Generate the entire descriptive prompt in English. The user's main text ("${text}") MUST remain exactly as provided, without translation. If the user provides "Additional Details" in Portuguese, you must interpret their meaning and incorporate the concepts into the English prompt. Do not include the original Portuguese text from the details in your final output.
-                2.  **Artistic Style:** The overall aesthetic MUST conform to the chosen "${style}". This is a primary directive. 
-                    - If 'realistic', aim for photorealism with hyper-detailed textures, complex materials, and physically accurate lighting.
-                    - If 'cartoon', the style must be simplified, stylized, and caricatured, with strong outlines, vibrant solid colors, and exaggerated features to convey humor and emotion, typical of animations and comic strips.
-                    - If 'illustration', treat it as a broad artistic interpretation. The style can vary from playful to detailed, aiming to complement an idea or create a specific atmosphere, as seen in book art or concept designs, using varied techniques.
-                3.  **Thematic Typography:** The typography for the text "${text}" MUST be highly stylized and consistent with the "${theme}" theme AND the chosen "${style}". This is a critical requirement.
-                4.  **Creative Variations:** Create 6 distinct prompts. Each should be a creative variation of the same concept, exploring different materials, lighting, composition, and finishes, all within the requested style. They must not be repetitive.
-                5.  **High-End Renderers:** Assign each of the 6 prompts to one of these specific high-end renderers, in this order: **V-Ray, Lumion, Twinmotion, Enscape, D5 Render, and Unreal Engine 5**. Explicitly mention the assigned renderer at the end of each prompt.
-                6.  **Seal/Sticker Style:** The visual should be that of a premium 3D digital sticker, with depth, defined edges, realistic reflections, and soft shadows.
-                ${backgroundRule}
-                7.  **Thematic Elements:** Incorporate decorative elements that match the theme "${theme}". The concepts from the "Additional Details" (interpreted from Portuguese if necessary, as per rule #1) must be creatively incorporated into all 6 variations.
-                8.  **Richness of Detail:** Accurately describe materials (e.g., subsurface scattering for plastics, PBR materials, anisotropic reflections), textures (e.g., 4K textures, micro-scratches, dust), and finishes according to the "${style}".
-                9. **Professional Rendering:** Include advanced rendering specifications like "physically-based rendering (PBR)", "HDRI studio lighting", "global illumination (GI)", "ray tracing", "soft cast shadows", "caustics", "ambient occlusion", and "cinematic depth of field (DoF) with bokeh".
-                10. **Output Format:** Respond with a JSON object containing a single key "prompts" which is an array of 6 strings. Each string is a complete prompt.
-            `;
-            
             const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const params = { text, theme, details, style, background, textDimension, compDimension, apiKey, apiUrl };
 
+            if (textDimension === '3d' && compDimension === '3d') {
+                await generate3DPrompts(params);
+            } else if (textDimension === '2d' && compDimension === '2d') {
+                await generate2DPrompts(params);
+            } else if (textDimension === '3d' && compDimension === '2d') {
+                await generateMixed3DText2DCompPrompts(params);
+            } else { // 2d text, 3d comp
+                await generateMixed2DText3DCompPrompts(params);
+            }
+        });
+
+        async function executePromptGeneration(params, masterPrompt, keys, type) {
+            const { text, theme, details, style, background, textDimension, compDimension, apiKey, apiUrl } = params;
             const payload = { contents: [{ parts: [{ text: masterPrompt }] }], generationConfig: { responseMimeType: "application/json" } };
             
             try {
@@ -524,63 +605,109 @@
                 const responseText = result.candidates[0].content.parts[0].text;
                 const generatedPrompts = JSON.parse(responseText).prompts;
 
-                if (generatedPrompts.length !== 6) {
-                    throw new Error("A IA não retornou o número esperado de 6 prompts.");
-                }
+                if (generatedPrompts.length !== 6) throw new Error("A IA não retornou 6 prompts.");
 
                 promptsLabel.classList.remove('hidden');
+                promptsLabel.textContent = `PROMPTS ${type}`;
+                filterTitle.textContent = type.includes('3D') || type.includes('TEXTO 2D') ? 'NAVEGAR POR RENDERIZADOR:' : 'NAVEGAR POR ESTILO:';
 
                 generatedPrompts.forEach((promptText, index) => {
-                    const rendererName = renderers[index];
+                    const keyName = keys[index];
                     const card = document.createElement('div');
                     card.className = `prompt-card bg-gray-700 p-6 rounded-lg shadow-md flex-col ${index === 0 ? 'flex' : 'hidden'}`;
-                    card.dataset.renderer = rendererName;
+                    card.dataset.key = keyName;
                     card.innerHTML = `
-                        <h3 class="text-xl font-semibold text-indigo-400 mb-3">${rendererName.toUpperCase()}</h3>
-                        <p class="prompt-text text-gray-300 flex-grow text-sm leading-relaxed">${promptText}</p>
-                        <div class="flex justify-end mt-4">
-                            <button class="copy-btn bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-md">COPIAR</button>
-                        </div>`;
+                        <h3 class="text-xl font-semibold text-indigo-400 mb-3">${keyName.toUpperCase()}</h3>
+                        <p class="prompt-text text-gray-300 flex-grow text-sm leading-relaxed">${promptText}</p>`;
                     promptsContainer.appendChild(card);
                     
                     const filterButton = document.createElement('button');
-                    filterButton.className = `renderer-btn bg-gray-600 text-gray-200 text-sm font-semibold py-1 px-4 rounded-md hover:bg-indigo-500 transition-colors ${index === 0 ? 'active' : ''}`;
-                    filterButton.textContent = rendererName.toUpperCase();
-                    filterButton.dataset.targetRenderer = rendererName;
-                    rendererButtonsContainer.appendChild(filterButton);
+                    filterButton.className = `filter-btn bg-gray-600 text-gray-200 text-sm font-semibold py-1 px-4 rounded-md hover:bg-indigo-500 transition-colors ${index === 0 ? 'active' : ''}`;
+                    filterButton.textContent = keyName.toUpperCase();
+                    filterButton.dataset.targetKey = keyName;
+                    filterButtonsContainer.appendChild(filterButton);
                 });
                 
-                rendererButtonsWrapper.classList.remove('hidden');
-
-                document.querySelectorAll('.copy-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const textToCopy = e.target.closest('.prompt-card').querySelector('.prompt-text').textContent;
-                        copyToClipboard(textToCopy, e.target);
-                    });
-                });
+                filterButtonsWrapper.classList.remove('hidden');
                 
-                saveToHistory({ text, theme, details, style, background, prompts: generatedPrompts });
+                saveToHistory({ text, theme, details, style, background, textDimension, compDimension, prompts: generatedPrompts });
 
             } catch (error) {
-                console.error("Erro ao gerar prompts:", error);
-                errorMessage.textContent = 'Ocorreu um erro ao gerar os prompts. Tente novamente.';
+                console.error(`Erro ao gerar prompts ${type}:`, error);
+                errorMessage.textContent = `Ocorreu um erro ao gerar os prompts ${type}. Tente novamente.`;
                 errorMessage.classList.remove('hidden');
             } finally {
                 loader.classList.add('hidden');
             }
-        });
+        }
+        
+        const coreDirectives = (params) => {
+            let baseDirective = `
+                **CORE DIRECTIVES FOR A RICH COMPOSITION (CREATE A MINIATURE UNIVERSE):**
+                1.  **Self-Contained Design:** The final result MUST be a self-contained logo/seal/emblem, NOT a scene or landscape. The focus is the typographic object.
+                2.  **Main Text:** The text "${params.text}" is the absolute centerpiece.
+            `;
 
-        rendererButtonsContainer.addEventListener('click', (e) => {
-            const clickedButton = e.target.closest('.renderer-btn');
+            if (params.details) {
+                // If details from an image exist, prioritize them.
+                baseDirective += `
+                3.  **Source of Truth:** The "Additional Details" field contains an expert description of a reference image. Your primary task is to FAITHFULLY translate this description into the target style/renderer.
+                4.  **Adapt, Don't Invent:** Use the characters, typography, and composition elements from the "Additional Details". Do NOT invent new concepts. Your creativity should be focused on adapting the existing design to the new style.
+                `;
+            } else {
+                // If no details, be creative based on the theme.
+                baseDirective += `
+                3.  **Invent a Thematic Font Style (CRITICAL):** The typography for the text "${params.text}" must be a radical, visual representation of the theme "${params.theme}". Do not just use a standard font. Invent a new style where the letters themselves are constructed from thematic materials (e.g., for a 'Pirate' theme, letters made of weathered ship planks and gold coins).
+                4.  **Include Thematic Characters (MANDATORY):** The logo MUST feature at least one character or mascot that embodies the theme. The character should interact with the text in a dynamic way (e.g., a ghost peeking from behind a 'Halloween' text).
+                5.  **Build a Rich Composition (MANDATORY):** The typography and character must not exist in a void. They must be the centerpiece of a rich composition of thematic elements that form the body of the emblem/seal (e.g., for 'Halloween', surround the text with carved pumpkins, spider webs, and bats).
+                `;
+            }
+            return baseDirective;
+        };
+
+        async function generate2DPrompts(params) {
+            loaderText.textContent = 'Gerando 6 estilos de ilustração 2D...';
+            const illustrationStyles = ['Design PSD', 'Adobe Illustrator Design', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
+            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
+            const masterPrompt = `Objective: Generate 6 distinct prompts for a 2D image AI. Main Text: "${params.text}", Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these styles: ${illustrationStyles.join(', ')}. Adapt the core concept to each style's conventions (e.g., for 'Adobe Illustrator Design', use clean vector lines and smooth gradients; for 'Sticker Style', describe a die-cut look with a thick white border). Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            await executePromptGeneration(params, masterPrompt, illustrationStyles, '2D');
+        }
+
+        async function generate3DPrompts(params) {
+            loaderText.textContent = 'Gerando prompts 3D...';
+            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
+            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
+            const masterPrompt = `Objective: Generate 6 professional prompts for 3D renderers. Main Text: "${params.text}", Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these renderers: ${renderers.join(', ')}. Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            await executePromptGeneration(params, masterPrompt, renderers, '3D');
+        }
+
+        async function generateMixed3DText2DCompPrompts(params) {
+            loaderText.textContent = 'Gerando prompts mistos (Texto 3D / Comp. 2D)...';
+            const illustrationStyles = ['Design PSD', 'Adobe Illustrator Design', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
+            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
+            const masterPrompt = `Objective: Generate 6 prompts for a 2D image AI, creating a "trompe-l'oeil" effect. 3D Main Text: "${params.text}", 2D Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} The text must be described as a photorealistic 3D object, while the characters and composition elements must be 2D. Create 6 prompts for these 2D composition styles: ${illustrationStyles.join(', ')}. Emphasize the 3D text vs 2D background contrast. Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            await executePromptGeneration(params, masterPrompt, illustrationStyles, 'MISTO (TEXTO 3D)');
+        }
+
+        async function generateMixed2DText3DCompPrompts(params) {
+            loaderText.textContent = 'Gerando prompts mistos (Texto 2D / Comp. 3D)...';
+            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
+            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
+            const masterPrompt = `Objective: Generate 6 prompts for 3D renderers. 2D Main Text: "${params.text}", 3D Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} The text must be described as a flat 2D graphic (decal, print) on a surface, while the characters and composition elements are photorealistic 3D. Create 6 prompts for these renderers: ${renderers.join(', ')}. Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            await executePromptGeneration(params, masterPrompt, renderers, 'MISTO (TEXTO 2D)');
+        }
+
+        filterButtonsContainer.addEventListener('click', (e) => {
+            const clickedButton = e.target.closest('.filter-btn');
             if (clickedButton) {
-                const targetRenderer = clickedButton.dataset.targetRenderer;
+                const targetKey = clickedButton.dataset.targetKey;
 
-                document.querySelectorAll('.renderer-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                 clickedButton.classList.add('active');
 
                 let targetCard;
                 document.querySelectorAll('.prompt-card').forEach(card => {
-                    if (card.dataset.renderer === targetRenderer) {
+                    if (card.dataset.key === targetKey) {
                         card.classList.remove('hidden');
                         card.classList.add('flex');
                         targetCard = card;
@@ -592,8 +719,7 @@
 
                 if (targetCard) {
                     const textToCopy = targetCard.querySelector('.prompt-text').textContent;
-                    const copyButton = targetCard.querySelector('.copy-btn');
-                    copyToClipboard(textToCopy, copyButton);
+                    copyToClipboard(textToCopy, clickedButton);
                 }
             }
         });
