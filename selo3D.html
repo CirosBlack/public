@@ -73,7 +73,7 @@
 </head>
 <body class="bg-gray-900 text-white p-4">
 
-    <div class="w-full max-w-7xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 h-full flex flex-col">
+    <div class="w-full bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 h-full flex flex-col">
         
         <div id="content-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 flex-grow overflow-hidden">
             
@@ -83,7 +83,7 @@
                 <div class="space-y-6 mb-8">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label for="text-input" class="block text-sm font-bold text-gray-300 mb-2">TEXTO PRINCIPAL</label>
+                            <label for="text-input" class="block text-sm font-bold text-gray-300 mb-2">TEXTO PRINCIPAL (OPCIONAL)</label>
                             <input type="text" id="text-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         </div>
                         <div>
@@ -97,35 +97,58 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-300 mb-2 text-center">DIMENSÃO DO TEXTO</label>
                             <div class="flex space-x-4">
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="text-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="text-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
+                                <label for="text-dim-3d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="text-dim-3d" name="text-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
+                                <label for="text-dim-2d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="text-dim-2d" name="text-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-300 mb-2 text-center">DIMENSÃO DA COMPOSIÇÃO</label>
                             <div class="flex space-x-4">
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="comp-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="comp-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
+                                <label for="comp-dim-3d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="comp-dim-3d" name="comp-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
+                                <label for="comp-dim-2d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="comp-dim-2d" name="comp-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Estilos Artísticos e Fundo -->
-                    <div class="grid grid-cols-2 gap-8">
+                    <!-- Estilos Artísticos, Ângulo e Fundo -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div>
                             <label class="block text-sm font-bold text-gray-300 mb-2 text-center">ESTILO ARTÍSTICO</label>
                             <div class="space-y-2">
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="realistic" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm text-gray-300">Realista</span></label>
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="cartoon" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Cartoon</span></label>
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="style-option" type="radio" value="illustration" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Ilustração</span></label>
+                                <label for="style-realistic" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-realistic" name="style-option" type="radio" value="realistic" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm text-gray-300">Realista</span></label>
+                                <label for="style-cartoon" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-cartoon" name="style-option" type="radio" value="cartoon" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Cartoon</span></label>
+                                <label for="style-illustration" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-illustration" name="style-option" type="radio" value="illustration" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Ilustração</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">ÂNGULO E POSIÇÃO</label>
+                            <div class="space-y-2">
+                                <!-- Angle options -->
+                                <div class="flex space-x-2">
+                                    <label for="angle-frontal" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="angle-frontal" name="angle-option" type="radio" value="frontal" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm">Frontal</span></label>
+                                    <label for="angle-perspective" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="angle-perspective" name="angle-option" type="radio" value="perspective" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm">Perspectiva</span></label>
+                                </div>
+                                <!-- Rotation direction options -->
+                                <div class="flex space-x-2">
+                                    <label for="rot-dir" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center">
+                                        <input id="rot-dir" name="rotation-direction" type="radio" value="direita" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                                        <span class="ml-2 text-sm">Direita</span>
+                                    </label>
+                                    <label for="rot-esq" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center">
+                                        <input id="rot-esq" name="rotation-direction" type="radio" value="esquerda" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500">
+                                        <span class="ml-2 text-sm">Esquerda</span>
+                                    </label>
+                                </div>
+                                <!-- Rotation degrees input -->
+                                <input type="number" id="rotation-degrees" placeholder="Graus" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                         </div>
                          <div>
                             <label class="block text-sm font-bold text-gray-300 mb-2 text-center">FUNDO</label>
                             <div class="space-y-2">
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="background-option" type="radio" value="solid black background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Preto</span></label>
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="background-option" type="radio" value="solid white background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Branco</span></label>
-                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input name="background-option" type="radio" value="transparent background (.png)" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Transparente</span></label>
+                                <label for="bg-black" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="bg-black" name="background-option" type="radio" value="solid black background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Preto</span></label>
+                                <label for="bg-white" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="bg-white" name="background-option" type="radio" value="solid white background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Branco</span></label>
+                                <label for="bg-transparent" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="bg-transparent" name="background-option" type="radio" value="transparent background (.png)" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Transparente</span></label>
                             </div>
                         </div>
                     </div>
@@ -145,7 +168,7 @@
                     
                     <!-- Detalhes Adicionais e Botões de IA -->
                     <div>
-                        <label for="details-input" class="block text-sm font-bold text-gray-300 mb-2">DETALHES ADICIONAIS (OPCIONAL)</label>
+                        <label for="details-input" class="block text-sm font-bold text-gray-300 mb-2">DETALHES ADICIONAIS</label>
                         <div class="flex items-center space-x-4 mb-3">
                             <button id="describe-image-btn" class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
                                 <svg id="describe-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
@@ -235,6 +258,11 @@
         const textInput = document.getElementById('text-input');
         const themeInput = document.getElementById('theme-input');
         const detailsInput = document.getElementById('details-input');
+        const rotationDegrees = document.getElementById('rotation-degrees');
+
+        // Variáveis globais para armazenar dados da imagem pré-processada
+        let currentBase64ImageData = null;
+        let currentMimeType = null;
         
         const HISTORY_KEY = 'promptHistory3D';
         
@@ -265,7 +293,7 @@
 
                 card.innerHTML = `
                     <div class="flex-grow">
-                        <p class="font-semibold text-indigo-400">${item.text} - ${item.theme} <span class="text-xs font-normal text-gray-400">(${dimensionLabel})</span></p>
+                        <p class="font-semibold text-indigo-400">${item.text ? `${item.text} - ` : ''}${item.theme} <span class="text-xs font-normal text-gray-400">(${dimensionLabel})</span></p>
                         <p class="text-xs text-gray-400">Estilo: ${item.style} | Fundo: ${item.background.split(' ')[1] || 'N/A'}</p>
                     </div>
                     <div class="flex items-center space-x-3">
@@ -295,14 +323,40 @@
             themeInput.value = item.theme;
             detailsInput.value = item.details;
             
+            document.querySelectorAll('input[name="angle-option"]').forEach(r => r.checked = false);
+            if (item.angle) {
+                const angleRadio = document.querySelector(`input[name="angle-option"][value="${item.angle}"]`);
+                if (angleRadio) angleRadio.checked = true;
+            }
+            
+            document.querySelectorAll('input[name="rotation-direction"]').forEach(r => r.checked = false);
+            if (item.rotation) {
+                const parts = item.rotation.match(/(\d+)\s*graus\s*à\s*(direita|esquerda)/i);
+                if (parts) {
+                    rotationDegrees.value = parts[1];
+                    const directionRadio = document.querySelector(`input[name="rotation-direction"][value="${parts[2].toLowerCase()}"]`);
+                    if(directionRadio) directionRadio.checked = true;
+                } else {
+                     rotationDegrees.value = '';
+                }
+            } else {
+                rotationDegrees.value = '';
+            }
+            
             document.querySelector(`input[name="text-dimension"][value="${item.textDimension}"]`).checked = true;
             document.querySelector(`input[name="comp-dimension"][value="${item.compDimension}"]`).checked = true;
-            document.querySelector(`input[name="style-option"][value="${item.style}"]`).checked = true;
             
-            const bgRadio = document.querySelector(`input[name="background-option"][value="${item.background}"]`);
-            if (bgRadio) bgRadio.checked = true;
-            else {
-                 document.querySelectorAll('input[name="background-option"]').forEach(r => r.checked = false);
+            const styleRadio = document.querySelector(`input[name="style-option"][value="${item.style}"]`);
+            if (styleRadio) {
+                styleRadio.checked = true;
+            } else {
+                document.querySelector('input[name="style-option"][value="realistic"]').checked = true; // Default to realistic
+            }
+            
+            document.querySelectorAll('input[name="background-option"]').forEach(r => r.checked = false);
+            if (item.background && item.background !== 'designer\'s choice') {
+                const bgRadio = document.querySelector(`input[name="background-option"][value="${item.background}"]`);
+                if (bgRadio) bgRadio.checked = true;
             }
             updateIdeaButtonText();
         };
@@ -324,11 +378,17 @@
             textInput.value = '';
             themeInput.value = '';
             detailsInput.value = '';
+            rotationDegrees.value = '';
             detailsInput.style.height = '';
+            
             document.querySelectorAll('input[name="background-option"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('input[name="angle-option"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('input[name="rotation-direction"]').forEach(radio => radio.checked = false);
+
             document.querySelector('input[value="3d"][name="text-dimension"]').checked = true;
             document.querySelector('input[value="3d"][name="comp-dimension"]').checked = true;
             document.querySelector('input[value="realistic"]').checked = true;
+
             promptsContainer.innerHTML = '';
             filterButtonsContainer.innerHTML = '';
             filterButtonsWrapper.classList.add('hidden');
@@ -338,6 +398,8 @@
             
             imagePreviewContainer.classList.add('hidden');
             imageUpload.value = '';
+            currentBase64ImageData = null;
+            currentMimeType = null;
             updateIdeaButtonText();
         };
 
@@ -346,23 +408,42 @@
         function getBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = (error) => {
-                    console.error("FileReader error object:", error);
+                reader.onload = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = (event) => {
+                    console.error("FileReader error object:", event);
+                    console.error("Detalhes do erro do FileReader:", reader.error);
                     reject(new Error('Não foi possível ler o arquivo. Pode estar corrompido ou o navegador bloqueou a leitura.'));
-                }
+                };
+                reader.readAsDataURL(file);
             });
         }
 
-        imageUpload.addEventListener('change', function() {
+        imageUpload.addEventListener('change', async function() {
+            currentBase64ImageData = null;
+            currentMimeType = null;
             if (this.files && this.files[0]) {
+                const file = this.files[0];
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     imagePreview.setAttribute('src', e.target.result);
                     imagePreviewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+                try {
+                    currentBase64ImageData = await getBase64(file);
+                    currentMimeType = file.type;
+                    errorMessage.classList.add('hidden');
+                } catch (error) {
+                    console.error("Erro ao pré-processar a imagem:", error);
+                    errorMessage.textContent = error.message || "Não foi possível ler o arquivo selecionado.";
+                    errorMessage.classList.remove('hidden');
+                    imagePreview.setAttribute('src', '#');
+                    imagePreviewContainer.classList.add('hidden');
                 }
-                reader.readAsDataURL(this.files[0]);
             }
         });
         
@@ -372,9 +453,8 @@
         };
 
         describeImageBtn.addEventListener('click', async () => {
-            const file = imageUpload.files[0];
-            if (!file) {
-                errorMessage.textContent = 'Por favor, selecione uma imagem primeiro.';
+            if (!currentBase64ImageData) {
+                errorMessage.textContent = 'Por favor, selecione uma imagem válida primeiro.';
                 errorMessage.classList.remove('hidden');
                 return;
             }
@@ -420,11 +500,11 @@
             }
             
             try {
-                const base64ImageData = await getBase64(file);
+                const base64ImageData = currentBase64ImageData;
                 const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM"; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const payload = {
-                    contents: [{ parts: [{ text: visionPrompt }, { inlineData: { mimeType: file.type, data: base64ImageData } }] }],
+                    contents: [{ parts: [{ text: visionPrompt }, { inlineData: { mimeType: currentMimeType, data: base64ImageData } }] }],
                     generationConfig: { responseMimeType: "application/json" }
                 };
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -461,52 +541,159 @@
         detailsInput.addEventListener('input', updateIdeaButtonText);
 
         generateIdeasBtn.addEventListener('click', async () => {
+            const file = imageUpload.files[0];
             const theme = themeInput.value;
+            const text = textInput.value;
             const existingDetails = detailsInput.value.trim();
+            const textDimension = document.querySelector('input[name="text-dimension"]:checked').value;
             const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
             const style = document.querySelector('input[name="style-option"]:checked').value;
-
-            if (!theme && !existingDetails) {
-                errorMessage.textContent = 'Preencha o campo "Tema" ou digite uma ideia para melhorar.';
-                errorMessage.classList.remove('hidden');
-                return;
+            const angle = document.querySelector('input[name="angle-option"]:checked')?.value;
+            const degrees = rotationDegrees.value;
+            let rotation = '';
+            if (degrees && document.querySelector('input[name="rotation-direction"]:checked')) {
+                const direction = document.querySelector('input[name="rotation-direction"]:checked').value;
+                rotation = `${degrees} graus à ${direction}`;
             }
-            
+            const background = document.querySelector('input[name="background-option"]:checked')?.value || 'designer\'s choice';
+
+
+            // Inicia o estado de carregamento da UI
             generateIdeasBtn.disabled = true;
             ideaLoader.classList.remove('hidden');
             ideaIcon.classList.add('hidden');
             ideaCheck.classList.add('hidden');
-            ideaBtnText.textContent = existingDetails ? 'MELHORANDO...' : 'GERANDO...';
             errorMessage.classList.add('hidden');
 
             let ideasPrompt = '';
-            
-            if (existingDetails) {
-                ideasPrompt = `
-                    As an elite-level creative director, your task is to take the user's initial concept and expand upon it, transforming it into a rich, detailed, and highly creative design brief. Do not replace the core idea; your job is to enhance and detail it, creating a miniature universe within the concept.
-
-                    User's Initial Idea:
-                    "${existingDetails}"
-
-                    Your Task:
-                    1.  **Analyze the Core Concept:** Identify the main subject, theme, and mood from the user's text.
-                    2.  **Enrich the Typography:** If the user described a font, make it more specific and imaginative. If not, invent a thematic font style that fits the concept perfectly. Describe its materials, textures, and style in great detail.
-                    3.  **Add/Detail Characters & Mascots:** If the user's idea lacks a character, introduce one that fits the theme. If a character exists, describe its interaction with the typography and other elements more dynamically.
-                    4.  **Build the Composition:** Expand on the user's composition. Add more thematic supporting elements, describe the layering, and define the overall shape of the emblem/seal to make it a complete, self-contained design.
-                    5.  **Refine the Details:** Add specifics about color palettes, lighting (for 3D), or line art (for 2D) that elevate the concept to a professional level.
-
-                    Final Output:
-                    Produce a single, cohesive, and highly detailed paragraph in ENGLISH that represents the improved and expanded creative brief.
-                `;
-            } else {
-                ideasPrompt = (compDimension === '2d') ? 
-                `As a creative director for 2D illustration, conceptualize a design for a 2D sticker... Theme: "${theme}", Style: "${style}"...` :
-                `As an elite-level creative director for 3D branding, conceptualize a design for a 3D seal... Theme: "${theme}", Style: "${style}"...`;
-            }
-            
-            const payload = { contents: [{ parts: [{ text: ideasPrompt }] }] };
+            let payload;
             const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM"; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            if (file) {
+                ideaBtnText.textContent = 'ANALISANDO...';
+                if (!theme) {
+                     errorMessage.textContent = 'Para gerar ideias a partir de uma imagem, preencha o campo "Tema".';
+                     errorMessage.classList.remove('hidden');
+                     generateIdeasBtn.disabled = false;
+                     ideaLoader.classList.add('hidden');
+                     ideaIcon.classList.remove('hidden');
+                     updateIdeaButtonText();
+                     return;
+                }
+                if (!currentBase64ImageData) {
+                    errorMessage.textContent = 'A imagem selecionada não pôde ser lida. Por favor, tente novamente.';
+                    errorMessage.classList.remove('hidden');
+                    generateIdeasBtn.disabled = false;
+                    ideaLoader.classList.add('hidden');
+                    ideaIcon.classList.remove('hidden');
+                    updateIdeaButtonText();
+                    return;
+                }
+
+                const base64ImageData = currentBase64ImageData;
+                const mainTextForIdeas = text ? `- Main Text for the new concept: "${text}"` : `- Main Concept: A purely illustrative design without text.`;
+                const typographyInstruction = text ? `- Similar but New Typography: Propose a different font style for the text "${text}" that still fits the theme.` : `- Illustrative Focus: Since there is no text, focus your description on the main illustrative elements that will be the centerpiece of the design.`;
+
+                ideasPrompt = `
+                    As an expert creative director specializing in variations, your task is a two-step process to generate a new, creative but similar variation inspired by a reference image.
+
+                    Inputs for your consideration:
+                    - Reference Image: [Image Data Attached]
+                    ${mainTextForIdeas}
+                    - Core Theme for the new concept: "${theme}"
+
+                    Step 1: Ultra-Detailed Internal Analysis (Do not output this part).
+                    First, perform an exhaustive technical and artistic analysis of the provided image. Mentally deconstruct its context, typography (style, 3D/2D effects), color palette, lighting scheme (highlights, shadows), overall structure (badge, logo, emblem), base shape, lines, curves, and all additional elements. Note the background type.
+
+                    Step 2: Create a Similar Variation (This is your output).
+                    Based on your detailed internal analysis, create a new design brief for a **similar but distinct variation**. Your new brief must be a single, highly detailed paragraph in ENGLISH that describes these specific modifications:
+                    ${typographyInstruction}
+                    - Similar but New Composition: Keep the core elements but change their form. Crucially, reinvent the base shape with more creativity; the base can be a complex geometric form or it can be formed from thematic elements themselves. Change its materials as well.
+                    - Similar but New Atmosphere: Adjust the lighting and color palette slightly to create a different mood while staying true to the original theme.
+
+                    Final Output:
+                    Produce a single, cohesive, and highly detailed paragraph in ENGLISH that describes this new, similar variation, ready to be used as a prompt.
+                `;
+                payload = {
+                    contents: [{ parts: [{ text: ideasPrompt }, { inlineData: { mimeType: currentMimeType, data: base64ImageData } }] }]
+                };
+            } else {
+                if (!theme || (!text && !existingDetails)) {
+                    errorMessage.textContent = 'Preencha o "Tema" e também o "Texto Principal" ou os "Detalhes Adicionais" para gerar ideias.';
+                    errorMessage.classList.remove('hidden');
+                    generateIdeasBtn.disabled = false;
+                    ideaLoader.classList.add('hidden');
+                    ideaIcon.classList.remove('hidden');
+                    updateIdeaButtonText();
+                    return;
+                }
+                
+                ideaBtnText.textContent = existingDetails ? 'MELHORANDO...' : 'GERANDO...';
+                
+                if (existingDetails) {
+                    const mainTextContext = text ? `- Main Text: "${text}"` : `- Main Concept: No text, purely illustrative.`;
+                    ideasPrompt = `
+                        As an elite-level creative director, your task is to take the user's initial concept and elevate it into an incredibly detailed and cohesive final design brief, using all provided context.
+
+                        User's Initial Idea (The Foundation):
+                        "${existingDetails}"
+
+                        Context for Enhancement (Your Guiding Principles):
+                        ${mainTextContext}
+                        - Core Theme: "${theme}"
+                        - Text Dimension: "${textDimension}"
+                        - Composition Dimension: "${compDimension}"
+                        - Artistic Style: "${style}"
+                        - View Angle: "${angle || 'Not specified'}"
+                        - Text Rotation: "${rotation || 'Not specified'}"
+                        - Background: "${background}"
+
+                        Your Mission:
+                        Refine and expand upon the user's core idea. Focus on:
+                        1.  Composition: Make the arrangement more dynamic, aligning with the specified angle and rotation.
+                        2.  Texture & Materials: Enhance surface descriptions to be more vivid and tactile.
+                        3.  Colors & Lighting: Refine the color palette and describe the lighting in greater detail to create a specific mood.
+                        4.  Cohesion: Ensure all elements work together perfectly to express the "${theme}".
+
+                        Final Output:
+                        Produce a single, cohesive, and incredibly detailed paragraph in ENGLISH that represents the improved and finalized creative brief.
+                    `;
+                } else {
+                    const mainTextSpec = text ? `- Main Text: "${text}"` : `- Main Concept: No text, purely illustrative.`;
+                    const typographyTask = text
+                        ? `2.  Thematic Typography: Invent a highly creative and thematic font style for the text "${text}". The letters themselves should be made of materials or have textures that embody the "${theme}". Describe this in detail.`
+                        : `2.  Central Illustration: Since there is no text, invent a central, iconic character or symbol that powerfully represents the "${theme}". This will be the main focus of the emblem. Describe it in detail.`;
+
+                    ideasPrompt = `
+                        As an elite-level creative director, your task is to conceptualize a complete and ultra-detailed design brief for a badge, logo, or emblem from scratch, based on the user's specifications.
+
+                        User's Specifications:
+                        ${mainTextSpec}
+                        - Core Theme: "${theme}"
+                        - Text Dimension: "${textDimension}"
+                        - Composition Dimension: "${compDimension}"
+                        - Artistic Style: "${style}"
+                        - View Angle: "${angle || 'Not specified'}"
+                        - Text Rotation: "${rotation || 'Not specified'}"
+                        - Background: "${background}"
+
+                        Your Task:
+                        Generate a single, cohesive paragraph in ENGLISH that describes a visually stunning badge, logo, or emblem, synthesizing all specifications:
+                        1.  Core Concept: The final piece must be a self-contained badge, logo, or emblem.
+                        ${typographyTask}
+                        3.  Creative Base Design: Design a unique and complex base or frame for the emblem. The base can be a complex geometric form or formed from thematic elements.
+                        4.  Rich Composition: Describe how all elements are integrated into this base to create a rich, layered composition.
+                        5.  Style and Realism: The aesthetic must match the selected "${style}".
+                        6.  Lighting and Texture: Describe the lighting setup and surface textures to enhance the theme.
+                        7.  Angle and Position: Incorporate the specified view angle and text rotation.
+
+                        Final Output:
+                        A single, detailed paragraph in ENGLISH that can be used as a high-quality prompt.
+                    `;
+                }
+                payload = { contents: [{ parts: [{ text: ideasPrompt }] }] };
+            }
 
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -515,9 +702,9 @@
                 detailsInput.value = result.candidates[0].content.parts[0].text.trim();
                 adjustTextareaHeight(detailsInput);
                 ideaCheck.classList.remove('hidden');
-                ideaBtnText.textContent = existingDetails ? 'IDEIA MELHORADA!' : 'IDEIAS GERADAS!';
+                ideaBtnText.textContent = 'IDEIA GERADA!';
                 updateIdeaButtonText();
-                generateBtn.click(); // Ativa o botão de gerar prompts
+                generateBtn.click();
             } catch (error) {
                 console.error("Erro ao gerar/melhorar ideias:", error);
                 errorMessage.textContent = "Não foi possível processar as ideias. Tente novamente.";
@@ -564,9 +751,17 @@
             const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
             const style = document.querySelector('input[name="style-option"]:checked').value;
             const background = document.querySelector('input[name="background-option"]:checked')?.value || 'designer\'s choice';
+            const angle = document.querySelector('input[name="angle-option"]:checked')?.value;
+            
+            const degrees = rotationDegrees.value;
+            let rotation = '';
+            if (degrees && document.querySelector('input[name="rotation-direction"]:checked')) {
+                const direction = document.querySelector('input[name="rotation-direction"]:checked').value;
+                rotation = `${degrees} graus à ${direction}`;
+            }
 
-            if (!text || !theme) {
-                errorMessage.textContent = 'Por favor, preencha os campos "Texto Principal" e "Tema".';
+            if (!theme || (!text && !details)) {
+                errorMessage.textContent = 'Preencha o "Tema" e também o "Texto Principal" ou os "Detalhes Adicionais".';
                 errorMessage.classList.remove('hidden');
                 return;
             }
@@ -581,7 +776,7 @@
             
             const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const params = { text, theme, details, style, background, textDimension, compDimension, apiKey, apiUrl };
+            const params = { text, theme, details, style, background, textDimension, compDimension, angle, rotation, apiKey, apiUrl };
 
             if (textDimension === '3d' && compDimension === '3d') {
                 await generate3DPrompts(params);
@@ -595,7 +790,7 @@
         });
 
         async function executePromptGeneration(params, masterPrompt, keys, type) {
-            const { text, theme, details, style, background, textDimension, compDimension, apiKey, apiUrl } = params;
+            const { text, theme, details, style, background, textDimension, compDimension, angle, rotation, apiKey, apiUrl } = params;
             const payload = { contents: [{ parts: [{ text: masterPrompt }] }], generationConfig: { responseMimeType: "application/json" } };
             
             try {
@@ -630,7 +825,7 @@
                 
                 filterButtonsWrapper.classList.remove('hidden');
                 
-                saveToHistory({ text, theme, details, style, background, textDimension, compDimension, prompts: generatedPrompts });
+                saveToHistory({ text, theme, details, style, background, textDimension, compDimension, angle, rotation, prompts: generatedPrompts });
 
             } catch (error) {
                 console.error(`Erro ao gerar prompts ${type}:`, error);
@@ -643,33 +838,62 @@
         
         const coreDirectives = (params) => {
             let baseDirective = `
-                **CORE DIRECTIVES FOR A RICH COMPOSITION (CREATE A MINIATURE UNIVERSE):**
-                1.  **Self-Contained Design:** The final result MUST be a self-contained logo/seal/emblem, NOT a scene or landscape. The focus is the typographic object.
-                2.  **Main Text:** The text "${params.text}" is the absolute centerpiece.
+                CORE DIRECTIVES FOR A RICH COMPOSITION:
+                1.  Self-Contained Design: The final result MUST be a self-contained badge emblem logo, NOT a scene or landscape.
             `;
+            if (params.text) {
+                baseDirective += `2. Main Text: The text "${params.text}" is the absolute centerpiece. The focus is the typographic object.\n`;
+            } else {
+                baseDirective += `2. No Main Text: The final result should be a purely illustrative emblem or logo without any text. The visual concept is described entirely in the "Additional Details" field.\n`;
+            }
 
             if (params.details) {
-                // If details from an image exist, prioritize them.
                 baseDirective += `
-                3.  **Source of Truth:** The "Additional Details" field contains an expert description of a reference image. Your primary task is to FAITHFULLY translate this description into the target style/renderer.
-                4.  **Adapt, Don't Invent:** Use the characters, typography, and composition elements from the "Additional Details". Do NOT invent new concepts. Your creativity should be focused on adapting the existing design to the new style.
+                3.  Source of Truth: The "Additional Details" field contains an expert description. Your primary task is to FAITHFULLY translate this description into the target style/renderer.
+                4.  Adapt, Don't Invent: Use the characters, typography, and composition elements from the "Additional Details". Do NOT invent new concepts. Your creativity should be focused on adapting the existing design to the new style.
                 `;
             } else {
-                // If no details, be creative based on the theme.
+                if (params.text) {
+                     baseDirective += `
+                        3.  Invent a Thematic Font Style: The typography for the text "${params.text}" must be a radical, visual representation of the theme "${params.theme}". Do not just use a standard font. Invent a new style where the letters themselves are constructed from thematic materials (e.g., for a 'Pirate' theme, letters made of weathered ship planks and gold coins).
+                     `;
+                }
                 baseDirective += `
-                3.  **Invent a Thematic Font Style (CRITICAL):** The typography for the text "${params.text}" must be a radical, visual representation of the theme "${params.theme}". Do not just use a standard font. Invent a new style where the letters themselves are constructed from thematic materials (e.g., for a 'Pirate' theme, letters made of weathered ship planks and gold coins).
-                4.  **Include Thematic Characters (MANDATORY):** The logo MUST feature at least one character or mascot that embodies the theme. The character should interact with the text in a dynamic way (e.g., a ghost peeking from behind a 'Halloween' text).
-                5.  **Build a Rich Composition (MANDATORY):** The typography and character must not exist in a void. They must be the centerpiece of a rich composition of thematic elements that form the body of the emblem/seal (e.g., for 'Halloween', surround the text with carved pumpkins, spider webs, and bats).
+                4.  Include Thematic Characters: The logo MUST feature at least one character or mascot that embodies the theme. The character should interact with the text (if present) in a dynamic way (e.g., a ghost peeking from behind a 'Halloween' text).
+                5.  Build a Rich Composition: The typography and character must not exist in a void. They must be the centerpiece of a rich composition of thematic elements that form the body of the emblem/seal (e.g., for 'Halloween', surround the text with carved pumpkins, spider webs, and bats).
                 `;
             }
-            return baseDirective;
+            return baseDirective.replace(/\*+/g, ''); // Remove all asterisks
+        };
+
+        const getAngleAndPositionRule = (params) => {
+            let rule = '';
+            if (params.angle === 'perspective') {
+                rule += ` The camera view for the entire composition MUST be in a dynamic perspective angle, not a flat front view.`;
+            } else if (params.angle === 'frontal'){
+                rule += ` The camera view for the entire composition MUST be a direct frontal shot.`;
+            }
+
+            if (params.rotation && params.text) {
+                const parts = params.rotation.match(/(\d+)\s*graus\s*à\s*(direita|esquerda)/i);
+                if (parts) {
+                    const degrees = parts[1];
+                    const direction = parts[2].toLowerCase();
+                    const rotationValue = direction === 'esquerda' ? -degrees : degrees;
+                    rule += ` Within this view, the main text object ITSELF MUST be rotated ${rotationValue} degrees on its Z-axis. This rotation applies only to the text, not the entire composition or camera angle.`;
+                }
+            }
+            return rule;
         };
 
         async function generate2DPrompts(params) {
             loaderText.textContent = 'Gerando 6 estilos de ilustração 2D...';
-            const illustrationStyles = ['Design PSD', 'Adobe Illustrator Design', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
+            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
-            const masterPrompt = `Objective: Generate 6 distinct prompts for a 2D image AI. Main Text: "${params.text}", Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these styles: ${illustrationStyles.join(', ')}. Adapt the core concept to each style's conventions (e.g., for 'Adobe Illustrator Design', use clean vector lines and smooth gradients; for 'Sticker Style', describe a die-cut look with a thick white border). Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const angleAndPositionRule = getAngleAndPositionRule(params);
+            const mainTextDirective = params.text ? `Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
+            const themeDirective = params.text ? `Theme: "${params.theme}",` : '';
+            const masterPrompt = `Objective: Generate 6 distinct prompts for a 2D image AI to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these styles: ${illustrationStyles.join(', ')}. Adapt the core concept to each style's conventions (e.g., for 'Procreate', describe a digital painting look with rich textures and varied brush strokes; for 'Sticker Style', describe a die-cut look with a thick white border). ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
             await executePromptGeneration(params, masterPrompt, illustrationStyles, '2D');
         }
 
@@ -677,15 +901,21 @@
             loaderText.textContent = 'Gerando prompts 3D...';
             const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
-            const masterPrompt = `Objective: Generate 6 professional prompts for 3D renderers. Main Text: "${params.text}", Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these renderers: ${renderers.join(', ')}. Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const angleAndPositionRule = getAngleAndPositionRule(params);
+            const mainTextDirective = params.text ? `Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
+            const themeDirective = params.text ? `Theme: "${params.theme}",` : '';
+            const masterPrompt = `Objective: Generate 6 professional prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these renderers: ${renderers.join(', ')}. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
             await executePromptGeneration(params, masterPrompt, renderers, '3D');
         }
 
         async function generateMixed3DText2DCompPrompts(params) {
             loaderText.textContent = 'Gerando prompts mistos (Texto 3D / Comp. 2D)...';
-            const illustrationStyles = ['Design PSD', 'Adobe Illustrator Design', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
+            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
-            const masterPrompt = `Objective: Generate 6 prompts for a 2D image AI, creating a "trompe-l'oeil" effect. 3D Main Text: "${params.text}", 2D Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} The text must be described as a photorealistic 3D object, while the characters and composition elements must be 2D. Create 6 prompts for these 2D composition styles: ${illustrationStyles.join(', ')}. Emphasize the 3D text vs 2D background contrast. Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const angleAndPositionRule = getAngleAndPositionRule(params);
+            const mainTextDirective = params.text ? `3D Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
+            const themeDirective = params.text ? `2D Theme: "${params.theme}",` : '';
+            const masterPrompt = `Objective: Generate 6 prompts for a 2D image AI, creating a "trompe-l'oeil" effect self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a photorealistic 3D object, while the characters and composition elements must be 2D. Create 6 prompts for these 2D composition styles: ${illustrationStyles.join(', ')}. Emphasize the 3D text vs 2D background contrast. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
             await executePromptGeneration(params, masterPrompt, illustrationStyles, 'MISTO (TEXTO 3D)');
         }
 
@@ -693,7 +923,10 @@
             loaderText.textContent = 'Gerando prompts mistos (Texto 2D / Comp. 3D)...';
             const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
-            const masterPrompt = `Objective: Generate 6 prompts for 3D renderers. 2D Main Text: "${params.text}", 3D Theme: "${params.theme}", Details: "${params.details}". ${coreDirectives(params)} The text must be described as a flat 2D graphic (decal, print) on a surface, while the characters and composition elements are photorealistic 3D. Create 6 prompts for these renderers: ${renderers.join(', ')}. Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const angleAndPositionRule = getAngleAndPositionRule(params);
+            const mainTextDirective = params.text ? `2D Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
+            const themeDirective = params.text ? `3D Theme: "${params.theme}",` : '';
+            const masterPrompt = `Objective: Generate 6 prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a flat 2D graphic (decal, print) on a surface, while the characters and composition elements are photorealistic 3D. Create 6 prompts for these renderers: ${renderers.join(', ')}. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
             await executePromptGeneration(params, masterPrompt, renderers, 'MISTO (TEXTO 2D)');
         }
 
@@ -723,8 +956,29 @@
                 }
             }
         });
+        
+        function setupRadioDeselection() {
+            const radioGroups = ['angle-option', 'rotation-direction', 'background-option'];
+            radioGroups.forEach(groupName => {
+                let lastChecked = null;
+                const radios = document.querySelectorAll(`input[name="${groupName}"]`);
+                radios.forEach(radio => {
+                    radio.addEventListener('click', function() {
+                        if (this === lastChecked) {
+                            this.checked = false;
+                            lastChecked = null;
+                        } else {
+                            lastChecked = this;
+                        }
+                    });
+                });
+            });
+        }
 
-        document.addEventListener('DOMContentLoaded', displayHistory);
+        document.addEventListener('DOMContentLoaded', () => {
+             displayHistory();
+             setupRadioDeselection();
+        });
     </script>
 </body>
 </html>
