@@ -800,7 +800,7 @@
                 const responseText = result.candidates[0].content.parts[0].text;
                 const generatedPrompts = JSON.parse(responseText).prompts;
 
-                if (generatedPrompts.length !== 6) throw new Error("A IA não retornou 6 prompts.");
+                if (generatedPrompts.length !== keys.length) throw new Error(`A IA não retornou ${keys.length} prompts.`);
 
                 promptsLabel.classList.remove('hidden');
                 promptsLabel.textContent = `PROMPTS ${type}`;
@@ -887,46 +887,46 @@
         };
 
         async function generate2DPrompts(params) {
-            loaderText.textContent = 'Gerando 6 estilos de ilustração 2D...';
-            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
+            loaderText.textContent = 'Gerando 11 estilos de ilustração 2D...';
+            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style', 'Hearthstone', 'Arcane', 'Guilty Gear', 'Genshin Impact', 'Tower of Fantasy'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
             const angleAndPositionRule = getAngleAndPositionRule(params);
             const mainTextDirective = params.text ? `Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
             const themeDirective = params.text ? `Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 6 distinct prompts for a 2D image AI to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these styles: ${illustrationStyles.join(', ')}. Adapt the core concept to each style's conventions (e.g., for 'Procreate', describe a digital painting look with rich textures and varied brush strokes; for 'Sticker Style', describe a die-cut look with a thick white border). ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const masterPrompt = `Objective: Generate 11 distinct prompts for a 2D image AI to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 11 prompts for these styles: ${illustrationStyles.join(', ')}. Adapt the core concept to each style's conventions (e.g., for 'Procreate', describe a digital painting look with rich textures; for 'Sticker Style', describe a die-cut look with a thick white border; for 'Hearthstone', describe a highly detailed 2D cartoon-fantasy digital painting with vibrant, saturated colors, soft outlines, delicate shadows, and dramatic lighting, mimicking the polished, epic, and magical art style of the game Hearthstone; for 'Arcane', describe a detailed and cinematic 2D digital painting in the style of the series Arcane: League of Legends, featuring rich textures, visible brushstrokes, intense yet harmonious colors, and dramatic, cinematic lighting with strong contrasts, conveying emotion and intensity with stylized realism; for 'Guilty Gear', describe a stylized and dynamic 2D digital art piece that simulates 3D cell shading, in the style of Guilty Gear: STRIVE, with strong lines, vibrant colors, and marked anime-style shading, featuring a dramatic, high-energy pose, cinematic lighting, and exaggerated expressiveness; for 'Genshin Impact', describe a highly detailed fantasy anime-style illustration with soft, vibrant colors, delicate digital painting, atmospheric lighting, and fine lines, conveying a magical, poetic, and ethereal feel with ornate fantasy details and a polished look; for 'Tower of Fantasy', describe a highly detailed futuristic anime-style illustration with clean lines, vibrant and saturated colors, clear lighting, and smooth shading, mixing fantasy and technology with stylized outfits, tech armor, and a modern, polished sci-fi aesthetic). ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 11 strings.`;
             await executePromptGeneration(params, masterPrompt, illustrationStyles, '2D');
         }
 
         async function generate3DPrompts(params) {
             loaderText.textContent = 'Gerando prompts 3D...';
-            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
+            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5', 'Hyperion Render'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
             const angleAndPositionRule = getAngleAndPositionRule(params);
             const mainTextDirective = params.text ? `Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
             const themeDirective = params.text ? `Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 6 professional prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 6 prompts for these renderers: ${renderers.join(', ')}. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const masterPrompt = `Objective: Generate 7 professional prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 7 prompts for these renderers: ${renderers.join(', ')}. For 'Hyperion Render', describe a prompt that combines the hyper-detailed organic sculpting of ZBrush with the photorealistic deferred rendering, global illumination, and advanced material properties (PBR, displacement) of Unreal Engine 5, mentioning the use of the Movie Render Queue for final output. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 7 strings.`;
             await executePromptGeneration(params, masterPrompt, renderers, '3D');
         }
 
         async function generateMixed3DText2DCompPrompts(params) {
             loaderText.textContent = 'Gerando prompts mistos (Texto 3D / Comp. 2D)...';
-            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style'];
+            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style', 'Hearthstone', 'Arcane', 'Guilty Gear', 'Genshin Impact', 'Tower of Fantasy'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
             const angleAndPositionRule = getAngleAndPositionRule(params);
             const mainTextDirective = params.text ? `3D Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
             const themeDirective = params.text ? `2D Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 6 prompts for a 2D image AI, creating a "trompe-l'oeil" effect self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a photorealistic 3D object, while the characters and composition elements must be 2D. Create 6 prompts for these 2D composition styles: ${illustrationStyles.join(', ')}. Emphasize the 3D text vs 2D background contrast. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const masterPrompt = `Objective: Generate 11 prompts for a 2D image AI, creating a "trompe-l'oeil" effect self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a photorealistic 3D object, while the characters and composition elements must be 2D. Create 11 prompts for these 2D composition styles: ${illustrationStyles.join(', ')}. Emphasize the 3D text vs 2D background contrast (e.g., for 'Hearthstone', describe a highly detailed 2D cartoon-fantasy digital painting with vibrant, saturated colors, soft outlines, delicate shadows, and dramatic lighting, mimicking the polished, epic, and magical art style of the game Hearthstone; for 'Arcane', describe a detailed and cinematic 2D digital painting in the style of the series Arcane: League of Legends, featuring rich textures, visible brushstrokes, intense yet harmonious colors, and dramatic, cinematic lighting with strong contrasts, conveying emotion and intensity with stylized realism; for 'Guilty Gear', describe a stylized and dynamic 2D digital art piece that simulates 3D cell shading, in the style of Guilty Gear: STRIVE, with strong lines, vibrant colors, and marked anime-style shading, featuring a dramatic, high-energy pose, cinematic lighting, and exaggerated expressiveness; for 'Genshin Impact', describe a highly detailed fantasy anime-style illustration with soft, vibrant colors, delicate digital painting, atmospheric lighting, and fine lines, conveying a magical, poetic, and ethereal feel with ornate fantasy details and a polished look; for 'Tower of Fantasy', describe a highly detailed futuristic anime-style illustration with clean lines, vibrant and saturated colors, clear lighting, and smooth shading, mixing fantasy and technology with stylized outfits, tech armor, and a modern, polished sci-fi aesthetic). ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 11 strings.`;
             await executePromptGeneration(params, masterPrompt, illustrationStyles, 'MISTO (TEXTO 3D)');
         }
 
         async function generateMixed2DText3DCompPrompts(params) {
             loaderText.textContent = 'Gerando prompts mistos (Texto 2D / Comp. 3D)...';
-            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5'];
+            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5', 'Hyperion Render'];
             const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
             const angleAndPositionRule = getAngleAndPositionRule(params);
             const mainTextDirective = params.text ? `2D Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
             const themeDirective = params.text ? `3D Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 6 prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a flat 2D graphic (decal, print) on a surface, while the characters and composition elements are photorealistic 3D. Create 6 prompts for these renderers: ${renderers.join(', ')}. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 6 strings.`;
+            const masterPrompt = `Objective: Generate 7 prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a flat 2D graphic (decal, print) on a surface, while the characters and composition elements are photorealistic 3D. Create 7 prompts for these renderers: ${renderers.join(', ')}. For 'Hyperion Render', describe a prompt that combines the hyper-detailed organic sculpting of ZBrush for the composition elements with the photorealistic deferred rendering of Unreal Engine 5, mentioning the use of the Movie Render Queue. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 7 strings.`;
             await executePromptGeneration(params, masterPrompt, renderers, 'MISTO (TEXTO 2D)');
         }
 
