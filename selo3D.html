@@ -224,6 +224,26 @@
         </div>
     </div>
 
+    <!-- Modal de Refinamento -->
+    <div id="refine-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg space-y-4">
+            <h3 class="text-xl font-bold text-white">Refinar Imagem</h3>
+            <p class="text-sm text-gray-400">Descreva a alteração que você deseja. Por exemplo: "Mude a cor do cabelo para azul" ou "Deixe o personagem sorrindo".</p>
+            <div>
+                <textarea id="refine-input" rows="3" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
+            </div>
+             <p id="refine-error" class="text-sm text-red-400 hidden"></p>
+            <div class="flex justify-end space-x-4">
+                <button id="refine-cancel-btn" class="btn-secondary text-white font-semibold py-2 px-4 rounded-lg">Cancelar</button>
+                <button id="refine-submit-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center">
+                     <svg id="refine-submit-loader" class="animate-spin h-5 w-5 mr-2 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span>Refinar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // Elementos do DOM
         const generateBtn = document.getElementById('generate-btn');
@@ -254,6 +274,13 @@
         const imagePreviewContainer = document.getElementById('image-preview-container');
         const imagePreview = document.getElementById('image-preview');
 
+        // Elementos do Modal de Refinamento
+        const refineModal = document.getElementById('refine-modal');
+        const refineInput = document.getElementById('refine-input');
+        const refineCancelBtn = document.getElementById('refine-cancel-btn');
+        const refineSubmitBtn = document.getElementById('refine-submit-btn');
+        const refineError = document.getElementById('refine-error');
+
         // Inputs
         const textInput = document.getElementById('text-input');
         const themeInput = document.getElementById('theme-input');
@@ -263,6 +290,7 @@
         // Variáveis globais para armazenar dados da imagem pré-processada
         let currentBase64ImageData = null;
         let currentMimeType = null;
+        let activeImageWrapperForRefinement = null;
         
         const HISTORY_KEY = 'promptHistory3D';
         
@@ -501,7 +529,7 @@
             
             try {
                 const base64ImageData = currentBase64ImageData;
-                const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM"; 
+                const apiKey = ""; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const payload = {
                     contents: [{ parts: [{ text: visionPrompt }, { inlineData: { mimeType: currentMimeType, data: base64ImageData } }] }],
@@ -567,7 +595,7 @@
 
             let ideasPrompt = '';
             let payload;
-            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM"; 
+            const apiKey = ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             if (file) {
@@ -774,7 +802,7 @@
             promptsLabel.classList.add('hidden');
             errorMessage.classList.add('hidden');
             
-            const apiKey = "AIzaSyAMc2t1NsMkkWS9nFNTrE5kijf-gWEKMuM";
+            const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const params = { text, theme, details, style, background, textDimension, compDimension, angle, rotation, apiKey, apiUrl };
 
@@ -811,9 +839,39 @@
                     const card = document.createElement('div');
                     card.className = `prompt-card bg-gray-700 p-6 rounded-lg shadow-md flex-col ${index === 0 ? 'flex' : 'hidden'}`;
                     card.dataset.key = keyName;
+
+                    let imageSlotsHTML = '';
+                    for (let i = 1; i <= 4; i++) {
+                        imageSlotsHTML += `
+                        <div class="generated-image-wrapper group relative bg-gray-800 rounded-md flex items-center justify-center aspect-square">
+                            <!-- Loader -->
+                            <div class="image-loader absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-md z-10 hidden">
+                                <svg class="animate-spin h-6 w-6 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="text-xs text-gray-300 mt-2">Gerando...</p>
+                            </div>
+                            <img class="generated-image h-full w-full object-contain rounded-md hidden" src="">
+                            <p class="image-error absolute text-red-400 text-xs hidden p-2 text-center z-10"></p>
+                            <a class="download-btn absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-full transition-opacity opacity-0 group-hover:opacity-100 hidden z-20" href="#" download="generated_image_${keyName}_${i}.png" title="Fazer Download">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </a>
+                            <button class="refine-btn absolute bottom-2 left-2 bg-purple-600 text-white p-2 rounded-full transition-opacity opacity-0 group-hover:opacity-100 hidden z-20" title="Refinar Imagem">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
+                        `;
+                    }
+
                     card.innerHTML = `
                         <h3 class="text-xl font-semibold text-indigo-400 mb-3">${keyName.toUpperCase()}</h3>
-                        <p class="prompt-text text-gray-300 flex-grow text-sm leading-relaxed">${promptText}</p>`;
+                        <p class="prompt-text text-gray-300 flex-grow text-sm leading-relaxed">${promptText}</p>
+                        <div class="image-generation-container mt-4 hidden">
+                            <div class="grid grid-cols-2 gap-4">
+                                ${imageSlotsHTML}
+                            </div>
+                        </div>`;
                     promptsContainer.appendChild(card);
                     
                     const filterButton = document.createElement('button');
@@ -886,6 +944,204 @@
             return rule;
         };
 
+        function openRefineModal(imageWrapper) {
+            activeImageWrapperForRefinement = imageWrapper;
+            refineInput.value = '';
+            refineError.classList.add('hidden');
+            refineModal.classList.remove('hidden');
+            refineInput.focus();
+        }
+
+        function closeRefineModal() {
+            activeImageWrapperForRefinement = null;
+            const loader = refineSubmitBtn.querySelector('#refine-submit-loader');
+            loader.classList.add('hidden');
+            refineSubmitBtn.disabled = false;
+            refineModal.classList.add('hidden');
+        }
+
+        async function regenerateSingleImage(newPrompt, imageWrapper) {
+            const loader = imageWrapper.querySelector('.image-loader');
+            const imgElement = imageWrapper.querySelector('.generated-image');
+            const errorElement = imageWrapper.querySelector('.image-error');
+            const downloadBtn = imageWrapper.querySelector('.download-btn');
+            const refineBtn = imageWrapper.querySelector('.refine-btn');
+
+            loader.classList.remove('hidden');
+            imgElement.classList.add('hidden');
+            errorElement.classList.add('hidden');
+            downloadBtn.classList.add('hidden');
+            refineBtn.classList.add('hidden');
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: newPrompt }] }],
+                generationConfig: {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: { targetSize: 2048 }
+                },
+            };
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${errorData.error?.message || 'Erro da API'}`);
+                }
+                const result = await response.json();
+                const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+                if (base64Data) {
+                    const imageUrl = `data:image/png;base64,${base64Data}`;
+                    imgElement.src = imageUrl;
+                    downloadBtn.href = imageUrl;
+                    imgElement.classList.remove('hidden');
+                    downloadBtn.classList.remove('hidden');
+                    refineBtn.classList.remove('hidden');
+                } else {
+                    throw new Error('Resposta inválida da API.');
+                }
+            } catch (error) {
+                console.error('Erro na regeneração da imagem:', error);
+                errorElement.textContent = error.message || 'Falha na regeneração.';
+                errorElement.classList.remove('hidden');
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        async function handleRefineSubmit() {
+            if (!activeImageWrapperForRefinement) return;
+
+            refineError.classList.add('hidden');
+            const refinementRequest = refineInput.value.trim();
+            if (!refinementRequest) {
+                refineError.textContent = 'Por favor, insira uma modificação.';
+                refineError.classList.remove('hidden');
+                return;
+            }
+
+            const loader = refineSubmitBtn.querySelector('#refine-submit-loader');
+            loader.classList.remove('hidden');
+            refineSubmitBtn.disabled = true;
+
+            const promptCard = activeImageWrapperForRefinement.closest('.prompt-card');
+            const originalPrompt = promptCard.querySelector('.prompt-text').textContent;
+
+            const metaPrompt = `
+                As an expert prompt engineer, your task is to rewrite an existing image generation prompt based on a user's modification request.
+                Do NOT add any explanatory text, commentary, or markdown formatting. Your output MUST be only the new, rewritten prompt string.
+
+                Original Prompt:
+                "${originalPrompt}"
+
+                User's Modification Request:
+                "${refinementRequest}"
+
+                New, Rewritten Prompt:
+            `;
+
+            try {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = { contents: [{ parts: [{ text: metaPrompt }] }] };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                const newPrompt = result.candidates[0].content.parts[0].text.trim();
+
+                await regenerateSingleImage(newPrompt, activeImageWrapperForRefinement);
+                closeRefineModal();
+
+            } catch (error) {
+                console.error("Erro ao refinar o prompt:", error);
+                refineError.textContent = "Ocorreu um erro ao refinar o prompt. Tente novamente.";
+                refineError.classList.remove('hidden');
+            } finally {
+                loader.classList.add('hidden');
+                refineSubmitBtn.disabled = false;
+            }
+        }
+
+
+        async function generateImage(promptText, cardElement) {
+            const imageContainer = cardElement.querySelector('.image-generation-container');
+            const imageWrappers = cardElement.querySelectorAll('.generated-image-wrapper');
+            
+            if (!imageContainer || imageWrappers.length !== 4) return;
+
+            // Show container and reset all slots
+            imageContainer.classList.remove('hidden');
+            imageWrappers.forEach(wrapper => {
+                wrapper.querySelector('.image-loader').classList.remove('hidden');
+                wrapper.querySelector('.generated-image').classList.add('hidden');
+                wrapper.querySelector('.image-error').classList.add('hidden');
+                wrapper.querySelector('.download-btn').classList.add('hidden');
+            });
+            
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }],
+                generationConfig: {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: {
+                        targetSize: 2048
+                    }
+                },
+            };
+
+            const generationPromises = Array(4).fill().map(() => 
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`HTTP ${response.status}: ${errorData.error?.message || 'Erro desconhecido da API'}`);
+                        });
+                    }
+                    return response.json();
+                })
+            );
+
+            const results = await Promise.allSettled(generationPromises);
+
+            results.forEach((result, index) => {
+                const wrapper = imageWrappers[index];
+                const loader = wrapper.querySelector('.image-loader');
+                const imgElement = wrapper.querySelector('.generated-image');
+                const errorElement = wrapper.querySelector('.image-error');
+                const downloadBtn = wrapper.querySelector('.download-btn');
+                const refineBtn = wrapper.querySelector('.refine-btn');
+
+                loader.classList.add('hidden');
+
+                if (result.status === 'fulfilled') {
+                    const apiResponse = result.value;
+                    const base64Data = apiResponse?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+                    if (base64Data) {
+                        const imageUrl = `data:image/png;base64,${base64Data}`;
+                        imgElement.src = imageUrl;
+                        downloadBtn.href = imageUrl;
+                        imgElement.classList.remove('hidden');
+                        downloadBtn.classList.remove('hidden');
+                        refineBtn.classList.remove('hidden');
+                    } else {
+                        errorElement.textContent = 'Resposta inválida da API.';
+                        errorElement.classList.remove('hidden');
+                    }
+                } else { // 'rejected'
+                    console.error(`Erro na geração da imagem ${index + 1}:`, result.reason);
+                    errorElement.textContent = result.reason.message || 'Falha na geração.';
+                    errorElement.classList.remove('hidden');
+                }
+            });
+        }
+
         async function generate2DPrompts(params) {
             loaderText.textContent = 'Gerando 11 estilos de ilustração 2D...';
             const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style', 'Hearthstone', 'Arcane', 'Guilty Gear', 'Genshin Impact', 'Tower of Fantasy'];
@@ -934,12 +1190,13 @@
             const clickedButton = e.target.closest('.filter-btn');
             if (clickedButton) {
                 const targetKey = clickedButton.dataset.targetKey;
-
+                
                 document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                 clickedButton.classList.add('active');
 
                 let targetCard;
                 document.querySelectorAll('.prompt-card').forEach(card => {
+                    const imageContainer = card.querySelector('.image-generation-container');
                     if (card.dataset.key === targetKey) {
                         card.classList.remove('hidden');
                         card.classList.add('flex');
@@ -947,16 +1204,35 @@
                     } else {
                         card.classList.add('hidden');
                         card.classList.remove('flex');
+                        if (imageContainer) imageContainer.classList.add('hidden');
                     }
                 });
 
                 if (targetCard) {
                     const textToCopy = targetCard.querySelector('.prompt-text').textContent;
+                    // Always generate a new set of images on click
+                    generateImage(textToCopy, targetCard);
                     copyToClipboard(textToCopy, clickedButton);
                 }
             }
         });
         
+        promptsContainer.addEventListener('click', (e) => {
+            const refineButton = e.target.closest('.refine-btn');
+            if (refineButton) {
+                const imageWrapper = refineButton.closest('.generated-image-wrapper');
+                openRefineModal(imageWrapper);
+            }
+        });
+
+        refineCancelBtn.addEventListener('click', closeRefineModal);
+        refineSubmitBtn.addEventListener('click', handleRefineSubmit);
+        refineModal.addEventListener('click', (e) => {
+            if (e.target === refineModal) {
+                closeRefineModal();
+            }
+        });
+
         function setupRadioDeselection() {
             const radioGroups = ['angle-option', 'rotation-direction', 'background-option'];
             radioGroups.forEach(groupName => {
@@ -982,3 +1258,7 @@
     </script>
 </body>
 </html>
+
+
+
+
