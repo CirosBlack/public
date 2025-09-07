@@ -1,1264 +1,960 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Prompts para Selos 3D & 2D</title>
+    <title>Gerador de Imagem com IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            height: 100vh; /* Define a altura total da viewport */
-            overflow: hidden; /* Impede a rolagem da página principal */
-        }
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
         }
-        .prompt-card, .history-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* Spinner personalizado */
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
-        .prompt-card:hover, .history-card:hover {
-            transform: translateY(-5px);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .reuse-btn:hover {
-            background-color: #3b82f6; /* Azul mais claro */
+        .placeholder-glow::placeholder {
+            color: #9ca3af;
+            opacity: 1;
         }
-        input[type="radio"]:checked {
-            box-shadow: 0 0 0 2px #4f46e5;
+        .aspect-ratio-btn.active, .filter-btn.active, .style-btn.active {
+            background-color: #4f46e5; /* bg-indigo-600 */
+            color: white;
+            font-weight: 600;
+            border-color: #6366f1;
         }
-        .btn-secondary {
-            background-color: #4b5563;
+        /* Fundo de xadrez para transparência */
+        .checkerboard {
+            background-color: #374151; /* bg-gray-700 */
+            background-image:
+                linear-gradient(45deg, #4b5563 25%, transparent 25%),
+                linear-gradient(-45deg, #4b5563 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #4b5563 75%),
+                linear-gradient(-45deg, transparent 75%, #4b5563 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
-        .btn-secondary:hover {
-            background-color: #6b7280;
+        .column-scroll::-webkit-scrollbar { width: 8px; }
+        .column-scroll::-webkit-scrollbar-track { background: #1f2937; border-radius: 10px;}
+        .column-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        .column-scroll::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        .prompt-text-area {
+            resize: vertical;
+            min-height: 240px; /* Aumentado de 120px */
         }
-        
-        /* Estilos para o scroll vertical das colunas */
-        #form-column, #output-column {
-            overflow-y: auto;
-            padding-right: 12px;
+        .prompt-text-area:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 1px #4f46e5;
         }
 
-        /* Estilização da barra de rolagem */
-        #form-column::-webkit-scrollbar, #output-column::-webkit-scrollbar {
-            width: 8px;
-        }
-        #form-column::-webkit-scrollbar-track, #output-column::-webkit-scrollbar-track {
-            background: #1f2937;
-            border-radius: 10px;
-        }
-        #form-column::-webkit-scrollbar-thumb, #output-column::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 10px;
-        }
-        #form-column::-webkit-scrollbar-thumb:hover, #output-column::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
-        }
-        .filter-btn.active {
-            background-color: #4f46e5;
-            color: white;
-        }
-        textarea {
-            resize: none; /* Impede que o usuário redimensione manualmente */
-        }
-        /* Oculta a barra de rolagem do textarea de detalhes */
-        #details-input::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
-        #details-input {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
     </style>
 </head>
-<body class="bg-gray-900 text-white p-4">
+<body class="text-white flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-10 h-full flex flex-col">
+    <div class="w-full mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col h-[95vh]">
         
-        <div id="content-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 flex-grow overflow-hidden">
-            
-            <!-- Coluna da Esquerda: Formulário e Histórico (com scroll) -->
-            <div id="form-column">
-                <!-- Formulário de Entrada -->
-                <div class="space-y-6 mb-8">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="text-input" class="block text-sm font-bold text-gray-300 mb-2">TEXTO PRINCIPAL (OPCIONAL)</label>
-                            <input type="text" id="text-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label for="theme-input" class="block text-sm font-bold text-gray-300 mb-2">TEMA</label>
-                            <input type="text" id="theme-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        </div>
-                    </div>
+        <!-- Cabeçalho -->
+        <div class="text-center mb-8 flex-shrink-0">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-500">Gerador de Imagem com IA</h1>
+            <p class="text-gray-400 mt-2">Transforme sua ideia ou uma imagem de referência em arte.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-10 gap-8 flex-grow min-h-0">
+            <!-- Coluna 1: Controles -->
+            <div id="controls-column" class="lg:col-span-3 flex flex-col space-y-6 overflow-y-auto column-scroll pr-2">
+                <!-- PONTO DE PARTIDA -->
+                <div class="space-y-4 p-4 bg-gray-900 rounded-lg">
+                    <h3 class="font-bold text-lg text-gray-300">1. Ponto de Partida</h3>
+                    <label for="idea-input" class="block font-medium text-gray-400">Opção A: Descreva sua ideia</label>
+                    <textarea id="idea-input" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition placeholder-glow" placeholder="Ex: um gato preto bocejando em uma almofada rosa"></textarea>
                     
-                    <!-- Controles de Dimensão -->
-                    <div class="grid grid-cols-2 gap-x-8 gap-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">DIMENSÃO DO TEXTO</label>
-                            <div class="flex space-x-4">
-                                <label for="text-dim-3d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="text-dim-3d" name="text-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
-                                <label for="text-dim-2d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="text-dim-2d" name="text-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">DIMENSÃO DA COMPOSIÇÃO</label>
-                            <div class="flex space-x-4">
-                                <label for="comp-dim-3d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="comp-dim-3d" name="comp-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
-                                <label for="comp-dim-2d" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="comp-dim-2d" name="comp-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
-                            </div>
+                    <div class="space-y-2">
+                        <label class="block font-medium text-gray-400 text-sm">Escolha um estilo:</label>
+                        <div id="style-selector" class="grid grid-cols-3 gap-2">
+                            <button class="style-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white py-2 px-2 rounded-lg transition text-sm active" data-style="realistic">Realista</button>
+                            <button class="style-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white py-2 px-2 rounded-lg transition text-sm" data-style="illustration">Ilustração</button>
+                            <button class="style-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white py-2 px-2 rounded-lg transition text-sm" data-style="cartoon">Cartoon</button>
                         </div>
                     </div>
 
-                    <!-- Estilos Artísticos, Ângulo e Fundo -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">ESTILO ARTÍSTICO</label>
-                            <div class="space-y-2">
-                                <label for="style-realistic" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-realistic" name="style-option" type="radio" value="realistic" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm text-gray-300">Realista</span></label>
-                                <label for="style-cartoon" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-cartoon" name="style-option" type="radio" value="cartoon" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Cartoon</span></label>
-                                <label for="style-illustration" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="style-illustration" name="style-option" type="radio" value="illustration" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm text-gray-300">Ilustração</span></label>
-                            </div>
+                    <button id="generate-prompt-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105" data-mode="idea">Gerar Prompt com a Ideia</button>
+                    <div class="relative flex py-3 items-center"><div class="flex-grow border-t border-gray-600"></div><span class="flex-shrink mx-4 text-gray-400">OU</span><div class="flex-grow border-t border-gray-600"></div></div>
+                    <label class="block font-medium text-gray-400">Opção B: Envie uma imagem</label>
+                    <div class="flex flex-col items-center gap-4">
+                        <img id="image-preview" src="" class="w-full h-auto object-cover rounded-lg hidden bg-gray-700 border border-gray-600">
+                        <div class="w-full flex gap-4">
+                            <input type="file" id="image-upload-input" class="hidden" accept="image/*">
+                            <label for="image-upload-input" class="w-full cursor-pointer bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition text-center block">Escolher Arquivo</label>
+                            <button id="describe-image-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition disabled:bg-teal-400 disabled:cursor-not-allowed" disabled>Descrever Imagem</button>
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">ÂNGULO E POSIÇÃO</label>
-                            <div class="space-y-2">
-                                <!-- Angle options -->
-                                <div class="flex space-x-2">
-                                    <label for="angle-frontal" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="angle-frontal" name="angle-option" type="radio" value="frontal" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm">Frontal</span></label>
-                                    <label for="angle-perspective" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input id="angle-perspective" name="angle-option" type="radio" value="perspective" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm">Perspectiva</span></label>
-                                </div>
-                                <!-- Rotation direction options -->
-                                <div class="flex space-x-2">
-                                    <label for="rot-dir" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center">
-                                        <input id="rot-dir" name="rotation-direction" type="radio" value="direita" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500">
-                                        <span class="ml-2 text-sm">Direita</span>
-                                    </label>
-                                    <label for="rot-esq" class="flex items-center p-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center">
-                                        <input id="rot-esq" name="rotation-direction" type="radio" value="esquerda" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500">
-                                        <span class="ml-2 text-sm">Esquerda</span>
-                                    </label>
-                                </div>
-                                <!-- Rotation degrees input -->
-                                <input type="number" id="rotation-degrees" placeholder="Graus" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            </div>
-                        </div>
-                         <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">FUNDO</label>
-                            <div class="space-y-2">
-                                <label for="bg-black" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="bg-black" name="background-option" type="radio" value="solid black background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Preto</span></label>
-                                <label for="bg-white" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="bg-white" name="background-option" type="radio" value="solid white background" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Branco</span></label>
-                                <label for="bg-transparent" class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"><input id="bg-transparent" name="background-option" type="radio" value="transparent background (.png)" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-2 text-sm text-gray-300">Transparente</span></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Seção de Upload de Imagem -->
-                    <div>
-                        <label class="block text-sm font-bold text-gray-300 mb-2">ENVIE UMA IMAGEM DE REFERÊNCIA</label>
-                        <label for="image-upload" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center transition-colors hover:bg-blue-700 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                            ESCOLHER ARQUIVO
-                        </label>
-                        <input type="file" id="image-upload" accept="image/*" class="hidden">
-                        <div id="image-preview-container" class="mt-4 hidden">
-                            <img id="image-preview" src="#" alt="Pré-visualização da Imagem" class="w-full h-auto rounded-lg"/>
-                        </div>
-                    </div>
-                    
-                    <!-- Detalhes Adicionais e Botões de IA -->
-                    <div>
-                        <label for="details-input" class="block text-sm font-bold text-gray-300 mb-2">DETALHES ADICIONAIS</label>
-                        <div class="flex items-center space-x-4 mb-3">
-                            <button id="describe-image-btn" class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
-                                <svg id="describe-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" /></svg>
-                                <svg id="describe-loader" class="animate-spin h-5 w-5 mr-2 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <span id="describe-btn-text">DESCREVER IMAGEM</span>
-                            </button>
-                            <button id="generate-ideas-btn" class="flex-1 text-sm bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold py-3 rounded-lg flex items-center justify-center transition-colors">
-                                <svg id="idea-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                                <svg id="idea-loader" class="animate-spin h-4 w-4 mr-1 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <svg id="idea-check" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 hidden text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                <span id="idea-btn-text">GERAR IDEIAS</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Botões de Ação Movidos -->
-                        <div class="flex space-x-4 my-4">
-                            <button id="clear-btn" class="flex-1 btn-secondary text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-gray-600 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50">LIMPAR</button>
-                            <button id="generate-btn" class="flex-1 bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">GERAR PROMPTS</button>
-                        </div>
-
-                        <textarea id="details-input" rows="2" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
                     </div>
                 </div>
-
-                <!-- Seção de Histórico -->
-                <div id="history-section" class="hidden">
-                    <div class="flex justify-start items-center mb-4">
-                         <h2 class="text-xl font-bold text-gray-300">HISTÓRICO DE PROMPTS</h2>
+                 <!-- FUNDO -->
+                <div class="space-y-3 p-4 bg-gray-900 rounded-lg">
+                    <label class="block font-bold text-lg text-gray-300">2. Fundo (Opcional)</label>
+                    <div id="background-selector" class="grid grid-cols-3 gap-2">
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white py-2 px-2 rounded-lg transition text-sm" data-bg="black">Preto</button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white py-2 px-2 rounded-lg transition text-sm" data-bg="white">Branco</button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white py-2 px-2 rounded-lg transition text-sm" data-bg="transparent">Transparente</button>
                     </div>
-                    <div id="history-container" class="space-y-4"></div>
+                </div>
+                <!-- PROMPT FINAL -->
+                <div class="space-y-3">
+                    <label for="prompt-output" class="block font-medium text-gray-300">3. Prompt de alta qualidade</label>
+                    <textarea id="prompt-output" rows="8" class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-gray-300" placeholder="O prompt detalhado aparecerá aqui..."></textarea>
+                    <button id="copy-prompt-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105" disabled>Copiar Prompt</button>
+                </div>
+                <!-- DIMENSÃO -->
+                <div class="space-y-4 p-4 bg-gray-900 rounded-lg">
+                     <h3 class="font-bold text-lg text-gray-300">4. Dimensão</h3>
+                     <div class="grid grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">TEXTO</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="text-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="text-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-300 mb-2 text-center">COMPOSIÇÃO</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="comp-dimension" type="radio" value="3d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500" checked><span class="ml-3 text-sm">3D</span></label>
+                                <label class="flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 flex-1 justify-center"><input name="comp-dimension" type="radio" value="2d" class="h-4 w-4 bg-gray-700 border-gray-600 text-indigo-600 focus:ring-indigo-500"><span class="ml-3 text-sm">2D</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- FORMATO -->
+                <div class="space-y-3 p-4 bg-gray-900 rounded-lg">
+                    <h3 class="font-bold text-lg text-gray-300">5. Formato (Aspect Ratio)</h3>
+                    <div id="aspect-ratio-selector" class="grid grid-cols-5 gap-2">
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition active" data-ratio="1:1">1:1</button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition" data-ratio="16:9">16:9</button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition" data-ratio="9:16">9:16</button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition" data-ratio="4:3">4:3</button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition" data-ratio="3:4">3:4</button>
+                    </div>
+                </div>
+                <!-- PERSPECTIVA -->
+                <div class="space-y-3 p-4 bg-gray-900 rounded-lg">
+                    <h3 class="font-bold text-lg text-gray-300">6. Perspectiva</h3>
+                    <div id="perspective-selector" class="grid grid-cols-2 gap-2">
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition active" data-perspective="frontal">Frontal</button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition" data-perspective="perspective">Perspectiva</button>
+                    </div>
+                    <div id="direction-selector" class="grid grid-cols-4 gap-2 mt-3 hidden">
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition flex justify-center items-center" data-direction="left" title="Vista da Direita">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+                        </button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition flex justify-center items-center" data-direction="up" title="Vista de Baixo">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/></svg>
+                        </button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition flex justify-center items-center" data-direction="down" title="Vista de Cima">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/></svg>
+                        </button>
+                        <button class="aspect-ratio-btn w-full bg-gray-700 border border-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-2 rounded-lg transition flex justify-center items-center" data-direction="right" title="Vista da Esquerda">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- AÇÃO PRINCIPAL -->
+                 <div class="space-y-4 text-center sticky bottom-0 bg-gray-800 py-4">
+                    <div class="flex items-center gap-4">
+                        <button id="generate-image-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500">
+                            Gerar Imagens
+                        </button>
+                        <button id="clear-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105">
+                            Limpar
+                        </button>
+                    </div>
+                    <button id="generate-by-renderer-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 hidden">
+                        Gerar Prompts por Renderizador
+                    </button>
                 </div>
             </div>
-            
-            <!-- Coluna da Direita: Saída (com scroll) -->
-            <div id="output-column">
-                <!-- Botões de Filtro -->
-                <div id="filter-buttons-wrapper" class="hidden mb-6">
-                    <h3 id="filter-title" class="text-left text-xl font-bold text-gray-300 mb-4">NAVEGAR PARA:</h3>
-                    <div id="filter-buttons" class="flex flex-wrap justify-start gap-3"></div>
-                </div>
 
-                <!-- Seção de Saída -->
-                <div id="output-section">
-                    <div id="initial-message" class="text-center text-gray-500 mt-20">
-                        <p>Seus prompts aparecerão aqui...</p>
+            <!-- Coluna 2: Renderizadores/Estilos -->
+            <div id="styles-column" class="lg:col-span-3 bg-gray-900 rounded-lg p-4 flex flex-col overflow-y-auto column-scroll">
+                <p id="styles-placeholder" class="text-gray-500 m-auto text-center">Os estilos e renderizadores aparecerão aqui...</p>
+                 <div id="filter-buttons-wrapper" class="hidden w-full mb-4 flex-shrink-0">
+                    <h3 id="filter-title" class="text-left text-md font-bold text-gray-300 mb-2">NAVEGAR POR ESTILO:</h3>
+                    <div id="filter-buttons" class="flex flex-wrap justify-start gap-2"></div>
+                </div>
+                <div id="prompts-container" class="w-full space-y-4 flex-grow"></div>
+            </div>
+
+            <!-- Coluna 3: Imagens Geradas -->
+            <div id="images-column" class="lg:col-span-4 bg-gray-900 rounded-lg flex items-center justify-center p-2 overflow-y-auto column-scroll">
+                <div id="image-results-content" class="w-full h-full">
+                    <div id="loader" class="loader hidden mx-auto my-auto"></div>
+                    <p id="image-placeholder" class="text-gray-500 text-center my-auto">As imagens geradas aparecerão aqui</p>
+                    <div id="image-grid" class="hidden w-full h-full grid grid-cols-2 gap-2">
+                        <!-- Imagens geradas -->
                     </div>
-                    <div id="loader" class="text-center hidden"><svg class="animate-spin h-8 w-8 text-indigo-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p id="loader-text" class="mt-2 text-gray-400">Gerando prompts...</p></div>
-                    <h2 id="prompts-label" class="hidden text-xl font-bold text-gray-300 mb-4">PROMPTS</h2>
-                    <div id="prompts-container" class="space-y-6"></div>
-                    <div id="error-message" class="text-center text-red-400 mt-4 hidden"></div>
                 </div>
             </div>
         </div>
+        
+        <!-- Área de Mensagens de Erro -->
+        <div id="error-message" class="text-red-400 text-center font-medium min-h-[1.25rem] pt-4 flex-shrink-0"></div>
+
     </div>
 
     <!-- Modal de Refinamento -->
-    <div id="refine-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg space-y-4">
-            <h3 class="text-xl font-bold text-white">Refinar Imagem</h3>
-            <p class="text-sm text-gray-400">Descreva a alteração que você deseja. Por exemplo: "Mude a cor do cabelo para azul" ou "Deixe o personagem sorrindo".</p>
-            <div>
-                <textarea id="refine-input" rows="3" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
-            </div>
-             <p id="refine-error" class="text-sm text-red-400 hidden"></p>
-            <div class="flex justify-end space-x-4">
-                <button id="refine-cancel-btn" class="btn-secondary text-white font-semibold py-2 px-4 rounded-lg">Cancelar</button>
-                <button id="refine-submit-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center">
-                     <svg id="refine-submit-loader" class="animate-spin h-5 w-5 mr-2 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <span>Refinar</span>
-                </button>
+    <div id="refine-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md space-y-4">
+            <h3 class="text-xl font-bold">Refinar Imagem</h3>
+            <p class="text-gray-400">Descreva as alterações que você deseja fazer na imagem.</p>
+            <textarea id="refine-input" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3" placeholder="Ex: adicione um céu estrelado, mude a cor para azul..."></textarea>
+            <div class="flex justify-end gap-3">
+                <button id="cancel-refine-btn" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg">Cancelar</button>
+                <button id="confirm-refine-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Confirmar</button>
             </div>
         </div>
     </div>
 
+    <!-- Visualização em Tela Cheia -->
+    <div id="fullscreen-view" class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 hidden z-50">
+        <img id="fullscreen-image" src="" class="max-w-full max-h-full object-contain">
+        <button id="close-fullscreen-btn" class="absolute top-4 right-4 text-white text-5xl font-bold opacity-80 hover:opacity-100">&times;</button>
+        <button id="prev-fullscreen-btn" class="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-gray-800/50 hover:bg-gray-800/80 p-2 rounded-full text-3xl transition">&lt;</button>
+        <button id="next-fullscreen-btn" class="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-gray-800/50 hover:bg-gray-800/80 p-2 rounded-full text-3xl transition">&gt;</button>
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+            <button id="fullscreen-refine-btn" title="Refinar Imagem" class="bg-gray-800/80 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="pointer-events-none" viewBox="0 0 16 16"><path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58-1.52 0 2.1l6.516 6.516c.58.58 1.52.58 2.1 0l6.516-6.516c.58-.58.58-1.52 0-2.1L9.05.435ZM7.293 4.293a1 1 0 0 1 1.414 0L10 5.586l1.293-1.293a1 1 0 1 1 1.414 1.414L11.414 7l1.293 1.293a1 1 0 0 1-1.414 1.414L10 8.414l-1.293 1.293a1 1 0 0 1-1.414-1.414L8.586 7 7.293 5.707a1 1 0 0 1 0-1.414Z"/></svg>
+                Refinar
+            </button>
+            <a id="fullscreen-download-btn" href="#" download="imagem-ia.png" title="Download da Imagem" class="bg-gray-800/80 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition">
+               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="pointer-events-none" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+               Download
+            </a>
+        </div>
+    </div>
 
     <script>
-        // Elementos do DOM
-        const generateBtn = document.getElementById('generate-btn');
-        const clearBtn = document.getElementById('clear-btn');
-        const generateIdeasBtn = document.getElementById('generate-ideas-btn');
-        const ideaIcon = document.getElementById('idea-icon');
-        const ideaLoader = document.getElementById('idea-loader');
-        const ideaCheck = document.getElementById('idea-check');
-        const ideaBtnText = document.getElementById('idea-btn-text');
-        const loader = document.getElementById('loader');
-        const loaderText = document.getElementById('loader-text');
-        const promptsContainer = document.getElementById('prompts-container');
-        const promptsLabel = document.getElementById('prompts-label');
-        const filterButtonsContainer = document.getElementById('filter-buttons');
-        const filterButtonsWrapper = document.getElementById('filter-buttons-wrapper');
-        const filterTitle = document.getElementById('filter-title');
-        const errorMessage = document.getElementById('error-message');
-        const historySection = document.getElementById('history-section');
-        const historyContainer = document.getElementById('history-container');
-        const initialMessage = document.getElementById('initial-message');
-        
-        // Elementos de Upload de Imagem
-        const imageUpload = document.getElementById('image-upload');
-        const describeImageBtn = document.getElementById('describe-image-btn');
-        const describeIcon = document.getElementById('describe-icon');
-        const describeLoader = document.getElementById('describe-loader');
-        const describeBtnText = document.getElementById('describe-btn-text');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
+        // --- Seletores de Elementos ---
+        const ideaInput = document.getElementById('idea-input');
+        const styleSelector = document.getElementById('style-selector');
+        const generatePromptBtn = document.getElementById('generate-prompt-btn');
+        const promptOutput = document.getElementById('prompt-output');
+        const copyPromptBtn = document.getElementById('copy-prompt-btn');
+        const generateImageBtn = document.getElementById('generate-image-btn');
+        const backgroundSelector = document.getElementById('background-selector');
+        const aspectRatioSelector = document.getElementById('aspect-ratio-selector');
+        const perspectiveSelector = document.getElementById('perspective-selector');
+        const directionSelector = document.getElementById('direction-selector');
+        const imageUploadInput = document.getElementById('image-upload-input');
         const imagePreview = document.getElementById('image-preview');
+        const describeImageBtn = document.getElementById('describe-image-btn');
+        const errorMessage = document.getElementById('error-message');
+        const clearBtn = document.getElementById('clear-btn');
 
-        // Elementos do Modal de Refinamento
+        // Coluna 2
+        const stylesColumn = document.getElementById('styles-column');
+        const stylesPlaceholder = document.getElementById('styles-placeholder');
+        const filterButtonsWrapper = document.getElementById('filter-buttons-wrapper');
+        const filterButtons = document.getElementById('filter-buttons');
+        const promptsContainer = document.getElementById('prompts-container');
+        
+        // Coluna 3
+        const imagesColumn = document.getElementById('images-column');
+        const loader = document.getElementById('loader');
+        const imagePlaceholder = document.getElementById('image-placeholder');
+        const imageGrid = document.getElementById('image-grid');
+
+        // Modal e Fullscreen
         const refineModal = document.getElementById('refine-modal');
         const refineInput = document.getElementById('refine-input');
-        const refineCancelBtn = document.getElementById('refine-cancel-btn');
-        const refineSubmitBtn = document.getElementById('refine-submit-btn');
-        const refineError = document.getElementById('refine-error');
+        const cancelRefineBtn = document.getElementById('cancel-refine-btn');
+        const confirmRefineBtn = document.getElementById('confirm-refine-btn');
+        const fullscreenView = document.getElementById('fullscreen-view');
+        const fullscreenImage = document.getElementById('fullscreen-image');
+        const closeFullscreenBtn = document.getElementById('close-fullscreen-btn');
+        const fullscreenRefineBtn = document.getElementById('fullscreen-refine-btn');
+        const fullscreenDownloadBtn = document.getElementById('fullscreen-download-btn');
+        const prevFullscreenBtn = document.getElementById('prev-fullscreen-btn');
+        const nextFullscreenBtn = document.getElementById('next-fullscreen-btn');
 
-        // Inputs
-        const textInput = document.getElementById('text-input');
-        const themeInput = document.getElementById('theme-input');
-        const detailsInput = document.getElementById('details-input');
-        const rotationDegrees = document.getElementById('rotation-degrees');
+        // --- Estado da Aplicação ---
+        let selectedStyle = 'realistic';
+        let selectedBackground = null;
+        let selectedAspectRatio = '1:1';
+        let selectedPerspective = 'frontal';
+        let selectedDirection = null;
+        let imageToRefine = null; 
+        let fullscreenImageElements = [];
+        let currentFullscreenIndex = 0;
+        const API_KEY = ""; // Será fornecido pelo ambiente.
 
-        // Variáveis globais para armazenar dados da imagem pré-processada
-        let currentBase64ImageData = null;
-        let currentMimeType = null;
-        let activeImageWrapperForRefinement = null;
-        
-        const HISTORY_KEY = 'promptHistory3D';
-        
-        // Funções de Histórico
-        const getHistory = () => JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
-        
-        const saveToHistory = (entry) => {
-            let history = getHistory();
-            history.unshift(entry);
-            history = history.slice(0, 5); // Manter apenas os últimos 5
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-            displayHistory();
-        };
+        // --- Funções de Lógica de UI ---
 
-        const displayHistory = () => {
-            const history = getHistory();
-            if (history.length === 0) {
-                historySection.classList.add('hidden');
-                return;
-            }
-            historySection.classList.remove('hidden');
-            historyContainer.innerHTML = '';
-            history.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'history-card bg-gray-700 p-4 rounded-lg shadow-md flex justify-between items-center';
-                
-                const dimensionLabel = `Texto ${item.textDimension.toUpperCase()} / Comp ${item.compDimension.toUpperCase()}`;
+        clearBtn.addEventListener('click', () => {
+            // Limpa campos de texto
+            ideaInput.value = '';
+            promptOutput.value = '';
 
-                card.innerHTML = `
-                    <div class="flex-grow">
-                        <p class="font-semibold text-indigo-400">${item.text ? `${item.text} - ` : ''}${item.theme} <span class="text-xs font-normal text-gray-400">(${dimensionLabel})</span></p>
-                        <p class="text-xs text-gray-400">Estilo: ${item.style} | Fundo: ${item.background.split(' ')[1] || 'N/A'}</p>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <button class="reuse-btn bg-blue-600 text-white text-sm font-medium py-2 px-3 rounded-md" data-index="${index}">REUSAR</button>
-                        <button class="delete-prompt-btn bg-red-600 text-white p-2 rounded-md hover:bg-red-700" data-index="${index}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    </div>
-                `;
-                historyContainer.appendChild(card);
-            });
-        };
-        
-        const deleteHistoryItem = (index) => {
-            let history = getHistory();
-            history.splice(index, 1);
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-            displayHistory();
-        };
+            // Reseta a pré-visualização da imagem
+            imagePreview.src = '';
+            imagePreview.classList.add('hidden');
+            imageUploadInput.value = ''; // Limpa a seleção do arquivo
+            describeImageBtn.disabled = true;
 
-        const reuseHistoryItem = (index) => {
-            const history = getHistory();
-            const item = history[index];
-            if (!item) return;
+            // Reseta botões de estado
+            copyPromptBtn.disabled = true;
+            generatePromptBtn.textContent = 'Gerar Prompt com a Ideia';
+            generatePromptBtn.dataset.mode = 'idea';
+            generateImageBtn.textContent = 'Gerar Imagens';
+            document.getElementById('generate-by-renderer-btn').classList.add('hidden');
 
-            textInput.value = item.text;
-            themeInput.value = item.theme;
-            detailsInput.value = item.details;
+
+            // Limpa coluna de estilos
+            promptsContainer.innerHTML = '';
+            filterButtons.innerHTML = '';
+            filterButtonsWrapper.classList.add('hidden');
+            stylesPlaceholder.classList.remove('hidden');
+
+            // Limpa coluna de imagens
+            showImagesPlaceholder('As imagens geradas aparecerão aqui');
+
+            // Reseta seletores
+            styleSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            const defaultStyle = styleSelector.querySelector('button[data-style="realistic"]');
+            if(defaultStyle) defaultStyle.classList.add('active');
+            selectedStyle = 'realistic';
+
+            backgroundSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            selectedBackground = null;
             
-            document.querySelectorAll('input[name="angle-option"]').forEach(r => r.checked = false);
-            if (item.angle) {
-                const angleRadio = document.querySelector(`input[name="angle-option"][value="${item.angle}"]`);
-                if (angleRadio) angleRadio.checked = true;
-            }
-            
-            document.querySelectorAll('input[name="rotation-direction"]').forEach(r => r.checked = false);
-            if (item.rotation) {
-                const parts = item.rotation.match(/(\d+)\s*graus\s*à\s*(direita|esquerda)/i);
-                if (parts) {
-                    rotationDegrees.value = parts[1];
-                    const directionRadio = document.querySelector(`input[name="rotation-direction"][value="${parts[2].toLowerCase()}"]`);
-                    if(directionRadio) directionRadio.checked = true;
-                } else {
-                     rotationDegrees.value = '';
-                }
+            aspectRatioSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            const defaultAspectRatio = aspectRatioSelector.querySelector('button[data-ratio="1:1"]');
+            if(defaultAspectRatio) defaultAspectRatio.classList.add('active');
+            selectedAspectRatio = '1:1';
+
+            perspectiveSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            const defaultPerspective = perspectiveSelector.querySelector('button[data-perspective="frontal"]');
+            if(defaultPerspective) defaultPerspective.classList.add('active');
+            selectedPerspective = 'frontal';
+
+            directionSelector.classList.add('hidden');
+            directionSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            selectedDirection = null;
+
+            // Reseta dimensões
+            document.querySelector('input[name="text-dimension"][value="3d"]').checked = true;
+            document.querySelector('input[name="comp-dimension"][value="3d"]').checked = true;
+
+            // Limpa erros
+            clearError();
+        });
+
+        styleSelector.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            styleSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            target.classList.add('active');
+            selectedStyle = target.dataset.style;
+        });
+
+        backgroundSelector.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            const currentBg = target.dataset.bg;
+            if (target.classList.contains('active')) {
+                target.classList.remove('active');
+                selectedBackground = null;
             } else {
-                rotationDegrees.value = '';
-            }
-            
-            document.querySelector(`input[name="text-dimension"][value="${item.textDimension}"]`).checked = true;
-            document.querySelector(`input[name="comp-dimension"][value="${item.compDimension}"]`).checked = true;
-            
-            const styleRadio = document.querySelector(`input[name="style-option"][value="${item.style}"]`);
-            if (styleRadio) {
-                styleRadio.checked = true;
-            } else {
-                document.querySelector('input[name="style-option"][value="realistic"]').checked = true; // Default to realistic
-            }
-            
-            document.querySelectorAll('input[name="background-option"]').forEach(r => r.checked = false);
-            if (item.background && item.background !== 'designer\'s choice') {
-                const bgRadio = document.querySelector(`input[name="background-option"][value="${item.background}"]`);
-                if (bgRadio) bgRadio.checked = true;
-            }
-            updateIdeaButtonText();
-        };
-
-        historyContainer.addEventListener('click', (e) => {
-            const targetButton = e.target.closest('button');
-            if (!targetButton) return;
-
-            const index = targetButton.dataset.index;
-            if (targetButton.classList.contains('reuse-btn')) {
-                reuseHistoryItem(index);
-            } else if (targetButton.classList.contains('delete-prompt-btn')) {
-                deleteHistoryItem(index);
+                backgroundSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
+                selectedBackground = currentBg;
             }
         });
 
-        // Limpar Formulário
-        const clearForm = () => {
-            textInput.value = '';
-            themeInput.value = '';
-            detailsInput.value = '';
-            rotationDegrees.value = '';
-            detailsInput.style.height = '';
+        aspectRatioSelector.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            aspectRatioSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            target.classList.add('active');
+            selectedAspectRatio = target.dataset.ratio;
+        });
+
+        perspectiveSelector.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            perspectiveSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            target.classList.add('active');
+            selectedPerspective = target.dataset.perspective;
+
+            if (selectedPerspective === 'perspective') {
+                directionSelector.classList.remove('hidden');
+            } else {
+                directionSelector.classList.add('hidden');
+                directionSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                selectedDirection = null;
+            }
+        });
+
+        directionSelector.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
             
-            document.querySelectorAll('input[name="background-option"]').forEach(radio => radio.checked = false);
-            document.querySelectorAll('input[name="angle-option"]').forEach(radio => radio.checked = false);
-            document.querySelectorAll('input[name="rotation-direction"]').forEach(radio => radio.checked = false);
+            if (target.classList.contains('active')) {
+                target.classList.remove('active');
+                selectedDirection = null;
+            } else {
+                directionSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                target.classList.add('active');
+                selectedDirection = target.dataset.direction;
+            }
+        });
 
-            document.querySelector('input[value="3d"][name="text-dimension"]').checked = true;
-            document.querySelector('input[value="3d"][name="comp-dimension"]').checked = true;
-            document.querySelector('input[value="realistic"]').checked = true;
+        function setLoadingState(button, isLoading, loadingText) {
+            button.disabled = isLoading;
+            if (!button.dataset.originalText) button.dataset.originalText = button.textContent;
+            button.textContent = isLoading ? loadingText : button.dataset.originalText;
+        }
+        
+        function showError(message) { errorMessage.textContent = message; }
+        function clearError() { errorMessage.textContent = ''; }
 
-            promptsContainer.innerHTML = '';
-            filterButtonsContainer.innerHTML = '';
-            filterButtonsWrapper.classList.add('hidden');
-            promptsLabel.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-            initialMessage.classList.remove('hidden');
-            
-            imagePreviewContainer.classList.add('hidden');
-            imageUpload.value = '';
-            currentBase64ImageData = null;
-            currentMimeType = null;
-            updateIdeaButtonText();
-        };
+        // --- Funções da API ---
 
-        clearBtn.addEventListener('click', clearForm);
-
-        function getBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const base64String = reader.result.split(',')[1];
-                    resolve(base64String);
-                };
-                reader.onerror = (event) => {
-                    console.error("FileReader error object:", event);
-                    console.error("Detalhes do erro do FileReader:", reader.error);
-                    reject(new Error('Não foi possível ler o arquivo. Pode estar corrompido ou o navegador bloqueou a leitura.'));
-                };
-                reader.readAsDataURL(file);
-            });
+        async function fetchWithExponentialBackoff(url, options, maxRetries = 5, baseDelay = 1000) {
+            let attempt = 0;
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return response.json();
+                    if (response.status >= 400 && response.status < 600) {
+                         const errorBody = await response.json();
+                         throw new Error(`Erro na API: ${errorBody.error?.message || response.statusText}`);
+                    }
+                } catch (error) {
+                    if (attempt === maxRetries - 1) throw error;
+                    const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                attempt++;
+            }
+            throw new Error("Falha na chamada da API após múltiplas tentativas.");
         }
 
-        imageUpload.addEventListener('change', async function() {
-            currentBase64ImageData = null;
-            currentMimeType = null;
-            if (this.files && this.files[0]) {
-                const file = this.files[0];
+        // --- Fluxo de Geração (Passos 1-3) ---
+
+        imageUploadInput.addEventListener('change', () => {
+            const file = imageUploadInput.files[0];
+            if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    imagePreview.setAttribute('src', e.target.result);
-                    imagePreviewContainer.classList.remove('hidden');
+                    imagePreview.src = e.target.result;
+                    imagePreview.dataset.mimeType = file.type;
+                    imagePreview.classList.remove('hidden');
+                    describeImageBtn.disabled = false;
+                    clearError();
                 };
                 reader.readAsDataURL(file);
-
-                try {
-                    currentBase64ImageData = await getBase64(file);
-                    currentMimeType = file.type;
-                    errorMessage.classList.add('hidden');
-                } catch (error) {
-                    console.error("Erro ao pré-processar a imagem:", error);
-                    errorMessage.textContent = error.message || "Não foi possível ler o arquivo selecionado.";
-                    errorMessage.classList.remove('hidden');
-                    imagePreview.setAttribute('src', '#');
-                    imagePreviewContainer.classList.add('hidden');
-                }
             }
         });
-        
-        const adjustTextareaHeight = (element) => {
-            element.style.height = 'auto';
-            element.style.height = (element.scrollHeight) + 'px';
-        };
 
         describeImageBtn.addEventListener('click', async () => {
-            if (!currentBase64ImageData) {
-                errorMessage.textContent = 'Por favor, selecione uma imagem válida primeiro.';
-                errorMessage.classList.remove('hidden');
-                return;
+            if (!imagePreview.src) return showError("Nenhuma imagem selecionada.");
+            const base64Data = imagePreview.src.split(',')[1];
+            const mimeType = imagePreview.dataset.mimeType;
+            if (!base64Data || !mimeType) return showError("Não foi possível ler a imagem.");
+
+            setLoadingState(describeImageBtn, true, 'Analisando...');
+            clearError();
+            promptOutput.value = "IA realizando análise técnica da imagem...";
+            
+            const coreVisionPrompt = `As a senior art director, perform an exhaustive analysis of the provided image to create a detailed creative brief. The output MUST be a valid JSON object with the key "details". "details": Provide an exhaustive, comma-separated list in ENGLISH describing every visual aspect for a master artist... (cover typography, composition, characters, elements, color, lighting, materials).`;
+            let visionPrompt = "";
+
+            switch (selectedStyle) {
+                case 'illustration':
+                    visionPrompt = `Analyze this image from the perspective of creating a beautiful, detailed illustration. Focus on line work, color palette, texture, and artistic style. ${coreVisionPrompt}`;
+                    break;
+                case 'cartoon':
+                    visionPrompt = `Analyze this image to describe it as a stylized cartoon. Focus on exaggerated features, bold outlines, simplified shapes, and vibrant color schemes. ${coreVisionPrompt}`;
+                    break;
+                case 'realistic':
+                default:
+                    visionPrompt = `Analyze this image to describe it with extreme photorealism in mind. Focus on intricate details, realistic lighting, shadows, textures, and materials. ${coreVisionPrompt}`;
+                    break;
             }
 
-            describeImageBtn.disabled = true;
-            describeIcon.classList.add('hidden');
-            describeLoader.classList.remove('hidden');
-            describeBtnText.textContent = 'ANALISANDO...';
-            errorMessage.classList.add('hidden');
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+            const payload = { contents: [{ parts: [ { text: visionPrompt }, { inlineData: { mimeType, data: base64Data } } ] }], generationConfig: { responseMimeType: "application/json" } };
 
-            const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
-            let visionPrompt = '';
-            
-            if (compDimension === '2d') {
-                visionPrompt = `
-                    As a senior art director, perform an exhaustive analysis of the provided image to create a detailed creative brief for recreating it as a 2D sticker.
-                    The output MUST be a valid JSON object with three keys: "text", "theme", and "details".
-
-                    1.  **"text"**: Analyze the image to identify the most prominent text. Extract this text *exactly* as it appears, including capitalization and punctuation. If no text is present, return an empty string.
-                    2.  **"theme"**: Based on the overall visual style, characters, and elements, define a concise, two-to-three-word theme in Portuguese.
-                    3.  **"details"**: Provide a comprehensive, comma-separated list in English describing every visual aspect for a master illustrator. This is a professional design brief. Be specific and cover these points:
-                        * **Typography Analysis:** Describe the font style (e.g., bold sans-serif, playful script, hand-drawn). Describe its visual treatment: thick outlines, drop shadows, gradients, textures within the letters.
-                        * **Composition & Structure:** Describe the layout. Is it centered, asymmetrical? How do the elements frame the text? What is the overall shape of the sticker?
-                        * **Characters & Mascots:** Identify any characters. Describe their style (e.g., chibi, cartoon, realistic), pose, expression, and interaction with the text.
-                        * **Supporting Elements:** List all other decorative elements (e.g., flowers, stars, splash effects, background patterns).
-                        * **Color Palette & Line Art:** List the dominant colors. Describe the line art style (e.g., clean vector lines, rough sketchy outlines, no outlines).
-                `;
-            } else { // 3D
-                visionPrompt = `
-                    As a senior 3D art director, perform an exhaustive analysis of the provided image to create a detailed creative brief for recreating it as a photorealistic 3D emblem.
-                    The output MUST be a valid JSON object with three keys: "text", "theme", and "details".
-
-                    1.  **"text"**: Analyze the image to identify the most prominent text. Extract this text *exactly* as it appears, including capitalization and punctuation. If no text is present, return an empty string.
-                    2.  **"theme"**: Based on the overall visual style, characters, and elements, define a concise, two-to-three-word theme in Portuguese.
-                    3.  **"details"**: Provide an exhaustive, comma-separated list in English describing every visual aspect. This is a creative brief for a master 3D artist. Be specific and cover these points:
-                        * **Typography Analysis (CRITICAL):** Describe the font of the extracted text. Is it serif, sans-serif, script? What is its weight (bold, light)? Describe its 3D properties: extrusion depth, bevel style (rounded, sharp), outlines, inlays.
-                        * **Composition & Structure:** Describe the overall shape of the emblem. How are the elements layered? What forms the backplate or container for the text?
-                        * **Characters & Mascots:** Identify any characters. Describe their pose, expression, and interaction with the text.
-                        * **Supporting Elements:** List all other decorative elements (shapes, swirls, icons, etc.) and their materials.
-                        * **Color Palette:** List the primary, secondary, and accent colors.
-                        * **Lighting & Materials:** Describe the lighting setup (e.g., dramatic top-down key light, soft ambient occlusion, colored rim lights) and the textures of all surfaces (PBR materials like glossy, matte, metallic).
-                `;
-            }
-            
             try {
-                const base64ImageData = currentBase64ImageData;
-                const apiKey = ""; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{ parts: [{ text: visionPrompt }, { inlineData: { mimeType: currentMimeType, data: base64ImageData } }] }],
-                    generationConfig: { responseMimeType: "application/json" }
-                };
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const result = await response.json();
-                const descriptionText = result.candidates[0].content.parts[0].text;
-                const descriptionJson = JSON.parse(descriptionText);
-                textInput.value = descriptionJson.text || '';
-                themeInput.value = descriptionJson.theme || '';
-                detailsInput.value = descriptionJson.details || '';
-                adjustTextareaHeight(detailsInput);
-                updateIdeaButtonText();
-                generateBtn.click(); // Ativa o botão de gerar prompts
+                const result = await fetchWithExponentialBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (responseText) {
+                    const descriptionJson = JSON.parse(responseText);
+                    let finalDescription = descriptionJson.details || 'A IA não conseguiu extrair detalhes.';
+                    
+                    // Adiciona a informação do fundo, se selecionada
+                    if (selectedBackground === 'black') {
+                        finalDescription += ", on a solid black background";
+                    } else if (selectedBackground === 'white') {
+                        finalDescription += ", on a solid white background";
+                    } else if (selectedBackground === 'transparent') {
+                        finalDescription += ", with a transparent background";
+                    }
+
+                    promptOutput.value = finalDescription;
+                    copyPromptBtn.disabled = false;
+                    generatePromptBtn.textContent = 'Gerar Prompt com Descrição';
+                    generatePromptBtn.dataset.mode = 'description';
+                    document.getElementById('generate-by-renderer-btn').classList.remove('hidden');
+                } else throw new Error("A resposta da IA estava vazia.");
             } catch (error) {
-                console.error("Erro ao descrever a imagem:", error);
-                errorMessage.textContent = error.message || "Não foi possível analisar a imagem. Tente um arquivo diferente.";
-                errorMessage.classList.remove('hidden');
+                console.error("Erro ao descrever imagem:", error);
+                showError("Não foi possível analisar a imagem.");
+                promptOutput.value = "";
             } finally {
-                describeImageBtn.disabled = false;
-                describeIcon.classList.remove('hidden');
-                describeLoader.classList.add('hidden');
-                describeBtnText.textContent = 'DESCREVER IMAGEM';
+                setLoadingState(describeImageBtn, false, 'Descrever Imagem');
+            }
+        });
+
+        generatePromptBtn.addEventListener('click', async () => {
+            const isDescriptionMode = generatePromptBtn.dataset.mode === 'description';
+            const sourceText = isDescriptionMode ? promptOutput.value.trim() : ideaInput.value.trim();
+            if (!sourceText) return showError(isDescriptionMode ? "Descrição vazia." : "Digite uma ideia.");
+
+            setLoadingState(generatePromptBtn, true, 'Gerando...');
+            clearError();
+            promptOutput.value = "IA transformando em prompt profissional...";
+            
+            const quotedTextMatches = sourceText.match(/"([^"]*)"/g);
+            let languageExceptionClause = "";
+            if (quotedTextMatches && quotedTextMatches.length > 0) {
+                const cleanMatches = quotedTextMatches.map(match => match.replace(/"/g, ''));
+                languageExceptionClause = ` IMPORTANT RULE: The following specific Portuguese phrases MUST remain in Portuguese and must NOT be translated to English. Keep them exactly as they are: ${JSON.stringify(cleanMatches)}. Integrate them naturally into the final English prompt.`;
+            }
+
+            let systemPrompt = "";
+            switch (selectedStyle) {
+                case 'illustration':
+                    systemPrompt = "You are an expert AI prompt engineer. Transform the following description into a detailed, high-quality, professional prompt for an image generation model. The final prompt MUST be in English, a concise, single paragraph, focusing on creating a beautiful and detailed illustration.";
+                    break;
+                case 'cartoon':
+                    systemPrompt = "You are an expert AI prompt engineer. Transform the following description into a detailed, high-quality, professional prompt for an image generation model. The final prompt MUST be in English, a concise, single paragraph, designed to generate a fun, stylized cartoon image with expressive characters and vibrant colors.";
+                    break;
+                case 'realistic':
+                default:
+                    systemPrompt = "You are an expert AI prompt engineer. Transform the following description into a detailed, high-quality, professional prompt for an image generation model. The final prompt MUST be in English, a concise, single paragraph. Generate a breathtaking, photorealistic image highly similar to the one described. Output only the final English prompt.";
+                    break;
+            }
+            
+            systemPrompt += languageExceptionClause;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+            const payload = { contents: [{ parts: [{ text: sourceText }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+
+            try {
+                const result = await fetchWithExponentialBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (generatedText) {
+                    promptOutput.value = generatedText.trim();
+                    copyPromptBtn.disabled = false;
+                    document.getElementById('generate-by-renderer-btn').classList.remove('hidden');
+                } else throw new Error("A resposta da IA estava vazia.");
+            } catch (error) {
+                showError("Não foi possível gerar o prompt.");
+                promptOutput.value = sourceText;
+            } finally {
+                const originalText = isDescriptionMode ? 'Gerar Prompt com Descrição' : 'Gerar Prompt com a Ideia';
+                setLoadingState(generatePromptBtn, false, originalText);
             }
         });
         
-        const updateIdeaButtonText = () => {
-            if (detailsInput.value.trim() !== '') {
-                ideaBtnText.textContent = 'MELHORAR IDEIAS';
-            } else {
-                ideaBtnText.textContent = 'GERAR IDEIAS';
+        copyPromptBtn.addEventListener('click', () => copyToClipboard(promptOutput.value, copyPromptBtn));
+
+        // --- Fluxo de Geração de Imagens (Botão Principal) ---
+        generateImageBtn.addEventListener('click', async () => {
+            const userPrompt = promptOutput.value.trim();
+            if (!userPrompt) return showError("Crie um prompt primeiro.");
+
+            setLoadingState(generateImageBtn, true, 'Gerando Imagens...');
+            clearError();
+            showImagesLoading();
+            
+            const finalPrompt = applyModifiersToPrompt(userPrompt);
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}`;
+            const payload = { instances: [{ prompt: finalPrompt }], parameters: { sampleCount: 4, aspectRatio: selectedAspectRatio } };
+
+            try {
+                const result = await fetchWithExponentialBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (result.predictions && result.predictions.length > 0) {
+                    displayImages(result.predictions);
+                } else {
+                    showImagesPlaceholder("Nenhuma imagem foi retornada.");
+                    throw new Error("Nenhum dado de imagem recebido.");
+                }
+            } catch (error) {
+                showImagesPlaceholder("Falha ao gerar imagens.");
+                showError("Falha ao gerar as imagens. Tente novamente.");
+            } finally {
+                setLoadingState(generateImageBtn, false, 'Gerar 4 Imagens');
             }
-        };
+        });
 
-        detailsInput.addEventListener('input', updateIdeaButtonText);
+        document.getElementById('generate-by-renderer-btn').addEventListener('click', async () => {
+            const userPrompt = promptOutput.value.trim();
+            if (!userPrompt) return showError("Crie um prompt primeiro.");
+            await generatePromptsByRenderer(userPrompt);
+        });
 
-        generateIdeasBtn.addEventListener('click', async () => {
-            const file = imageUpload.files[0];
-            const theme = themeInput.value;
-            const text = textInput.value;
-            const existingDetails = detailsInput.value.trim();
+        // --- Funções de Geração de Prompts por Estilo ---
+        
+        async function generatePromptsByRenderer(details) {
             const textDimension = document.querySelector('input[name="text-dimension"]:checked').value;
             const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
-            const style = document.querySelector('input[name="style-option"]:checked').value;
-            const angle = document.querySelector('input[name="angle-option"]:checked')?.value;
-            const degrees = rotationDegrees.value;
-            let rotation = '';
-            if (degrees && document.querySelector('input[name="rotation-direction"]:checked')) {
-                const direction = document.querySelector('input[name="rotation-direction"]:checked').value;
-                rotation = `${degrees} graus à ${direction}`;
-            }
-            const background = document.querySelector('input[name="background-option"]:checked')?.value || 'designer\'s choice';
+            const params = { details, textDimension, compDimension };
 
+            setLoadingState(generateImageBtn, true, 'Gerando Prompts...');
+            clearError();
+            stylesPlaceholder.classList.add('hidden');
+            promptsContainer.innerHTML = '';
+            filterButtons.innerHTML = '';
+            filterButtonsWrapper.classList.add('hidden');
+            showImagesPlaceholder("Selecione um estilo e gere as imagens.");
+            
+            if (textDimension === '3d' && compDimension === '3d') await generate3DPrompts(params);
+            else if (textDimension === '2d' && compDimension === '2d') await generate2DPrompts(params);
+            else if (textDimension === '3d' && compDimension === '2d') await generateMixed3DText2DCompPrompts(params);
+            else await generateMixed2DText3DCompPrompts(params);
 
-            // Inicia o estado de carregamento da UI
-            generateIdeasBtn.disabled = true;
-            ideaLoader.classList.remove('hidden');
-            ideaIcon.classList.add('hidden');
-            ideaCheck.classList.add('hidden');
-            errorMessage.classList.add('hidden');
+            setLoadingState(generateImageBtn, false, 'Gerar Prompts por Renderizador');
+        }
 
-            let ideasPrompt = '';
-            let payload;
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            if (file) {
-                ideaBtnText.textContent = 'ANALISANDO...';
-                if (!theme) {
-                     errorMessage.textContent = 'Para gerar ideias a partir de uma imagem, preencha o campo "Tema".';
-                     errorMessage.classList.remove('hidden');
-                     generateIdeasBtn.disabled = false;
-                     ideaLoader.classList.add('hidden');
-                     ideaIcon.classList.remove('hidden');
-                     updateIdeaButtonText();
-                     return;
-                }
-                if (!currentBase64ImageData) {
-                    errorMessage.textContent = 'A imagem selecionada não pôde ser lida. Por favor, tente novamente.';
-                    errorMessage.classList.remove('hidden');
-                    generateIdeasBtn.disabled = false;
-                    ideaLoader.classList.add('hidden');
-                    ideaIcon.classList.remove('hidden');
-                    updateIdeaButtonText();
-                    return;
-                }
-
-                const base64ImageData = currentBase64ImageData;
-                const mainTextForIdeas = text ? `- Main Text for the new concept: "${text}"` : `- Main Concept: A purely illustrative design without text.`;
-                const typographyInstruction = text ? `- Similar but New Typography: Propose a different font style for the text "${text}" that still fits the theme.` : `- Illustrative Focus: Since there is no text, focus your description on the main illustrative elements that will be the centerpiece of the design.`;
-
-                ideasPrompt = `
-                    As an expert creative director specializing in variations, your task is a two-step process to generate a new, creative but similar variation inspired by a reference image.
-
-                    Inputs for your consideration:
-                    - Reference Image: [Image Data Attached]
-                    ${mainTextForIdeas}
-                    - Core Theme for the new concept: "${theme}"
-
-                    Step 1: Ultra-Detailed Internal Analysis (Do not output this part).
-                    First, perform an exhaustive technical and artistic analysis of the provided image. Mentally deconstruct its context, typography (style, 3D/2D effects), color palette, lighting scheme (highlights, shadows), overall structure (badge, logo, emblem), base shape, lines, curves, and all additional elements. Note the background type.
-
-                    Step 2: Create a Similar Variation (This is your output).
-                    Based on your detailed internal analysis, create a new design brief for a **similar but distinct variation**. Your new brief must be a single, highly detailed paragraph in ENGLISH that describes these specific modifications:
-                    ${typographyInstruction}
-                    - Similar but New Composition: Keep the core elements but change their form. Crucially, reinvent the base shape with more creativity; the base can be a complex geometric form or it can be formed from thematic elements themselves. Change its materials as well.
-                    - Similar but New Atmosphere: Adjust the lighting and color palette slightly to create a different mood while staying true to the original theme.
-
-                    Final Output:
-                    Produce a single, cohesive, and highly detailed paragraph in ENGLISH that describes this new, similar variation, ready to be used as a prompt.
-                `;
-                payload = {
-                    contents: [{ parts: [{ text: ideasPrompt }, { inlineData: { mimeType: currentMimeType, data: base64ImageData } }] }]
-                };
-            } else {
-                if (!theme || (!text && !existingDetails)) {
-                    errorMessage.textContent = 'Preencha o "Tema" e também o "Texto Principal" ou os "Detalhes Adicionais" para gerar ideias.';
-                    errorMessage.classList.remove('hidden');
-                    generateIdeasBtn.disabled = false;
-                    ideaLoader.classList.add('hidden');
-                    ideaIcon.classList.remove('hidden');
-                    updateIdeaButtonText();
-                    return;
-                }
+        async function executePromptGeneration(params, masterPrompt, keys, type) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+            const payload = { contents: [{ parts: [{ text: masterPrompt }] }], generationConfig: { responseMimeType: "application/json" } };
+            
+            try {
+                const result = await fetchWithExponentialBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const responseText = result.candidates[0].content.parts[0].text;
+                const generatedPrompts = JSON.parse(responseText).prompts;
+                if (generatedPrompts.length !== keys.length) throw new Error(`A IA não retornou ${keys.length} prompts.`);
                 
-                ideaBtnText.textContent = existingDetails ? 'MELHORANDO...' : 'GERANDO...';
-                
-                if (existingDetails) {
-                    const mainTextContext = text ? `- Main Text: "${text}"` : `- Main Concept: No text, purely illustrative.`;
-                    ideasPrompt = `
-                        As an elite-level creative director, your task is to take the user's initial concept and elevate it into an incredibly detailed and cohesive final design brief, using all provided context.
-
-                        User's Initial Idea (The Foundation):
-                        "${existingDetails}"
-
-                        Context for Enhancement (Your Guiding Principles):
-                        ${mainTextContext}
-                        - Core Theme: "${theme}"
-                        - Text Dimension: "${textDimension}"
-                        - Composition Dimension: "${compDimension}"
-                        - Artistic Style: "${style}"
-                        - View Angle: "${angle || 'Not specified'}"
-                        - Text Rotation: "${rotation || 'Not specified'}"
-                        - Background: "${background}"
-
-                        Your Mission:
-                        Refine and expand upon the user's core idea. Focus on:
-                        1.  Composition: Make the arrangement more dynamic, aligning with the specified angle and rotation.
-                        2.  Texture & Materials: Enhance surface descriptions to be more vivid and tactile.
-                        3.  Colors & Lighting: Refine the color palette and describe the lighting in greater detail to create a specific mood.
-                        4.  Cohesion: Ensure all elements work together perfectly to express the "${theme}".
-
-                        Final Output:
-                        Produce a single, cohesive, and incredibly detailed paragraph in ENGLISH that represents the improved and finalized creative brief.
+                document.getElementById('filter-title').textContent = type.includes('3D') || type.includes('TEXTO 2D') ? 'NAVEGAR POR RENDERIZADOR:' : 'NAVEGAR POR ESTILO:';
+                generatedPrompts.forEach((promptText, index) => {
+                    const keyName = keys[index];
+                    const card = document.createElement('div');
+                    card.className = `prompt-card bg-gray-700 p-4 rounded-lg shadow-md flex-col ${index === 0 ? 'flex' : 'hidden'}`;
+                    card.dataset.key = keyName;
+                    // Corrige palavras juntas (ex: "ActionFigure" -> "Action Figure")
+                    const processedPromptText = promptText.replace(/([a-z])([A-Z])/g, '$1 $2');
+                    card.innerHTML = `
+                        <h3 class="text-lg font-semibold text-indigo-400 mb-2">${keyName.toUpperCase()}</h3>
+                        <textarea class="prompt-text-area w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-gray-300 flex-grow text-sm leading-relaxed" rows="12">${processedPromptText}</textarea>
+                        <div class="flex gap-2 mt-3">
+                            <button class="copy-specific-prompt-btn flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg text-sm">Copiar</button>
+                            <button class="generate-style-images-btn flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Gerar Imagens</button>
+                        </div>
                     `;
+                    promptsContainer.appendChild(card);
+                    const filterButton = document.createElement('button');
+                    filterButton.className = `filter-btn bg-gray-600 border border-gray-500 text-gray-200 text-xs font-semibold py-1 px-3 rounded-md hover:bg-indigo-500 transition-colors ${index === 0 ? 'active' : ''}`;
+                    filterButton.textContent = keyName.toUpperCase();
+                    filterButton.dataset.targetKey = keyName;
+                    filterButtons.appendChild(filterButton);
+                });
+                filterButtonsWrapper.classList.remove('hidden');
+                // Gera a imagem para o primeiro estilo automaticamente
+                const firstCard = promptsContainer.querySelector('.prompt-card');
+                if (firstCard) {
+                     const promptText = firstCard.querySelector('.prompt-text-area').value;
+                     const generateBtn = firstCard.querySelector('.generate-style-images-btn');
+                     generateImagesForStyle(promptText, generateBtn);
+                }
+            } catch (error) {
+                showError(`Erro ao gerar os prompts ${type}.`);
+                stylesPlaceholder.classList.remove('hidden');
+                console.error(`Erro em ${type}:`, error);
+            }
+        }
+
+        const coreDirectives = (params) => `CORE DIRECTIVES: Must be a self-contained badge/emblem/logo. The "Additional Details" is the source of truth, FAITHFULLY translate this description. Adapt, do not invent new concepts. Ensure compound words are correctly spaced (e.g., "baile funk", not "bailefunk").`;
+        
+        async function generate2DPrompts(params) {
+            const styles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style', 'Hearthstone', 'Arcane', 'Guilty Gear', 'Genshin Impact', 'Tower of Fantasy'];
+            const masterPrompt = `Objective: Generate 11 distinct prompts for a 2D image AI to create a self-contained badge emblem logo. Details from user: "${params.details}". ${coreDirectives(params)} Create 11 prompts for these styles: ${styles.join(', ')}. Adapt the core concept to each style's conventions (e.g., for 'Procreate', describe a digital painting look with rich textures; for 'Sticker Style', describe a die-cut look with a thick white border; for 'Hearthstone', describe a highly detailed 2D cartoon-fantasy digital painting with vibrant, saturated colors, soft outlines, delicate shadows, and dramatic lighting, mimicking the polished, epic, and magical art style of the game Hearthstone; for 'Arcane', describe a detailed and cinematic 2D digital painting in the style of the series Arcane: League of Legends, featuring rich textures, visible brushstrokes, intense yet harmonious colors, and dramatic, cinematic lighting with strong contrasts, conveying emotion and intensity with stylized realism; for 'Guilty Gear', describe a stylized and dynamic 2D digital art piece that simulates 3D cell shading, in the style of Guilty Gear: STRIVE, with strong lines, vibrant colors, and marked anime-style shading, featuring a dramatic, high-energy pose, cinematic lighting, and exaggerated expressiveness; for 'Genshin Impact', describe a highly detailed fantasy anime-style illustration with soft, vibrant colors, delicate digital painting, atmospheric lighting, and fine lines, conveying a magical, poetic, and ethereal feel with ornate fantasy details and a polished look; for 'Tower of Fantasy', describe a highly detailed futuristic anime-style illustration with clean lines, vibrant and saturated colors, clear lighting, and smooth shading, mixing fantasy and technology with stylized outfits, tech armor, and a modern, polished sci-fi aesthetic). Output Format: JSON with a "prompts" array of 11 strings.`;
+            await executePromptGeneration(params, masterPrompt, styles, '2D');
+        }
+        async function generate3DPrompts(params) {
+            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5', 'Hyperion Render', 'Cinematic Reality'];
+            const masterPrompt = `Objective: Generate 8 professional prompts for 3D renderers to create a self-contained badge emblem logo. Details from user: "${params.details}". ${coreDirectives(params)} Create 8 prompts for these renderers: ${renderers.join(', ')}. For 'Hyperion Render', describe a prompt that combines the hyper-detailed organic sculpting of ZBrush with the photorealistic deferred rendering, global illumination, and advanced material properties (PBR, displacement) of Unreal Engine 5, mentioning the use of the Movie Render Queue for final output. For 'Cinematic Reality', describe a composite image where a photorealistic 3D render of ONLY the text is placed ON TOP OF a real, ultra-realistic photograph. The background MUST be explicitly described as a high-end DSLR photograph of the composition elements. The 3D text should be seamlessly integrated. Emphasize cinematic lighting, shallow depth of field that slightly blurs the photographic background, and professional color grading to make the text pop. The final result must look like a polished commercial advertisement. Output Format: JSON with a "prompts" array of 8 strings.`;
+            await executePromptGeneration(params, masterPrompt, renderers, '3D');
+        }
+        async function generateMixed3DText2DCompPrompts(params) {
+            const styles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style', 'Hearthstone', 'Arcane', 'Guilty Gear', 'Genshin Impact', 'Tower of Fantasy'];
+            const masterPrompt = `Objective: Generate 11 prompts for a 2D image AI, creating a "trompe-l'oeil" effect self-contained badge emblem logo. Details from user: "${params.details}". ${coreDirectives(params)} The text must be described as a photorealistic 3D object, while the characters and composition elements must be 2D. Create 11 prompts for these 2D composition styles: ${styles.join(', ')}. Emphasize the 3D text vs 2D background contrast (e.g., for 'Hearthstone', describe a highly detailed 2D cartoon-fantasy digital painting with vibrant, saturated colors, soft outlines, delicate shadows, and dramatic lighting, mimicking the polished, epic, and magical art style of the game Hearthstone; for 'Arcane', describe a detailed and cinematic 2D digital painting in the style of the series Arcane: League of Legends, featuring rich textures, visible brushstrokes, intense yet harmonious colors, and dramatic, cinematic lighting with strong contrasts, conveying emotion and intensity with stylized realism; for 'Guilty Gear', describe a stylized and dynamic 2D digital art piece that simulates 3D cell shading, in the style of Guilty Gear: STRIVE, with strong lines, vibrant colors, and marked anime-style shading, featuring a dramatic, high-energy pose, cinematic lighting, and exaggerated expressiveness; for 'Genshin Impact', describe a highly detailed fantasy anime-style illustration with soft, vibrant colors, delicate digital painting, atmospheric lighting, and fine lines, conveying a magical, poetic, and ethereal feel with ornate fantasy details and a polished look; for 'Tower of Fantasy', describe a highly detailed futuristic anime-style illustration with clean lines, vibrant and saturated colors, clear lighting, and smooth shading, mixing fantasy and technology with stylized outfits, tech armor, and a modern, polished sci-fi aesthetic). Output Format: JSON with a "prompts" array of 11 strings.`;
+            await executePromptGeneration(params, masterPrompt, styles, 'MISTO (TEXTO 3D)');
+        }
+        async function generateMixed2DText3DCompPrompts(params) {
+            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5', 'Hyperion Render', 'Cinematic Reality'];
+            const masterPrompt = `Objective: Generate 8 prompts for 3D renderers to create a self-contained badge emblem logo. Details from user: "${params.details}". ${coreDirectives(params)} The text must be described as a flat 2D graphic (decal, print) on a surface, while the characters and composition elements are photorealistic 3D. Create 8 prompts for these renderers: ${renderers.join(', ')}. For 'Hyperion Render', describe a prompt that combines the hyper-detailed organic sculpting of ZBrush for the composition elements with the photorealistic deferred rendering of Unreal Engine 5, mentioning the use of the Movie Render Queue. For 'Cinematic Reality', describe an ultra-photorealistic prompt emulating a high-end DSLR camera shot with a prime lens for the 3D elements, emphasizing cinematic lighting, shallow depth of field, natural film grain, and professional color grading, ensuring the 2D text looks like a perfect, crisp decal on the realistic surface. Output Format: JSON with a "prompts" array of 8 strings.`;
+            await executePromptGeneration(params, masterPrompt, renderers, 'MISTO (TEXTO 2D)');
+        }
+        
+        // --- Interação com as Colunas 2 e 3 ---
+
+        stylesColumn.addEventListener('click', async (e) => {
+            const target = e.target;
+            const filterButton = target.closest('.filter-btn');
+            const copyButton = target.closest('.copy-specific-prompt-btn');
+            const generateStyleButton = target.closest('.generate-style-images-btn');
+
+            if (filterButton) {
+                const targetKey = filterButton.dataset.targetKey;
+                filterButtons.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                filterButton.classList.add('active');
+                
+                let activeCard;
+                promptsContainer.querySelectorAll('.prompt-card').forEach(card => {
+                    const isTarget = card.dataset.key === targetKey;
+                    card.classList.toggle('hidden', !isTarget);
+                    card.classList.toggle('flex', isTarget);
+                    if(isTarget) activeCard = card;
+                });
+
+                // Gera imagem automaticamente ao selecionar o estilo
+                if (activeCard) {
+                    const promptText = activeCard.querySelector('.prompt-text-area').value;
+                    const generateBtn = activeCard.querySelector('.generate-style-images-btn');
+                    if (!generateBtn.disabled) {
+                        await generateImagesForStyle(promptText, generateBtn);
+                    }
+                }
+            }
+            if (copyButton) {
+                const card = copyButton.closest('.prompt-card');
+                const textToCopy = card.querySelector('.prompt-text-area').value;
+                copyToClipboard(textToCopy, copyButton);
+            }
+            if (generateStyleButton) {
+                const card = generateStyleButton.closest('.prompt-card');
+                const promptText = card.querySelector('.prompt-text-area').value;
+                await generateImagesForStyle(promptText, generateStyleButton);
+            }
+        });
+
+        async function generateImagesForStyle(promptText, button) {
+            setLoadingState(button, true, 'Gerando...');
+            showImagesLoading();
+            const finalPrompt = applyModifiersToPrompt(promptText);
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}`;
+            const payload = { instances: [{ prompt: finalPrompt }], parameters: { sampleCount: 4, aspectRatio: selectedAspectRatio } };
+            try {
+                const result = await fetchWithExponentialBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (result.predictions && result.predictions.length > 0) {
+                    displayImages(result.predictions);
                 } else {
-                    const mainTextSpec = text ? `- Main Text: "${text}"` : `- Main Concept: No text, purely illustrative.`;
-                    const typographyTask = text
-                        ? `2.  Thematic Typography: Invent a highly creative and thematic font style for the text "${text}". The letters themselves should be made of materials or have textures that embody the "${theme}". Describe this in detail.`
-                        : `2.  Central Illustration: Since there is no text, invent a central, iconic character or symbol that powerfully represents the "${theme}". This will be the main focus of the emblem. Describe it in detail.`;
-
-                    ideasPrompt = `
-                        As an elite-level creative director, your task is to conceptualize a complete and ultra-detailed design brief for a badge, logo, or emblem from scratch, based on the user's specifications.
-
-                        User's Specifications:
-                        ${mainTextSpec}
-                        - Core Theme: "${theme}"
-                        - Text Dimension: "${textDimension}"
-                        - Composition Dimension: "${compDimension}"
-                        - Artistic Style: "${style}"
-                        - View Angle: "${angle || 'Not specified'}"
-                        - Text Rotation: "${rotation || 'Not specified'}"
-                        - Background: "${background}"
-
-                        Your Task:
-                        Generate a single, cohesive paragraph in ENGLISH that describes a visually stunning badge, logo, or emblem, synthesizing all specifications:
-                        1.  Core Concept: The final piece must be a self-contained badge, logo, or emblem.
-                        ${typographyTask}
-                        3.  Creative Base Design: Design a unique and complex base or frame for the emblem. The base can be a complex geometric form or formed from thematic elements.
-                        4.  Rich Composition: Describe how all elements are integrated into this base to create a rich, layered composition.
-                        5.  Style and Realism: The aesthetic must match the selected "${style}".
-                        6.  Lighting and Texture: Describe the lighting setup and surface textures to enhance the theme.
-                        7.  Angle and Position: Incorporate the specified view angle and text rotation.
-
-                        Final Output:
-                        A single, detailed paragraph in ENGLISH that can be used as a high-quality prompt.
-                    `;
+                    showImagesPlaceholder("Nenhuma imagem foi retornada.");
                 }
-                payload = { contents: [{ parts: [{ text: ideasPrompt }] }] };
+            } catch (error) {
+                showImagesPlaceholder("Falha ao gerar imagens para este estilo.");
+                console.error(error);
+            } finally {
+                setLoadingState(button, false, 'Gerar Imagens');
             }
+        }
+
+        // --- Funções de Exibição de Imagens e Interação ---
+
+        function applyModifiersToPrompt(prompt) {
+            let modifiedPrompt = prompt;
+
+            // Perspectiva
+            if (selectedPerspective === 'frontal') {
+                modifiedPrompt = `orthographic front view, straight-on shot, centered, no perspective distortion, (${modifiedPrompt})`;
+            } else if (selectedPerspective === 'perspective') {
+                let perspectiveTerm = 'dynamic perspective view';
+                if (selectedDirection === 'left') perspectiveTerm = 'view from the right, looking left';
+                else if (selectedDirection === 'right') perspectiveTerm = 'view from the left, looking right';
+                else if (selectedDirection === 'up') perspectiveTerm = 'view from below, looking up, low angle shot';
+                else if (selectedDirection === 'down') perspectiveTerm = 'view from above, looking down, high angle shot';
+                modifiedPrompt = `${perspectiveTerm}, rule of thirds, (${modifiedPrompt})`;
+            }
+
+            // Fundo
+            if (selectedBackground === 'black') modifiedPrompt = `(${modifiedPrompt}) isolated on a solid, pure black background (#000000), clean, no gradients, no textures, studio lighting, no shadows on background.`;
+            else if (selectedBackground === 'white') modifiedPrompt = `(${modifiedPrompt}) isolated on a solid, pure white background (#FFFFFF), clean, no gradients, no textures, studio lighting, no shadows on background.`;
+            else if (selectedBackground === 'transparent') modifiedPrompt = `PNG image of (${modifiedPrompt}), professional cutout, 100% transparent background (full alpha channel), perfectly isolated, remove any background, no shadows, no ground plane.`;
+            
+            return modifiedPrompt;
+        }
+
+        function showImagesLoading() {
+            imageGrid.classList.add('hidden');
+            imagePlaceholder.classList.add('hidden');
+            loader.classList.remove('hidden');
+        }
+        function showImagesPlaceholder(message) {
+            imageGrid.classList.add('hidden');
+            loader.classList.add('hidden');
+            imagePlaceholder.textContent = message;
+            imagePlaceholder.classList.remove('hidden');
+        }
+        function displayImages(predictions) {
+            imageGrid.innerHTML = ''; 
+            predictions.forEach(prediction => {
+                const base64Data = prediction.bytesBase64Encoded;
+                const imageUrl = `data:image/png;base64,${base64Data}`;
+                const imageElement = createImageCard(imageUrl);
+                imageGrid.appendChild(imageElement);
+            });
+            loader.classList.add('hidden');
+            imagePlaceholder.classList.add('hidden');
+            imageGrid.classList.remove('hidden');
+        }
+
+        function createImageCard(imageUrl) {
+            const wrapper = document.createElement('div');
+            const aspectRatios = {'1:1':'aspect-square','16:9':'aspect-[16/9]','9:16':'aspect-[9/16]','4:3':'aspect-[4/3]','3:4':'aspect-[3/4]'};
+            let bgClass = selectedBackground === 'transparent' ? ' checkerboard' : '';
+            const aspectRatioClass = aspectRatios[selectedAspectRatio] || 'aspect-square';
+            wrapper.className = `relative group w-full h-full rounded-lg ${aspectRatioClass}${bgClass}`;
+            wrapper.innerHTML = `
+                <img src="${imageUrl}" alt="Imagem gerada" class="w-full h-full object-contain rounded-lg cursor-pointer" data-transparent="${selectedBackground === 'transparent'}">
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 rounded-lg p-2 flex justify-between items-end">
+                    <button title="Refinar Imagem" class="refine-btn bg-gray-800/80 hover:bg-gray-700 text-white font-semibold py-1 px-2 rounded-lg flex items-center gap-1 text-xs transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="pointer-events-none" viewBox="0 0 16 16"><path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58-1.52 0 2.1l6.516 6.516c.58.58 1.52.58 2.1 0l6.516-6.516c.58-.58.58-1.52 0-2.1L9.05.435ZM7.293 4.293a1 1 0 0 1 1.414 0L10 5.586l1.293-1.293a1 1 0 1 1 1.414 1.414L11.414 7l1.293 1.293a1 1 0 0 1-1.414 1.414L10 8.414l-1.293 1.293a1 1 0 0 1-1.414-1.414L8.586 7 7.293 5.707a1 1 0 0 1 0-1.414Z"/></svg>
+                        Refinar
+                    </button>
+                    <a href="${imageUrl}" download="imagem-ia.png" title="Download" class="download-btn bg-gray-800/80 hover:bg-gray-700 text-white font-semibold py-1 px-2 rounded-lg flex items-center gap-1 text-xs transition">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="pointer-events-none" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                       Download
+                    </a>
+                </div>
+                <div class="absolute inset-0 bg-black/70 rounded-lg flex items-center justify-center hidden spinner-overlay"><div class="loader"></div></div>
+            `;
+            return wrapper;
+        }
+        
+        imagesColumn.addEventListener('click', (e) => {
+            const imageWrapper = e.target.closest('.relative.group');
+            if (!imageWrapper) return;
+            const imageElement = imageWrapper.querySelector('img');
+
+            const refineBtn = e.target.closest('.refine-btn');
+            const downloadBtn = e.target.closest('.download-btn');
+
+            if (refineBtn) {
+                // Se o botão de refinar foi clicado, abre o modal
+                imageToRefine = imageElement;
+                refineModal.classList.remove('hidden');
+                refineInput.focus();
+            } else if (!downloadBtn) { 
+                // Se não foi o botão de download, trata como um clique para tela cheia
+                fullscreenImageElements = Array.from(imageWrapper.closest('.grid').querySelectorAll('img'));
+                currentFullscreenIndex = fullscreenImageElements.indexOf(imageElement);
+                if (currentFullscreenIndex > -1) { // Garante que a imagem foi encontrada
+                    updateFullscreenImage();
+                    fullscreenView.classList.remove('hidden');
+                }
+            }
+            // Se foi o botão de download, o comportamento padrão do link (<a>) fará o download
+        });
+        
+        confirmRefineBtn.addEventListener('click', async () => {
+            const refinementText = refineInput.value.trim();
+            if (!refinementText || !imageToRefine) return showError("Por favor, descreva a alteração.");
+            
+            const currentImageBase64 = imageToRefine.src.split(',')[1];
+            if (!currentImageBase64) return;
+
+            refineModal.classList.add('hidden');
+            const wrapper = imageToRefine.closest('.relative.group');
+            const spinner = wrapper.querySelector('.spinner-overlay');
+            spinner.classList.remove('hidden');
+
+            let finalRefinementPrompt = `Apply this edit, described in Portuguese: "${refinementText}"`;
+            const isTransparentRequest = refinementText.toLowerCase().match(/transparente|remover\s?o?\s?fundo|sem\s?fundo/);
+
+            if (isTransparentRequest) finalRefinementPrompt = `Apply this edit: "${refinementText}". The final output MUST be a PNG with a 100% transparent background (full alpha channel). Perfectly isolate the subject and remove all background elements.`;
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${API_KEY}`;
+            const payload = { contents: [{ role: "user", parts: [ { text: finalRefinementPrompt }, { inlineData: { mimeType: "image/png", data: currentImageBase64 } } ] }], generationConfig: { responseModalities: ['IMAGE'] } };
 
             try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const result = await response.json();
-                detailsInput.value = result.candidates[0].content.parts[0].text.trim();
-                adjustTextareaHeight(detailsInput);
-                ideaCheck.classList.remove('hidden');
-                ideaBtnText.textContent = 'IDEIA GERADA!';
-                updateIdeaButtonText();
-                generateBtn.click();
+                const result = await fetchWithExponentialBackoff(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                if (base64Data) {
+                    const newImageUrl = `data:image/png;base64,${base64Data}`;
+                    imageToRefine.src = newImageUrl;
+                    wrapper.querySelector('.download-btn').href = newImageUrl;
+                    if (isTransparentRequest) {
+                        imageToRefine.dataset.transparent = 'true';
+                        wrapper.classList.add('checkerboard');
+                    }
+                } else throw new Error("Nenhum dado de imagem recebido no refinamento.");
             } catch (error) {
-                console.error("Erro ao gerar/melhorar ideias:", error);
-                errorMessage.textContent = "Não foi possível processar as ideias. Tente novamente.";
-                errorMessage.classList.remove('hidden');
-                updateIdeaButtonText();
+                console.error('Erro ao refinar a imagem:', error);
+                showError("Falha ao refinar a imagem.");
             } finally {
-                generateIdeasBtn.disabled = false;
-                ideaLoader.classList.add('hidden');
+                spinner.classList.add('hidden');
+                refineInput.value = '';
+                imageToRefine = null;
             }
         });
         
-        const copyToClipboard = (text, buttonElement) => {
+        // --- Lógica de Tela Cheia ---
+        
+        function updateFullscreenImage() {
+            const currentImageElement = fullscreenImageElements[currentFullscreenIndex];
+            fullscreenImage.src = currentImageElement.src;
+            fullscreenDownloadBtn.href = currentImageElement.src;
+            fullscreenView.classList.toggle('checkerboard', currentImageElement.dataset.transparent === 'true');
+        }
+
+        function navigateFullscreen(direction) {
+            currentFullscreenIndex = (currentFullscreenIndex + direction + fullscreenImageElements.length) % fullscreenImageElements.length;
+            updateFullscreenImage();
+        }
+
+        nextFullscreenBtn.addEventListener('click', () => navigateFullscreen(1));
+        prevFullscreenBtn.addEventListener('click', () => navigateFullscreen(-1));
+        fullscreenRefineBtn.addEventListener('click', () => {
+            if (fullscreenImageElements[currentFullscreenIndex]) {
+                imageToRefine = fullscreenImageElements[currentFullscreenIndex];
+                fullscreenView.classList.add('hidden');
+                refineModal.classList.remove('hidden');
+            }
+        });
+        cancelRefineBtn.addEventListener('click', () => { refineModal.classList.add('hidden'); imageToRefine = null; });
+        closeFullscreenBtn.addEventListener('click', () => { fullscreenView.classList.add('hidden'); fullscreenImageElements = []; });
+
+        function copyToClipboard(text, buttonElement) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
             document.body.appendChild(textarea);
             textarea.select();
             try {
-                document.execCommand('copy');
-                if (buttonElement) {
+                if (document.execCommand('copy')) {
                     const originalText = buttonElement.textContent;
-                    buttonElement.textContent = 'COPIADO!';
+                    buttonElement.textContent = 'Copiado!';
                     setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
                 }
-            } catch (err) {
-                console.error('Falha ao copiar texto: ', err);
-                if (buttonElement) {
-                    const originalText = buttonElement.textContent;
-                    buttonElement.textContent = 'ERRO!';
-                    setTimeout(() => { buttonElement.textContent = originalText; }, 2000);
-                }
-            }
+            } catch (err) { showError("Falha ao copiar."); }
             document.body.removeChild(textarea);
-        };
-
-        generateBtn.addEventListener('click', async () => {
-            ideaCheck.classList.add('hidden');
-            ideaIcon.classList.remove('hidden');
-            updateIdeaButtonText();
-
-            const text = textInput.value;
-            const theme = themeInput.value;
-            const details = detailsInput.value;
-            const textDimension = document.querySelector('input[name="text-dimension"]:checked').value;
-            const compDimension = document.querySelector('input[name="comp-dimension"]:checked').value;
-            const style = document.querySelector('input[name="style-option"]:checked').value;
-            const background = document.querySelector('input[name="background-option"]:checked')?.value || 'designer\'s choice';
-            const angle = document.querySelector('input[name="angle-option"]:checked')?.value;
-            
-            const degrees = rotationDegrees.value;
-            let rotation = '';
-            if (degrees && document.querySelector('input[name="rotation-direction"]:checked')) {
-                const direction = document.querySelector('input[name="rotation-direction"]:checked').value;
-                rotation = `${degrees} graus à ${direction}`;
-            }
-
-            if (!theme || (!text && !details)) {
-                errorMessage.textContent = 'Preencha o "Tema" e também o "Texto Principal" ou os "Detalhes Adicionais".';
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-            
-            initialMessage.classList.add('hidden');
-            loader.classList.remove('hidden');
-            promptsContainer.innerHTML = '';
-            filterButtonsContainer.innerHTML = '';
-            filterButtonsWrapper.classList.add('hidden');
-            promptsLabel.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-            
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const params = { text, theme, details, style, background, textDimension, compDimension, angle, rotation, apiKey, apiUrl };
-
-            if (textDimension === '3d' && compDimension === '3d') {
-                await generate3DPrompts(params);
-            } else if (textDimension === '2d' && compDimension === '2d') {
-                await generate2DPrompts(params);
-            } else if (textDimension === '3d' && compDimension === '2d') {
-                await generateMixed3DText2DCompPrompts(params);
-            } else { // 2d text, 3d comp
-                await generateMixed2DText3DCompPrompts(params);
-            }
-        });
-
-        async function executePromptGeneration(params, masterPrompt, keys, type) {
-            const { text, theme, details, style, background, textDimension, compDimension, angle, rotation, apiKey, apiUrl } = params;
-            const payload = { contents: [{ parts: [{ text: masterPrompt }] }], generationConfig: { responseMimeType: "application/json" } };
-            
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const result = await response.json();
-                const responseText = result.candidates[0].content.parts[0].text;
-                const generatedPrompts = JSON.parse(responseText).prompts;
-
-                if (generatedPrompts.length !== keys.length) throw new Error(`A IA não retornou ${keys.length} prompts.`);
-
-                promptsLabel.classList.remove('hidden');
-                promptsLabel.textContent = `PROMPTS ${type}`;
-                filterTitle.textContent = type.includes('3D') || type.includes('TEXTO 2D') ? 'NAVEGAR POR RENDERIZADOR:' : 'NAVEGAR POR ESTILO:';
-
-                generatedPrompts.forEach((promptText, index) => {
-                    const keyName = keys[index];
-                    const card = document.createElement('div');
-                    card.className = `prompt-card bg-gray-700 p-6 rounded-lg shadow-md flex-col ${index === 0 ? 'flex' : 'hidden'}`;
-                    card.dataset.key = keyName;
-
-                    let imageSlotsHTML = '';
-                    for (let i = 1; i <= 4; i++) {
-                        imageSlotsHTML += `
-                        <div class="generated-image-wrapper group relative bg-gray-800 rounded-md flex items-center justify-center aspect-square">
-                            <!-- Loader -->
-                            <div class="image-loader absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-md z-10 hidden">
-                                <svg class="animate-spin h-6 w-6 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <p class="text-xs text-gray-300 mt-2">Gerando...</p>
-                            </div>
-                            <img class="generated-image h-full w-full object-contain rounded-md hidden" src="">
-                            <p class="image-error absolute text-red-400 text-xs hidden p-2 text-center z-10"></p>
-                            <a class="download-btn absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-full transition-opacity opacity-0 group-hover:opacity-100 hidden z-20" href="#" download="generated_image_${keyName}_${i}.png" title="Fazer Download">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            </a>
-                            <button class="refine-btn absolute bottom-2 left-2 bg-purple-600 text-white p-2 rounded-full transition-opacity opacity-0 group-hover:opacity-100 hidden z-20" title="Refinar Imagem">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
-                            </button>
-                        </div>
-                        `;
-                    }
-
-                    card.innerHTML = `
-                        <h3 class="text-xl font-semibold text-indigo-400 mb-3">${keyName.toUpperCase()}</h3>
-                        <p class="prompt-text text-gray-300 flex-grow text-sm leading-relaxed">${promptText}</p>
-                        <div class="image-generation-container mt-4 hidden">
-                            <div class="grid grid-cols-2 gap-4">
-                                ${imageSlotsHTML}
-                            </div>
-                        </div>`;
-                    promptsContainer.appendChild(card);
-                    
-                    const filterButton = document.createElement('button');
-                    filterButton.className = `filter-btn bg-gray-600 text-gray-200 text-sm font-semibold py-1 px-4 rounded-md hover:bg-indigo-500 transition-colors ${index === 0 ? 'active' : ''}`;
-                    filterButton.textContent = keyName.toUpperCase();
-                    filterButton.dataset.targetKey = keyName;
-                    filterButtonsContainer.appendChild(filterButton);
-                });
-                
-                filterButtonsWrapper.classList.remove('hidden');
-                
-                saveToHistory({ text, theme, details, style, background, textDimension, compDimension, angle, rotation, prompts: generatedPrompts });
-
-            } catch (error) {
-                console.error(`Erro ao gerar prompts ${type}:`, error);
-                errorMessage.textContent = `Ocorreu um erro ao gerar os prompts ${type}. Tente novamente.`;
-                errorMessage.classList.remove('hidden');
-            } finally {
-                loader.classList.add('hidden');
-            }
-        }
-        
-        const coreDirectives = (params) => {
-            let baseDirective = `
-                CORE DIRECTIVES FOR A RICH COMPOSITION:
-                1.  Self-Contained Design: The final result MUST be a self-contained badge emblem logo, NOT a scene or landscape.
-            `;
-            if (params.text) {
-                baseDirective += `2. Main Text: The text "${params.text}" is the absolute centerpiece. The focus is the typographic object.\n`;
-            } else {
-                baseDirective += `2. No Main Text: The final result should be a purely illustrative emblem or logo without any text. The visual concept is described entirely in the "Additional Details" field.\n`;
-            }
-
-            if (params.details) {
-                baseDirective += `
-                3.  Source of Truth: The "Additional Details" field contains an expert description. Your primary task is to FAITHFULLY translate this description into the target style/renderer.
-                4.  Adapt, Don't Invent: Use the characters, typography, and composition elements from the "Additional Details". Do NOT invent new concepts. Your creativity should be focused on adapting the existing design to the new style.
-                `;
-            } else {
-                if (params.text) {
-                     baseDirective += `
-                        3.  Invent a Thematic Font Style: The typography for the text "${params.text}" must be a radical, visual representation of the theme "${params.theme}". Do not just use a standard font. Invent a new style where the letters themselves are constructed from thematic materials (e.g., for a 'Pirate' theme, letters made of weathered ship planks and gold coins).
-                     `;
-                }
-                baseDirective += `
-                4.  Include Thematic Characters: The logo MUST feature at least one character or mascot that embodies the theme. The character should interact with the text (if present) in a dynamic way (e.g., a ghost peeking from behind a 'Halloween' text).
-                5.  Build a Rich Composition: The typography and character must not exist in a void. They must be the centerpiece of a rich composition of thematic elements that form the body of the emblem/seal (e.g., for 'Halloween', surround the text with carved pumpkins, spider webs, and bats).
-                `;
-            }
-            return baseDirective.replace(/\*+/g, ''); // Remove all asterisks
-        };
-
-        const getAngleAndPositionRule = (params) => {
-            let rule = '';
-            if (params.angle === 'perspective') {
-                rule += ` The camera view for the entire composition MUST be in a dynamic perspective angle, not a flat front view.`;
-            } else if (params.angle === 'frontal'){
-                rule += ` The camera view for the entire composition MUST be a direct frontal shot.`;
-            }
-
-            if (params.rotation && params.text) {
-                const parts = params.rotation.match(/(\d+)\s*graus\s*à\s*(direita|esquerda)/i);
-                if (parts) {
-                    const degrees = parts[1];
-                    const direction = parts[2].toLowerCase();
-                    const rotationValue = direction === 'esquerda' ? -degrees : degrees;
-                    rule += ` Within this view, the main text object ITSELF MUST be rotated ${rotationValue} degrees on its Z-axis. This rotation applies only to the text, not the entire composition or camera angle.`;
-                }
-            }
-            return rule;
-        };
-
-        function openRefineModal(imageWrapper) {
-            activeImageWrapperForRefinement = imageWrapper;
-            refineInput.value = '';
-            refineError.classList.add('hidden');
-            refineModal.classList.remove('hidden');
-            refineInput.focus();
         }
 
-        function closeRefineModal() {
-            activeImageWrapperForRefinement = null;
-            const loader = refineSubmitBtn.querySelector('#refine-submit-loader');
-            loader.classList.add('hidden');
-            refineSubmitBtn.disabled = false;
-            refineModal.classList.add('hidden');
-        }
-
-        async function regenerateSingleImage(newPrompt, imageWrapper) {
-            const loader = imageWrapper.querySelector('.image-loader');
-            const imgElement = imageWrapper.querySelector('.generated-image');
-            const errorElement = imageWrapper.querySelector('.image-error');
-            const downloadBtn = imageWrapper.querySelector('.download-btn');
-            const refineBtn = imageWrapper.querySelector('.refine-btn');
-
-            loader.classList.remove('hidden');
-            imgElement.classList.add('hidden');
-            errorElement.classList.add('hidden');
-            downloadBtn.classList.add('hidden');
-            refineBtn.classList.add('hidden');
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: newPrompt }] }],
-                generationConfig: {
-                    responseModalities: ['IMAGE'],
-                    imageConfig: { targetSize: 2048 }
-                },
-            };
-
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`HTTP ${response.status}: ${errorData.error?.message || 'Erro da API'}`);
-                }
-                const result = await response.json();
-                const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-
-                if (base64Data) {
-                    const imageUrl = `data:image/png;base64,${base64Data}`;
-                    imgElement.src = imageUrl;
-                    downloadBtn.href = imageUrl;
-                    imgElement.classList.remove('hidden');
-                    downloadBtn.classList.remove('hidden');
-                    refineBtn.classList.remove('hidden');
-                } else {
-                    throw new Error('Resposta inválida da API.');
-                }
-            } catch (error) {
-                console.error('Erro na regeneração da imagem:', error);
-                errorElement.textContent = error.message || 'Falha na regeneração.';
-                errorElement.classList.remove('hidden');
-            } finally {
-                loader.classList.add('hidden');
-            }
-        }
-
-        async function handleRefineSubmit() {
-            if (!activeImageWrapperForRefinement) return;
-
-            refineError.classList.add('hidden');
-            const refinementRequest = refineInput.value.trim();
-            if (!refinementRequest) {
-                refineError.textContent = 'Por favor, insira uma modificação.';
-                refineError.classList.remove('hidden');
-                return;
-            }
-
-            const loader = refineSubmitBtn.querySelector('#refine-submit-loader');
-            loader.classList.remove('hidden');
-            refineSubmitBtn.disabled = true;
-
-            const promptCard = activeImageWrapperForRefinement.closest('.prompt-card');
-            const originalPrompt = promptCard.querySelector('.prompt-text').textContent;
-
-            const metaPrompt = `
-                As an expert prompt engineer, your task is to rewrite an existing image generation prompt based on a user's modification request.
-                Do NOT add any explanatory text, commentary, or markdown formatting. Your output MUST be only the new, rewritten prompt string.
-
-                Original Prompt:
-                "${originalPrompt}"
-
-                User's Modification Request:
-                "${refinementRequest}"
-
-                New, Rewritten Prompt:
-            `;
-
-            try {
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                const payload = { contents: [{ parts: [{ text: metaPrompt }] }] };
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const result = await response.json();
-                const newPrompt = result.candidates[0].content.parts[0].text.trim();
-
-                await regenerateSingleImage(newPrompt, activeImageWrapperForRefinement);
-                closeRefineModal();
-
-            } catch (error) {
-                console.error("Erro ao refinar o prompt:", error);
-                refineError.textContent = "Ocorreu um erro ao refinar o prompt. Tente novamente.";
-                refineError.classList.remove('hidden');
-            } finally {
-                loader.classList.add('hidden');
-                refineSubmitBtn.disabled = false;
-            }
-        }
-
-
-        async function generateImage(promptText, cardElement) {
-            const imageContainer = cardElement.querySelector('.image-generation-container');
-            const imageWrappers = cardElement.querySelectorAll('.generated-image-wrapper');
-            
-            if (!imageContainer || imageWrappers.length !== 4) return;
-
-            // Show container and reset all slots
-            imageContainer.classList.remove('hidden');
-            imageWrappers.forEach(wrapper => {
-                wrapper.querySelector('.image-loader').classList.remove('hidden');
-                wrapper.querySelector('.generated-image').classList.add('hidden');
-                wrapper.querySelector('.image-error').classList.add('hidden');
-                wrapper.querySelector('.download-btn').classList.add('hidden');
-            });
-            
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: promptText }] }],
-                generationConfig: {
-                    responseModalities: ['IMAGE'],
-                    imageConfig: {
-                        targetSize: 2048
-                    }
-                },
-            };
-
-            const generationPromises = Array(4).fill().map(() => 
-                fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                }).then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errorData => {
-                            throw new Error(`HTTP ${response.status}: ${errorData.error?.message || 'Erro desconhecido da API'}`);
-                        });
-                    }
-                    return response.json();
-                })
-            );
-
-            const results = await Promise.allSettled(generationPromises);
-
-            results.forEach((result, index) => {
-                const wrapper = imageWrappers[index];
-                const loader = wrapper.querySelector('.image-loader');
-                const imgElement = wrapper.querySelector('.generated-image');
-                const errorElement = wrapper.querySelector('.image-error');
-                const downloadBtn = wrapper.querySelector('.download-btn');
-                const refineBtn = wrapper.querySelector('.refine-btn');
-
-                loader.classList.add('hidden');
-
-                if (result.status === 'fulfilled') {
-                    const apiResponse = result.value;
-                    const base64Data = apiResponse?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-
-                    if (base64Data) {
-                        const imageUrl = `data:image/png;base64,${base64Data}`;
-                        imgElement.src = imageUrl;
-                        downloadBtn.href = imageUrl;
-                        imgElement.classList.remove('hidden');
-                        downloadBtn.classList.remove('hidden');
-                        refineBtn.classList.remove('hidden');
-                    } else {
-                        errorElement.textContent = 'Resposta inválida da API.';
-                        errorElement.classList.remove('hidden');
-                    }
-                } else { // 'rejected'
-                    console.error(`Erro na geração da imagem ${index + 1}:`, result.reason);
-                    errorElement.textContent = result.reason.message || 'Falha na geração.';
-                    errorElement.classList.remove('hidden');
-                }
-            });
-        }
-
-        async function generate2DPrompts(params) {
-            loaderText.textContent = 'Gerando 11 estilos de ilustração 2D...';
-            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style', 'Hearthstone', 'Arcane', 'Guilty Gear', 'Genshin Impact', 'Tower of Fantasy'];
-            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
-            const angleAndPositionRule = getAngleAndPositionRule(params);
-            const mainTextDirective = params.text ? `Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
-            const themeDirective = params.text ? `Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 11 distinct prompts for a 2D image AI to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 11 prompts for these styles: ${illustrationStyles.join(', ')}. Adapt the core concept to each style's conventions (e.g., for 'Procreate', describe a digital painting look with rich textures; for 'Sticker Style', describe a die-cut look with a thick white border; for 'Hearthstone', describe a highly detailed 2D cartoon-fantasy digital painting with vibrant, saturated colors, soft outlines, delicate shadows, and dramatic lighting, mimicking the polished, epic, and magical art style of the game Hearthstone; for 'Arcane', describe a detailed and cinematic 2D digital painting in the style of the series Arcane: League of Legends, featuring rich textures, visible brushstrokes, intense yet harmonious colors, and dramatic, cinematic lighting with strong contrasts, conveying emotion and intensity with stylized realism; for 'Guilty Gear', describe a stylized and dynamic 2D digital art piece that simulates 3D cell shading, in the style of Guilty Gear: STRIVE, with strong lines, vibrant colors, and marked anime-style shading, featuring a dramatic, high-energy pose, cinematic lighting, and exaggerated expressiveness; for 'Genshin Impact', describe a highly detailed fantasy anime-style illustration with soft, vibrant colors, delicate digital painting, atmospheric lighting, and fine lines, conveying a magical, poetic, and ethereal feel with ornate fantasy details and a polished look; for 'Tower of Fantasy', describe a highly detailed futuristic anime-style illustration with clean lines, vibrant and saturated colors, clear lighting, and smooth shading, mixing fantasy and technology with stylized outfits, tech armor, and a modern, polished sci-fi aesthetic). ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 11 strings.`;
-            await executePromptGeneration(params, masterPrompt, illustrationStyles, '2D');
-        }
-
-        async function generate3DPrompts(params) {
-            loaderText.textContent = 'Gerando prompts 3D...';
-            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5', 'Hyperion Render'];
-            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
-            const angleAndPositionRule = getAngleAndPositionRule(params);
-            const mainTextDirective = params.text ? `Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
-            const themeDirective = params.text ? `Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 7 professional prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} Create 7 prompts for these renderers: ${renderers.join(', ')}. For 'Hyperion Render', describe a prompt that combines the hyper-detailed organic sculpting of ZBrush with the photorealistic deferred rendering, global illumination, and advanced material properties (PBR, displacement) of Unreal Engine 5, mentioning the use of the Movie Render Queue for final output. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 7 strings.`;
-            await executePromptGeneration(params, masterPrompt, renderers, '3D');
-        }
-
-        async function generateMixed3DText2DCompPrompts(params) {
-            loaderText.textContent = 'Gerando prompts mistos (Texto 3D / Comp. 2D)...';
-            const illustrationStyles = ['Design PSD', 'Procreate', 'Watercolor', 'Anime/Manga', 'Vintage Cartoon', 'Sticker Style', 'Hearthstone', 'Arcane', 'Guilty Gear', 'Genshin Impact', 'Tower of Fantasy'];
-            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}". For "transparent", use "isolated on white background, png".`;
-            const angleAndPositionRule = getAngleAndPositionRule(params);
-            const mainTextDirective = params.text ? `3D Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
-            const themeDirective = params.text ? `2D Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 11 prompts for a 2D image AI, creating a "trompe-l'oeil" effect self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a photorealistic 3D object, while the characters and composition elements must be 2D. Create 11 prompts for these 2D composition styles: ${illustrationStyles.join(', ')}. Emphasize the 3D text vs 2D background contrast (e.g., for 'Hearthstone', describe a highly detailed 2D cartoon-fantasy digital painting with vibrant, saturated colors, soft outlines, delicate shadows, and dramatic lighting, mimicking the polished, epic, and magical art style of the game Hearthstone; for 'Arcane', describe a detailed and cinematic 2D digital painting in the style of the series Arcane: League of Legends, featuring rich textures, visible brushstrokes, intense yet harmonious colors, and dramatic, cinematic lighting with strong contrasts, conveying emotion and intensity with stylized realism; for 'Guilty Gear', describe a stylized and dynamic 2D digital art piece that simulates 3D cell shading, in the style of Guilty Gear: STRIVE, with strong lines, vibrant colors, and marked anime-style shading, featuring a dramatic, high-energy pose, cinematic lighting, and exaggerated expressiveness; for 'Genshin Impact', describe a highly detailed fantasy anime-style illustration with soft, vibrant colors, delicate digital painting, atmospheric lighting, and fine lines, conveying a magical, poetic, and ethereal feel with ornate fantasy details and a polished look; for 'Tower of Fantasy', describe a highly detailed futuristic anime-style illustration with clean lines, vibrant and saturated colors, clear lighting, and smooth shading, mixing fantasy and technology with stylized outfits, tech armor, and a modern, polished sci-fi aesthetic). ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 11 strings.`;
-            await executePromptGeneration(params, masterPrompt, illustrationStyles, 'MISTO (TEXTO 3D)');
-        }
-
-        async function generateMixed2DText3DCompPrompts(params) {
-            loaderText.textContent = 'Gerando prompts mistos (Texto 2D / Comp. 3D)...';
-            const renderers = ['V-Ray', 'Lumion', 'Twinmotion', 'Enscape', 'D5 Render', 'Unreal Engine 5', 'Hyperion Render'];
-            const backgroundRule = params.background.includes('designer') ? `Creative freedom for background.` : `Background MUST be: "${params.background}".`;
-            const angleAndPositionRule = getAngleAndPositionRule(params);
-            const mainTextDirective = params.text ? `2D Main Text: "${params.text}",` : `Main Concept (No Text): Focus on the details provided,`;
-            const themeDirective = params.text ? `3D Theme: "${params.theme}",` : '';
-            const masterPrompt = `Objective: Generate 7 prompts for 3D renderers to create a self-contained badge emblem logo. ${mainTextDirective} ${themeDirective} Details: "${params.details}". ${coreDirectives(params)} The text must be described as a flat 2D graphic (decal, print) on a surface, while the characters and composition elements are photorealistic 3D. Create 7 prompts for these renderers: ${renderers.join(', ')}. For 'Hyperion Render', describe a prompt that combines the hyper-detailed organic sculpting of ZBrush for the composition elements with the photorealistic deferred rendering of Unreal Engine 5, mentioning the use of the Movie Render Queue. ${angleAndPositionRule} Background rule: ${backgroundRule}. Output Format: JSON with a "prompts" array of 7 strings.`;
-            await executePromptGeneration(params, masterPrompt, renderers, 'MISTO (TEXTO 2D)');
-        }
-
-        filterButtonsContainer.addEventListener('click', (e) => {
-            const clickedButton = e.target.closest('.filter-btn');
-            if (clickedButton) {
-                const targetKey = clickedButton.dataset.targetKey;
-                
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                clickedButton.classList.add('active');
-
-                let targetCard;
-                document.querySelectorAll('.prompt-card').forEach(card => {
-                    const imageContainer = card.querySelector('.image-generation-container');
-                    if (card.dataset.key === targetKey) {
-                        card.classList.remove('hidden');
-                        card.classList.add('flex');
-                        targetCard = card;
-                    } else {
-                        card.classList.add('hidden');
-                        card.classList.remove('flex');
-                        if (imageContainer) imageContainer.classList.add('hidden');
-                    }
-                });
-
-                if (targetCard) {
-                    const textToCopy = targetCard.querySelector('.prompt-text').textContent;
-                    // Always generate a new set of images on click
-                    generateImage(textToCopy, targetCard);
-                    copyToClipboard(textToCopy, clickedButton);
-                }
-            }
-        });
-        
-        promptsContainer.addEventListener('click', (e) => {
-            const refineButton = e.target.closest('.refine-btn');
-            if (refineButton) {
-                const imageWrapper = refineButton.closest('.generated-image-wrapper');
-                openRefineModal(imageWrapper);
-            }
-        });
-
-        refineCancelBtn.addEventListener('click', closeRefineModal);
-        refineSubmitBtn.addEventListener('click', handleRefineSubmit);
-        refineModal.addEventListener('click', (e) => {
-            if (e.target === refineModal) {
-                closeRefineModal();
-            }
-        });
-
-        function setupRadioDeselection() {
-            const radioGroups = ['angle-option', 'rotation-direction', 'background-option'];
-            radioGroups.forEach(groupName => {
-                let lastChecked = null;
-                const radios = document.querySelectorAll(`input[name="${groupName}"]`);
-                radios.forEach(radio => {
-                    radio.addEventListener('click', function() {
-                        if (this === lastChecked) {
-                            this.checked = false;
-                            lastChecked = null;
-                        } else {
-                            lastChecked = this;
-                        }
-                    });
-                });
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-             displayHistory();
-             setupRadioDeselection();
-        });
     </script>
 </body>
 </html>
-
-
-
 
