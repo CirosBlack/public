@@ -6,6 +6,12 @@
     "link": "https://cirosblack.github.io/CirosBlack/Courses/Cinema4D"
   },
   {
+     "title": "Cinema 4D",
+    "category": "3D",
+    "image": "https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/Cinema4D/c4.png",
+    "link": "https://cirosblack.github.io/public/Cursos/Packshot_NativaSPA/"
+  },
+  {
     "title": "AdobeIlustrator",
     "category": "3D",
     "image": "https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Courses/AdobeIlustrator/capa.png",
