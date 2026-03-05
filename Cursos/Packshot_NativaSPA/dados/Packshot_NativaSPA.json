@@ -1,6 +1,9 @@
 {
   "serie": "Packshot NativaSPA",
   "episodios": [
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rm9ybWHDp8OjbyAzRA/UGFja3Nob3QgTmF0aXZhU1BB/001.mp4", "audioSrc": "", "title": "Packshot NativaSPA - Conteúdo completo - Início ao Fim" }
+    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rm9ybWHDp8OjbyAzRA/UGFja3Nob3QgTmF0aXZhU1BB/001.mp4", "audioSrc": "", "title": "Packshot NativaSPA - Conteúdo completo - Início ao Fim" },
+    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rm9ybWHDp8OjbyAzRA/UGFja3Nob3QgUGVyZnVtZQ/001.mp4", "audioSrc": "", "title": "Packshot Perfume - Modelagem do Frasco" },
+    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rm9ybWHDp8OjbyAzRA/UGFja3Nob3QgUGVyZnVtZQ/002.mp4", "audioSrc": "", "title": "Packshot Perfume - Líquido e Tampa" },
+    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rm9ybWHDp8OjbyAzRA/UGFja3Nob3QgUGVyZnVtZQ/003.mp4", "audioSrc": "", "title": "Packshot Perfume - Cenário e Iluminação" }
   ]
 }
