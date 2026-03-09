@@ -1,55 +1,225 @@
 {
-  "serie": "Flashman",
+  "serie": "Changeman",
   "episodios": [
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/001.mp4", "title": "A Terra Em Perigo" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/002.mp4", "title": "O Robô Gigante" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/003.mp4", "title": "O Caçador" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/004.mp4", "title": "O Robô Mag" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/005.mp4", "title": "O Sucesso Das Guerreiras" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/006.mp4", "title": "A Super Máquina" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/007.mp4", "title": "O Balão Dos Sonhos" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/008.mp4", "title": "A Família" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/009.mp4", "title": "O Guerreiro Do Tempo" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/010.mp4", "title": "A Cilada Da Menina" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/011.mp4", "title": "A Mãe Do Monstro" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/012.mp4", "title": "Wandar, O Super Vilão" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/013.mp4", "title": "Guerreiro Intrépido" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/014.mp4", "title": "O Sonho De Gô" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/015.mp4", "title": "O Extermínio Do Robô" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/016.mp4", "title": "A Estratégia" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/017.mp4", "title": "Máquina Enigmática" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/018.mp4", "title": "A Reviravolta Do Robô" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/019.mp4", "title": "Mensagem Mortal" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/020.mp4", "title": "A Ressurreição Do Robô" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/021.mp4", "title": "Triste Guerreira" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/022.mp4", "title": "Pássaro Imortal" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/023.mp4", "title": "Sonho Dourado" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/024.mp4", "title": "Férias Secretas" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/025.mp4", "title": "Fusão Conversão" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/026.mp4", "title": "Abóboras Selvagens" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/027.mp4", "title": "Golpe Da Amizade" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/028.mp4", "title": "O Magnífico Gals" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/029.mp4", "title": "Abominável Alienígena" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/030.mp4", "title": "Diabólica Nefer" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/031.mp4", "title": "Guerreiros Indefesos" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/032.mp4", "title": "Querido Mascote" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/033.mp4", "title": "Meu Pai, Meu Herói" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/034.mp4", "title": "O Destino De Gô" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/035.mp4", "title": "Canção Celestial" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/036.mp4", "title": "Bicho Metálico" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/037.mp4", "title": "Amor Das Trevas" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/038.mp4", "title": "Hora Fatal" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/039.mp4", "title": "Furor Da Tempestade" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/040.mp4", "title": "A Cidade Do Terror" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/041.mp4", "title": "A Infância" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/042.mp4", "title": "Guerreira, Não Chore" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/043.mp4", "title": "A Revolta De Kaura" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/044.mp4", "title": "A Vinda Do Monstro Guerreiro" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/045.mp4", "title": "Deixem A Terra Em Paz" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/046.mp4", "title": "20 Dias De Vida" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/047.mp4", "title": "O Grito Da Morte" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/048.mp4", "title": "Kaura, É O Seu Fim" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/049.mp4", "title": "De Encontro A La Deus" },
-    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rmxhc2htYW4/050.mp4", "title": "Adeus Planeta Terra" }
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp1",
+      "title": "Os defensores do planeta Terra"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp2",
+      "title": "A ira do poderoso Bazoo"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp3",
+      "title": "O desespero de Zoobie"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp4",
+      "title": "O desaparecimento de Togo"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp5",
+      "title": "O mistério do cristal X"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp6",
+      "title": "Cuidado, meninas de virgem"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp7",
+      "title": "O enviado do planeta Atlanta"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp8",
+      "title": "As mulheres vampiras"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp9",
+      "title": "A bola Dragão salva a humanidade"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp10",
+      "title": "O toque dos bonecos"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp11",
+      "title": "A visita de Koko e Kiki"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp12",
+      "title": "Mermaid se torna mãe"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp13",
+      "title": "A Garota Do Planeta Technolíquel"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp14",
+      "title": "Perdida Na Terra"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp15",
+      "title": "A Motoqueira Mai"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp16",
+      "title": "O Anjo Do Planeta Meril"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp17",
+      "title": "O Navio Fantasma"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp18",
+      "title": "O Poder De Ahames"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp19",
+      "title": "A Fúria De Sayaka"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp20",
+      "title": "A Revanche De Giluke"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp21",
+      "title": "O Metaleiro Espacial"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp22",
+      "title": "A Prisioneira Do Espelho"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp23",
+      "title": "O Menino E O Golfinho"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp24",
+      "title": "A Fuga De Gyodai"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp25",
+      "title": "Canção Fatal"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp26",
+      "title": "Toque Da Primavera"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp27",
+      "title": "O Sonho Da Família Gata"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp28",
+      "title": "A Maldição Sangrenta"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp29",
+      "title": "A Lenda Da Borboleta Dourada"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp30",
+      "title": "Avante, Pégasus!"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp31",
+      "title": "O Segredo De Bazoo"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp32",
+      "title": "Reencontro Perigoso"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp33",
+      "title": "O Fim De Giluke"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp34",
+      "title": "Invencível Ahames"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp35",
+      "title": "S.O.S. Planeta Terra!"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp36",
+      "title": "A Super Potência"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp37",
+      "title": "O Desaparecimento De Dragon"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp38",
+      "title": "O Espectro Do Baseball"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp39",
+      "title": "O Jogo Do Medo"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp40",
+      "title": "O Estranho Doce"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp41",
+      "title": "O Príncipe Das Estrelas"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp42",
+      "title": "A Garota De Uniforme Escolar"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp43",
+      "title": "O Super Giluke"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp44",
+      "title": "Mai Em Ação"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp45",
+      "title": "Aira, A Menina Do Arco-Íris"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp46",
+      "title": "A Transformação De Shima"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp47",
+      "title": "O Sofrimento Da Família Gata"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp48",
+      "title": "A Paixão De Buba"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp49",
+      "title": "A Aflição De Shima"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp50",
+      "title": "O Abalo De Gozma"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp51",
+      "title": "A Mensagem De Nana"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp52",
+      "title": "A Morte De Buba"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp53",
+      "title": "A Vingança De Ahames"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp54",
+      "title": "A Última Batalha"
+    },
+    {
+      "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Q2hhbmdlbWFt/001.mp55",
+      "title": "Adeus, Heróis Do Universo!"
+    }
   ]
 }
