@@ -4,18 +4,7 @@
     {
       "nome": "Packshot NativaSPA",
       "episodios": [
-        {"src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rm9ybWHDp8OjbyAzRA/UGFja3Nob3QgTmF0aXZhU1BB/001.mp4",
-          "audioSrc": "",
-          "title": "Packshot NativaSPA - Conteúdo completo - Início ao Fim", "downloads": [
-            { "nome": "Opção 1", "url": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/SmFzcGlvbg/001.mp4?download=true" },
-            { "nome": "Opção 2", "url": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/SmFzcGlvbg/001.mp4?download=true" }
-        
-      ],
-      "downloads": [
-        {
-          "nome": "Opção 1",
-          "url": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/SmFzcGlvbg/001.mp4?download=true"
-        }
+        { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/Rm9ybWHDp8OjbyAzRA/UGFja3Nob3QgTmF0aXZhU1BB/001.mp4", "audioSrc": "", "title": "Packshot NativaSPA - Conteúdo completo - Início ao Fim", "arquivoDownload": "" }
       ]
     },
     {
