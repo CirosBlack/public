@@ -349,6 +349,13 @@ body {
   background-color: #444;
 }
 
+/* Container flexível para os botões de download */
+.download-buttons-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .download-btn {
   display: none;
   color: #fff;
@@ -484,9 +491,9 @@ body {
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s ease-in-out; /* ATUALIZADO */
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s ease-in-out; 
   outline: none;
-  box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7); /* Estado inicial da animação */
+  box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7); 
 }
 
 #resumeConfirmBtn {
@@ -511,12 +518,10 @@ body {
   background-color: #555;
 }
 
-/* ATUALIZADO: Estilo para o botão focado pelo teclado com animação */
 .resume-buttons button.focused {
   transform: scale(1.05);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
 }
-
 
 /* --- ESTILOS PARA A BARRA DE NAVEGAÇÃO --- */
 nav a { text-decoration: none; }
@@ -534,7 +539,6 @@ nav a { text-decoration: none; }
 .font-bold { font-weight: 700; }
 
 /* --- Media Queries --- */
-
 @media (min-width: 640px) {
   .sm\:gap-5 { gap: 1.25rem; }
 }
@@ -557,3 +561,58 @@ nav a { text-decoration: none; }
   #volumeSlider { width: 50px; }
 }
 
+/* --- ESTILOS DOS GRUPOS DA PLAYLIST (SESSÕES) --- */
+.playlist-group {
+  margin-bottom: 5px;
+  background-color: #222;
+  border-radius: 4px;
+}
+
+.playlist-group summary {
+  background-color: #111;
+  color: #ef4444; 
+  padding: 12px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #333;
+  list-style: none; 
+  outline: none;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.playlist-group summary::-webkit-details-marker {
+  display: none;
+}
+
+.playlist-group summary::after {
+  content: "▼";
+  font-size: 0.8rem;
+  color: #888;
+  transition: transform 0.3s ease;
+}
+
+.playlist-group[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.group-list {
+  padding: 5px;
+  list-style: none;
+}
+
+.group-list li {
+  margin-bottom: 2px !important;
+  border-radius: 2px !important;
+}
+
+.fullscreen-playlist-container .playlist-group {
+    background: transparent;
+}
+.fullscreen-playlist-container .playlist-group summary {
+    background: transparent;
+    border-bottom: 1px solid #444;
+}
