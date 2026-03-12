@@ -100,12 +100,12 @@
         <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
       </nav>
     </div>
-    <ul id="playlist"></ul>
+    <div id="playlist"></div>
   </div>
 
 
   <script>
- // Elementos do DOM
+// Elementos do DOM
 const videoPlayer = document.getElementById('videoPlayer');
 const playlist = document.getElementById('playlist');
 const prevBtn = document.getElementById('prevBtn');
@@ -150,12 +150,9 @@ let serieKey;
 let lastSaveTime = 0;
 let lastPlayTimestamp = 0;
 let focusedButtonIndex = 0;
-
-// NOVO: Elemento de áudio externo
 let externalAudio = new Audio();
 
 // --- FUNÇÕES ---
-
 function saveProgress() {
   if (!serieKey || isNaN(videoPlayer.currentTime) || videoPlayer.currentTime < 10) return;
   localStorage.setItem(`${serieKey}_episodeIndex`, currentIndex);
@@ -170,11 +167,10 @@ function loadVideo(index, time = 0, shouldPlay = true) {
   videoPlayer.src = currentVideo.src;
   episodeTitle.textContent = currentVideo.title;
 
-  // Lógica de Áudio Externo
   if (currentVideo.audioSrc) {
     externalAudio.src = currentVideo.audioSrc;
     externalAudio.load();
-    videoPlayer.muted = true; // Muta o vídeo original se houver áudio externo
+    videoPlayer.muted = true;
   } else {
     externalAudio.pause();
     externalAudio.src = "";
@@ -197,7 +193,6 @@ function loadVideo(index, time = 0, shouldPlay = true) {
   scrollPlaylistToCurrent();
 }
 
-// Funções de sincronização de Play/Pause
 function playAll() {
     const playPromise = videoPlayer.play();
     if (playPromise !== undefined) {
@@ -212,11 +207,10 @@ function pauseAll() {
     if (externalAudio.src) externalAudio.pause();
 }
 
-// Sincronização em tempo real (Garante que o áudio não saia de fase)
 videoPlayer.addEventListener('timeupdate', () => {
     if (externalAudio.src && !externalAudio.paused) {
         const diff = Math.abs(videoPlayer.currentTime - externalAudio.currentTime);
-        if (diff > 0.15) { // Se a diferença for maior que 150ms, resincroniza
+        if (diff > 0.15) { 
             externalAudio.currentTime = videoPlayer.currentTime;
         }
     }
@@ -240,33 +234,83 @@ function updateButtonFocus() {
     });
 }
 
-function generatePlaylist() {
+function generatePlaylist(sessoes) {
   playlist.innerHTML = "";
-  videos.forEach((video, index) => {
-    const li = document.createElement('li');
-    li.dataset.index = index;
-    li.innerHTML = `
-      <span class="episode-title">${video.title}</span>
-      <a href="${video.src}?download=true" class="download-btn" download>Download</a>
-    `;
-    
-    // ATUALIZAÇÃO: Impede que o clique no link de download dispare o loadVideo do elemento li
-    const downloadBtn = li.querySelector('.download-btn');
-    downloadBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); 
+  if (!sessoes) return;
+
+  sessoes.forEach((sessao, sessaoIndex) => {
+    const details = document.createElement('details');
+    details.className = 'playlist-group';
+    if(sessaoIndex === 0) details.open = true;
+
+    const summary = document.createElement('summary');
+    summary.textContent = sessao.nome;
+    details.appendChild(summary);
+
+    const ul = document.createElement('ul');
+    ul.className = 'group-list';
+
+    sessao.episodios.forEach(video => {
+      const li = document.createElement('li');
+      li.dataset.index = video.globalIndex; 
+
+      let downloadsHTML = '';
+      if (video.downloads && video.downloads.length > 0) {
+        video.downloads.forEach(dl => {
+          downloadsHTML += `<a href="${dl.url}" class="download-btn" download target="_blank">${dl.nome}</a>`;
+        });
+      } else {
+        const linkPadrao = video.arquivoDownload ? video.arquivoDownload : `${video.src}?download=true`;
+        downloadsHTML = `<a href="${linkPadrao}" class="download-btn" download target="_blank">Download</a>`;
+      }
+
+      li.innerHTML = `
+        <span class="episode-title">${video.title}</span>
+        <div class="download-buttons-container">
+          ${downloadsHTML}
+        </div>
+      `;
+      
+      const botoesDownload = li.querySelectorAll('.download-btn');
+      botoesDownload.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+        });
+      });
+
+      ul.appendChild(li);
     });
 
-    playlist.appendChild(li);
+    details.appendChild(ul);
+    playlist.appendChild(details);
   });
 }
 
-function generateFullscreenPlaylist() {
+function generateFullscreenPlaylist(sessoes) {
     fullscreenPlaylist.innerHTML = "";
-    videos.forEach((video, index) => {
-        const li = document.createElement('li');
-        li.dataset.index = index;
-        li.textContent = video.title;
-        fullscreenPlaylist.appendChild(li);
+    if (!sessoes) return;
+
+    sessoes.forEach((sessao, sessaoIndex) => {
+        const details = document.createElement('details');
+        details.className = 'playlist-group';
+        if(sessaoIndex === 0) details.open = true;
+        
+        const summary = document.createElement('summary');
+        summary.textContent = sessao.nome;
+        details.appendChild(summary);
+        
+        const ul = document.createElement('ul');
+        ul.className = 'group-list';
+
+        sessao.episodios.forEach(video => {
+            const li = document.createElement('li');
+            li.dataset.index = video.globalIndex;
+            li.textContent = video.title;
+            ul.appendChild(li);
+        });
+
+        details.appendChild(ul);
+        fullscreenPlaylist.appendChild(details);
     });
 }
 
@@ -297,6 +341,10 @@ function highlightCurrentItem() {
 function scrollPlaylistToCurrent() {
   const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
   if (currentItem) {
+    const parentDetails = currentItem.closest('details');
+    if (parentDetails && !parentDetails.open) {
+        parentDetails.open = true;
+    }
     currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
@@ -341,7 +389,7 @@ function toggleMute() {
     const isMuted = (videoPlayer.muted && (externalAudio.src ? externalAudio.muted : true)) || videoPlayer.volume === 0;
     
     if (isMuted) {
-        videoPlayer.muted = externalAudio.src ? true : false; // Vídeo continua mudo se houver áudio ext
+        videoPlayer.muted = externalAudio.src ? true : false; 
         if (externalAudio.src) externalAudio.muted = false;
         videoPlayer.volume = lastVolume;
         if (externalAudio.src) externalAudio.volume = lastVolume;
@@ -399,19 +447,34 @@ function resetControlsTimeout() {
   }, 3000);
 }
 
-
 // --- EVENT LISTENERS ---
-
 window.addEventListener('load', () => {
   fetch('dados/Packshot_NativaSPA.json')
     .then(res => res.json())
     .then(data => {
-      videos = data.episodios || [];
       serieKey = data.serie; 
       document.title = serieKey;
 
-      generatePlaylist();
-      generateFullscreenPlaylist();
+      videos = [];
+      let globalIndex = 0;
+
+      if (data.sessoes) {
+          data.sessoes.forEach(sessao => {
+              sessao.episodios.forEach(video => {
+                  video.globalIndex = globalIndex;
+                  videos.push(video);
+                  globalIndex++;
+              });
+          });
+          generatePlaylist(data.sessoes);
+          generateFullscreenPlaylist(data.sessoes);
+      } else {
+          videos = data.episodios || [];
+          videos.forEach((video, index) => { video.globalIndex = index; });
+          const sessaoUnica = [{ nome: "Todos os Episódios", episodios: videos }];
+          generatePlaylist(sessaoUnica);
+          generateFullscreenPlaylist(sessaoUnica);
+      }
 
       const savedIndex = parseInt(localStorage.getItem(`${serieKey}_episodeIndex`)) || 0;
       const savedTime = parseFloat(localStorage.getItem(`${serieKey}_currentTime`)) || 0;
@@ -425,7 +488,6 @@ window.addEventListener('load', () => {
         loadVideo(savedIndex, savedTime, false); 
       } else {
         loadVideo(0, 0, false);
-        // Autoplay logic
         const playPromise = videoPlayer.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
@@ -480,7 +542,6 @@ videoPlayer.addEventListener('pause', () => {
 
 videoPlayer.addEventListener('ended', () => { if (currentIndex + 1 < videos.length) loadVideo(currentIndex + 1); });
 
-// Dragging / Seeking
 progressContainer.addEventListener('mousedown', (e) => { 
     isDragging = true; 
     wasPausedBeforeDrag = videoPlayer.paused; 
@@ -494,7 +555,6 @@ document.addEventListener('mouseup', () => {
     } 
 });
 
-// Eventos de volume e interface
 volumeBtn.addEventListener('click', toggleMute);
 volumeSlider.addEventListener('input', handleVolumeChange);
 videoPlayer.addEventListener('volumechange', updateVolumeUI);
@@ -507,20 +567,25 @@ skipIntroBtn.addEventListener('click', () => {
 nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
 pauseIcon.addEventListener('click', () => { playAll(); });
 
-// ATUALIZAÇÃO: Verificação adicional para ignorar o clique no botão de download dentro da playlist
 playlist.addEventListener('click', (e) => { 
   if (e.target.classList.contains('download-btn')) return;
   const li = e.target.closest('li'); 
   if (li && li.dataset.index) loadVideo(parseInt(li.dataset.index)); 
 });
 
-fullscreenPlaylist.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li && li.dataset.index) { loadVideo(parseInt(li.dataset.index, 10)); fullscreenPlaylistContainer.classList.remove('visible'); } });
+fullscreenPlaylist.addEventListener('click', (e) => { 
+  const li = e.target.closest('li'); 
+  if (li && li.dataset.index) { 
+    loadVideo(parseInt(li.dataset.index, 10)); 
+    fullscreenPlaylistContainer.classList.remove('visible'); 
+  } 
+});
+
 playlistBtn.addEventListener('click', () => { fullscreenPlaylistContainer.classList.toggle('visible'); resetControlsTimeout(); });
 toggleDownloadsBtn.addEventListener('click', () => { playlistContainer.classList.toggle('show-downloads'); });
 videoContainer.addEventListener('mousemove', showControlsAndReset);
 videoContainer.addEventListener('touchstart', showControlsAndReset);
 
-// Click no container para pause/fullscreen
 videoContainer.addEventListener('click', (e) => {
   if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn') || e.target.closest('#pauseIcon')) {
     resetControlsTimeout(); return;
@@ -544,7 +609,6 @@ videoContainer.addEventListener('click', (e) => {
   }
 });
 
-// --- CONTROLES GLOBAIS ---
 if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('previoustrack', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
   navigator.mediaSession.setActionHandler('nexttrack', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
@@ -580,9 +644,3 @@ document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
 </html>
-
-
-
-
-
-
